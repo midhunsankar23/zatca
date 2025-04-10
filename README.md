@@ -5,6 +5,7 @@ The ZATCA package provides tools for generating and managing e-invoices complian
 ## Features
 
 - Generate ZATCA-compliant QR codes for invoices.
+- Generate ZATCA-compliant XML codes for invoices.
 - Create and manage invoice data models.
 - Support for signing invoices with private keys and certificates.
 - Easy integration with Flutter and Dart projects.
