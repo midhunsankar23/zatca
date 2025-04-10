@@ -1,7 +1,7 @@
 name: zatca
 description: "zatca invoice and qr genration"
 version: 0.0.2
-homepage:
+homepage: https://github.com/sbrsubuvga/zatca.git
 
 environment:
   sdk: ^3.7.2
