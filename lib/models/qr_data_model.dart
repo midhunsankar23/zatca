@@ -22,4 +22,31 @@ class ZatcaQr {
     required this.invoiceData,
     required this.xmlString,
   });
+
+  factory ZatcaQr.fromMap(Map<String, dynamic> json) {
+    return ZatcaQr(
+      sellerName: json['sellerName'] ?? '',
+      sellerTRN: json['sellerTRN'] ?? '',
+      issueDate: json['issueDate'] ?? '',
+      invoiceHash: json['invoiceHash'] ?? '',
+      digitalSignature: json['digitalSignature'] ?? '',
+      publicKey: json['publicKey'] ?? '',
+      certificateSignature: json['certificateSignature'] ?? '',
+      invoiceData: ZatcaInvoice.fromMap(json['invoiceData']),
+      xmlString: json['xmlString'] ?? '',
+    );
+  }
+  Map<String, dynamic> toMap() {
+    return {
+      'sellerName': sellerName,
+      'sellerTRN': sellerTRN,
+      'issueDate': issueDate,
+      'invoiceHash': invoiceHash,
+      'digitalSignature': digitalSignature,
+      'publicKey': publicKey,
+      'certificateSignature': certificateSignature,
+      'invoiceData': invoiceData.toMap(),
+      'xmlString': xmlString,
+    };
+  }
 }

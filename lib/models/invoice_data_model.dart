@@ -34,6 +34,50 @@ class ZatcaInvoice {
     required this.totalAmount,
     required this.previousInvoiceHash,
   });
+
+  factory ZatcaInvoice.fromMap(Map<String, dynamic> map) {
+    return ZatcaInvoice(
+      profileID: map['profileID'] ?? '',
+      id: map['id'] ?? '',
+      uuid: map['uuid'] ?? '',
+      issueDate: map['issueDate'] ?? '',
+      issueTime: map['issueTime'] ?? '',
+      invoiceTypeCode: map['invoiceTypeCode'] ?? '',
+      invoiceTypeName: map['invoiceTypeName'] ?? '',
+      note: map['note'] ?? '',
+      currencyCode: map['currencyCode'] ?? '',
+      taxCurrencyCode: map['taxCurrencyCode'] ?? '',
+      supplier: Supplier.fromMap(map['supplier']),
+      customer: Customer.fromMap(map['customer']),
+      invoiceLines:
+          (map['invoiceLines'] as List<dynamic>)
+              .map((line) => InvoiceLine.fromMap(line))
+              .toList(),
+      taxAmount: map['taxAmount'] ?? '',
+      totalAmount: map['totalAmount'] ?? '',
+      previousInvoiceHash: map['previousInvoiceHash'] ?? '',
+    );
+  }
+  Map<String, dynamic> toMap() {
+    return {
+      'profileID': profileID,
+      'id': id,
+      'uuid': uuid,
+      'issueDate': issueDate,
+      'issueTime': issueTime,
+      'invoiceTypeCode': invoiceTypeCode,
+      'invoiceTypeName': invoiceTypeName,
+      'note': note,
+      'currencyCode': currencyCode,
+      'taxCurrencyCode': taxCurrencyCode,
+      'supplier': supplier.toMap(),
+      'customer': customer.toMap(),
+      'invoiceLines': invoiceLines.map((line) => line.toMap()).toList(),
+      'taxAmount': taxAmount,
+      'totalAmount': totalAmount,
+      'previousInvoiceHash': previousInvoiceHash,
+    };
+  }
 }
 
 class Supplier {
@@ -46,6 +90,20 @@ class Supplier {
     required this.registrationName,
     required this.address,
   });
+  factory Supplier.fromMap(Map<String, dynamic> map) {
+    return Supplier(
+      companyID: map['companyID'] ?? '',
+      registrationName: map['registrationName'] ?? '',
+      address: Address.fromMap(map['address']),
+    );
+  }
+  Map<String, dynamic> toMap() {
+    return {
+      'companyID': companyID,
+      'registrationName': registrationName,
+      'address': address.toMap(),
+    };
+  }
 }
 
 class Customer {
@@ -58,6 +116,20 @@ class Customer {
     required this.registrationName,
     required this.address,
   });
+  factory Customer.fromMap(Map<String, dynamic> map) {
+    return Customer(
+      companyID: map['companyID'] ?? '',
+      registrationName: map['registrationName'] ?? '',
+      address: Address.fromMap(map['address']),
+    );
+  }
+  Map<String, dynamic> toMap() {
+    return {
+      'companyID': companyID,
+      'registrationName': registrationName,
+      'address': address.toMap(),
+    };
+  }
 }
 
 class Address {
@@ -76,6 +148,26 @@ class Address {
     required this.postalZone,
     this.countryCode = "SA",
   });
+  factory Address.fromMap(Map<String, dynamic> map) {
+    return Address(
+      streetName: map['streetName'] ?? '',
+      buildingNumber: map['buildingNumber'] ?? '',
+      citySubdivisionName: map['citySubdivisionName'] ?? '',
+      cityName: map['cityName'] ?? '',
+      postalZone: map['postalZone'] ?? '',
+      countryCode: map['countryCode'] ?? 'SA',
+    );
+  }
+  Map<String, dynamic> toMap() {
+    return {
+      'streetName': streetName,
+      'buildingNumber': buildingNumber,
+      'citySubdivisionName': citySubdivisionName,
+      'cityName': cityName,
+      'postalZone': postalZone,
+      'countryCode': countryCode,
+    };
+  }
 }
 
 class InvoiceLine {
@@ -94,4 +186,24 @@ class InvoiceLine {
     required this.itemName,
     required this.taxPercent,
   });
+  factory InvoiceLine.fromMap(Map<String, dynamic> map) {
+    return InvoiceLine(
+      id: map['id'] ?? '',
+      quantity: map['quantity'] ?? '',
+      unitCode: map['unitCode'] ?? '',
+      lineExtensionAmount: map['lineExtensionAmount'] ?? '',
+      itemName: map['itemName'] ?? '',
+      taxPercent: map['taxPercent'] ?? '',
+    );
+  }
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'quantity': quantity,
+      'unitCode': unitCode,
+      'lineExtensionAmount': lineExtensionAmount,
+      'itemName': itemName,
+      'taxPercent': taxPercent,
+    };
+  }
 }
