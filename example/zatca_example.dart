@@ -2,7 +2,7 @@ import 'package:zatca/models/invoice_data_model.dart';
 import 'package:zatca/resources/enums.dart';
 import 'package:zatca/zatca_manager.dart';
 
-void main(){
+void main() {
   final zatcaManager = ZatcaManager.instance;
   zatcaManager.initializeZacta(
     sellerName: "My Branch",
@@ -18,8 +18,12 @@ void main(){
         postalZone: "31952",
       ),
     ),
-    privateKeyBase64:"",///PrivateKey
-    certificateBase64:"",///"""-----BEGIN CERTIFICATE REQUEST-----\nCSRKEY\n-----END CERTIFICATE REQUEST-----",
+    privateKeyBase64: "",
+
+    ///PrivateKey
+    certificateBase64: "",
+
+    ///"""-----BEGIN CERTIFICATE REQUEST-----\nCSRKEY\n-----END CERTIFICATE REQUEST-----",
   );
 
   final qrData = zatcaManager.generateZatcaQrInit(

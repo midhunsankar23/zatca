@@ -82,4 +82,3 @@ Map<String, dynamic> parseCSR(String csrPem) {
     'signature': signatureBytes, // Raw signature bytes
   };
 }
-

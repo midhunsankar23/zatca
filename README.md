@@ -16,4 +16,4 @@ To use this package, add it to your `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  zatca: ^0.0.1
+  zatca: ^0.0.4
