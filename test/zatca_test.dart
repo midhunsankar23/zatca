@@ -7,9 +7,6 @@ import 'package:zatca/zatca_manager.dart';
 void main() {
   test('adds one to input values', () {
     final zatcaManager = ZatcaManager.instance;
-
-    // "uuid":"152E0C50-AE2F-11EF-BB6F-0D9BB8BCBF42",
-
     zatcaManager.initializeZacta(
       sellerName: "My Branch",
       sellerTRN: "310175397400003",
@@ -62,6 +59,5 @@ void main() {
     );
     String xml = qrData.xmlString;
     String qr = zatcaManager.getQrString(qrData);
-    print("**qr ***|$qr|");
   });
 }

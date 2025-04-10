@@ -28,7 +28,6 @@ Map<String, dynamic> parseCSR(String csrPem) {
   // Extract raw public key bytes
   final rawPublicKeyBytes = publicKeyBitString.contentBytes();
   final domainParams = ECDomainParameters('prime256v1');
-  ECPoint ecPublicKeyPoint;
 
   // Handle compressed/uncompressed keys
   if (rawPublicKeyBytes.length == 33) {
@@ -40,7 +39,7 @@ Map<String, dynamic> parseCSR(String csrPem) {
           .join(),
       radix: 16,
     );
-    ecPublicKeyPoint = domainParams.curve.decompressPoint(prefix, x);
+    domainParams.curve.decompressPoint(prefix, x);
   } else if (rawPublicKeyBytes.length == 65) {
     final x = BigInt.parse(
       rawPublicKeyBytes
@@ -56,7 +55,7 @@ Map<String, dynamic> parseCSR(String csrPem) {
           .join(),
       radix: 16,
     );
-    ecPublicKeyPoint = domainParams.curve.createPoint(x, y);
+    domainParams.curve.createPoint(x, y);
   } else {
     throw ArgumentError('Unexpected length for raw public key bytes');
   }
@@ -83,3 +82,4 @@ Map<String, dynamic> parseCSR(String csrPem) {
     'signature': signatureBytes, // Raw signature bytes
   };
 }
+
