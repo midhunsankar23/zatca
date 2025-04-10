@@ -2,6 +2,9 @@
 
 The ZATCA package provides tools for generating and managing e-invoices compliant with the ZATCA (Zakat, Tax, and Customs Authority) regulations in Saudi Arabia. It includes features for creating QR codes, signing invoices, and handling invoice data models.
 
+For more information about ZATCA e-invoicing regulations, visit the [official ZATCA website](https://zatca.gov.sa/en/E-Invoicing/SystemsDevelopers/Pages/default.aspx).
+![ZATCA Fatoora Logo](https://zatca.gov.sa/ar/E-Invoicing/PublishingImages/header_logo.svg)
+
 ---
 
 <a href="https://github.com/sponsors/sbrsubuvga" target="_blank">
@@ -28,4 +31,4 @@ To use this package, add it to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  zatca: ^0.0.4
+  zatca: ^0.1.0
