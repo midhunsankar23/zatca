@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:zatca/models/invoice_data_model.dart';
 import 'package:zatca/resources/enums.dart';
 import 'package:zatca/zatca_manager.dart';
@@ -37,7 +38,7 @@ void main() {
         taxPercent: '15',
       ),
     ],
-    invoiceType: InvoiceType.StandardInvoicesAndSimplifiedInvoices,
+    invoiceType: InvoiceType.standardInvoicesAndSimplifiedInvoices,
     issueDate: "2025-04-08",
     issueTime: "03:41:08",
     invoiceUUid: "8e6000cf-1a98-4174-b3e7-b5d5954bc10d",
@@ -60,4 +61,8 @@ void main() {
   );
   String xml = qrData.xmlString;
   String qr = zatcaManager.getQrString(qrData);
+  if (kDebugMode) {
+    print("XML: $xml");
+    print("qr: $qr");
+  }
 }

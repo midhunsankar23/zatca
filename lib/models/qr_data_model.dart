@@ -1,14 +1,32 @@
 import 'invoice_data_model.dart';
 
+/// A class representing a ZATCA-compliant QR code and invoice data.
 class ZatcaQr {
-  final String sellerName; // Seller's name
-  final String sellerTRN; // Seller's VAT registration number
-  final String issueDate; // ISO 8601 format date and time
-  final String invoiceHash; // SHA-256 hash of the invoice
-  final String digitalSignature; // ECDSA digital signature
-  final String publicKey; // Base64-encoded public key
+  /// Seller's name
+  final String sellerName;
+
+  /// Seller's VAT registration number
+  final String sellerTRN;
+
+  /// ISO 8601 format date and time
+  final String issueDate;
+
+  /// SHA-256 hash of the invoice
+  final String invoiceHash;
+
+  /// ECDSA digital signature
+  final String digitalSignature;
+
+  /// Base64-encoded public key
+  final String publicKey;
+
+  /// Base64-encoded certificate signature
   final String certificateSignature;
+
+  /// The invoice data
   final ZatcaInvoice invoiceData;
+
+  /// The XML string representation of the invoice
   final String xmlString;
 
   ZatcaQr({
@@ -23,6 +41,7 @@ class ZatcaQr {
     required this.xmlString,
   });
 
+  /// Creates a new [ZatcaQr] instance from a map.
   factory ZatcaQr.fromMap(Map<String, dynamic> json) {
     return ZatcaQr(
       sellerName: json['sellerName'] ?? '',
@@ -36,6 +55,8 @@ class ZatcaQr {
       xmlString: json['xmlString'] ?? '',
     );
   }
+
+  /// Converts the [ZatcaQr] instance to a map.
   Map<String, dynamic> toMap() {
     return {
       'sellerName': sellerName,

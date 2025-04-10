@@ -1,21 +1,54 @@
+/// Represents a ZATCA-compliant invoice.
 class ZatcaInvoice {
+  /// The profile ID of the invoice.
   final String profileID;
+
+  /// The unique identifier of the invoice.
   final String id;
+
+  /// The universally unique identifier (UUID) of the invoice.
   final String uuid;
+
+  /// The issue date of the invoice in ISO 8601 format.
   final String issueDate;
+
+  /// The issue time of the invoice in ISO 8601 format.
   final String issueTime;
+
+  /// The type code of the invoice.
   final String invoiceTypeCode;
+
+  /// The name of the invoice type.
   final String invoiceTypeName;
+
+  /// Additional notes or comments about the invoice.
   final String note;
+
+  /// The currency code used in the invoice.
   final String currencyCode;
+
+  /// The tax currency code used in the invoice.
   final String taxCurrencyCode;
+
+  /// The supplier information.
   final Supplier supplier;
+
+  /// The customer information.
   final Customer customer;
+
+  /// The list of invoice line items.
   final List<InvoiceLine> invoiceLines;
+
+  /// The total tax amount for the invoice.
   final String taxAmount;
+
+  /// The total amount for the invoice.
   final String totalAmount;
+
+  /// The hash of the previous invoice, if applicable.
   final String previousInvoiceHash;
 
+  /// Creates a new [ZatcaInvoice] instance.
   ZatcaInvoice({
     required this.profileID,
     required this.id,
@@ -35,6 +68,7 @@ class ZatcaInvoice {
     required this.previousInvoiceHash,
   });
 
+  /// Creates a [ZatcaInvoice] instance from a [Map].
   factory ZatcaInvoice.fromMap(Map<String, dynamic> map) {
     return ZatcaInvoice(
       profileID: map['profileID'] ?? '',
@@ -58,6 +92,8 @@ class ZatcaInvoice {
       previousInvoiceHash: map['previousInvoiceHash'] ?? '',
     );
   }
+
+  /// Converts the [ZatcaInvoice] instance to a [Map].
   Map<String, dynamic> toMap() {
     return {
       'profileID': profileID,
@@ -80,16 +116,25 @@ class ZatcaInvoice {
   }
 }
 
+/// Represents a supplier in the invoice.
 class Supplier {
+  /// The company ID of the supplier.
   final String companyID;
+
+  /// The registration name of the supplier.
   final String registrationName;
+
+  /// The address of the supplier.
   final Address address;
 
+  /// Creates a new [Supplier] instance.
   Supplier({
     required this.companyID,
     required this.registrationName,
     required this.address,
   });
+
+  /// Creates a [Supplier] instance from a [Map].
   factory Supplier.fromMap(Map<String, dynamic> map) {
     return Supplier(
       companyID: map['companyID'] ?? '',
@@ -97,6 +142,8 @@ class Supplier {
       address: Address.fromMap(map['address']),
     );
   }
+
+  /// Converts the [Supplier] instance to a [Map].
   Map<String, dynamic> toMap() {
     return {
       'companyID': companyID,
@@ -106,9 +153,15 @@ class Supplier {
   }
 }
 
+/// Represents a customer in the invoice.
 class Customer {
+  /// The company ID of the customer.
   final String companyID;
+
+  /// The registration name of the customer.
   final String registrationName;
+
+  /// The address of the customer.
   final Address address;
 
   Customer({
@@ -116,6 +169,8 @@ class Customer {
     required this.registrationName,
     required this.address,
   });
+
+  /// Creates a [Customer] instance from a [Map].
   factory Customer.fromMap(Map<String, dynamic> map) {
     return Customer(
       companyID: map['companyID'] ?? '',
@@ -123,6 +178,8 @@ class Customer {
       address: Address.fromMap(map['address']),
     );
   }
+
+  /// Converts the [Customer] instance to a [Map].
   Map<String, dynamic> toMap() {
     return {
       'companyID': companyID,
@@ -132,14 +189,27 @@ class Customer {
   }
 }
 
+/// Represents an address in the invoice.
 class Address {
+  /// The street name of the address.
   final String streetName;
+
+  /// The building number of the address.
   final String buildingNumber;
+
+  /// The city subdivision name of the address.
   final String citySubdivisionName;
+
+  /// The city name of the address.
   final String cityName;
+
+  /// The postal zone of the address.
   final String postalZone;
+
+  /// The country code of the address.
   final String countryCode;
 
+  /// Creates a new [Address] instance.
   Address({
     required this.streetName,
     required this.buildingNumber,
@@ -148,6 +218,8 @@ class Address {
     required this.postalZone,
     this.countryCode = "SA",
   });
+
+  /// Creates an [Address] instance from a [Map].
   factory Address.fromMap(Map<String, dynamic> map) {
     return Address(
       streetName: map['streetName'] ?? '',
@@ -158,6 +230,8 @@ class Address {
       countryCode: map['countryCode'] ?? 'SA',
     );
   }
+
+  /// Converts the [Address] instance to a [Map].
   Map<String, dynamic> toMap() {
     return {
       'streetName': streetName,
@@ -170,6 +244,7 @@ class Address {
   }
 }
 
+/// Represents an invoice line item in the invoice.
 class InvoiceLine {
   final String id;
   final String quantity;
@@ -178,6 +253,7 @@ class InvoiceLine {
   final String itemName;
   final String taxPercent;
 
+  /// Creates a new [InvoiceLine] instance.
   InvoiceLine({
     required this.id,
     required this.quantity,
@@ -186,6 +262,8 @@ class InvoiceLine {
     required this.itemName,
     required this.taxPercent,
   });
+
+  /// Creates an [InvoiceLine] instance from a [Map].
   factory InvoiceLine.fromMap(Map<String, dynamic> map) {
     return InvoiceLine(
       id: map['id'] ?? '',
@@ -196,6 +274,8 @@ class InvoiceLine {
       taxPercent: map['taxPercent'] ?? '',
     );
   }
+
+  /// Converts the [InvoiceLine] instance to a [Map].
   Map<String, dynamic> toMap() {
     return {
       'id': id,

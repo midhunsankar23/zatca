@@ -4,32 +4,32 @@ import 'package:asn1lib/asn1lib.dart';
 import 'package:pointycastle/export.dart';
 
 Map<String, dynamic> parseCSR(String csrPem) {
-  // Remove the PEM headers and footers
+  /// Remove the PEM headers and footers
   final pemContent = csrPem
       .replaceAll("-----BEGIN CERTIFICATE REQUEST-----", "")
       .replaceAll("-----END CERTIFICATE REQUEST-----", "")
       .replaceAll("\n", "")
       .replaceAll("\r", ""); // Handle potential carriage returns
 
-  // Decode the Base64 PEM content
+  /// Decode the Base64 PEM content
   final bytes = base64.decode(pemContent);
 
-  // Parse ASN.1 structure
+  /// Parse ASN.1 structure
   final asn1Parser = ASN1Parser(bytes);
   final topLevelSeq = asn1Parser.nextObject() as ASN1Sequence;
 
-  // Extract the certification request information
+  /// Extract the certification request information
   final certificationRequestInfo = topLevelSeq.elements[0] as ASN1Sequence;
 
-  // Extract the public key
+  /// Extract the public key
   final publicKeyInfo = certificationRequestInfo.elements[2] as ASN1Sequence;
   final publicKeyBitString = publicKeyInfo.elements[1] as ASN1BitString;
 
-  // Extract raw public key bytes
+  /// Extract raw public key bytes
   final rawPublicKeyBytes = publicKeyBitString.contentBytes();
   final domainParams = ECDomainParameters('prime256v1');
 
-  // Handle compressed/uncompressed keys
+  /// Handle compressed/uncompressed keys
   if (rawPublicKeyBytes.length == 33) {
     final prefix = rawPublicKeyBytes[0];
     final x = BigInt.parse(
@@ -60,7 +60,7 @@ Map<String, dynamic> parseCSR(String csrPem) {
     throw ArgumentError('Unexpected length for raw public key bytes');
   }
 
-  // Convert public key to DER format
+  /// Convert public key to DER format
   final publicKeyDER = [
     ...[0x30, 0x56], // SEQUENCE header
     ...[0x30, 0x10], // OID for EC public key
@@ -70,7 +70,7 @@ Map<String, dynamic> parseCSR(String csrPem) {
     ...rawPublicKeyBytes,
   ];
 
-  // Extract the signature
+  /// Extract the signature
   final signature = topLevelSeq.elements[2] as ASN1BitString;
   final signatureBytes = signature.contentBytes();
 

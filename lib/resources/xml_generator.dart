@@ -1,6 +1,7 @@
 import 'package:xml/xml.dart';
 import 'package:zatca/models/invoice_data_model.dart';
 
+///     Generate a ZATCA-compliant XML string for the invoice data.
 String generateZATCAXml(ZatcaInvoice data) {
   final builder = XmlBuilder();
   builder.processing('xml', 'version="1.0" encoding="UTF-8"');
@@ -443,6 +444,9 @@ String generateZATCAXml(ZatcaInvoice data) {
     },
   );
 
+  /// Build the XML document
   final document = builder.buildDocument();
+
+  /// Convert the XML document to a string
   return document.toXmlString(pretty: true);
 }
