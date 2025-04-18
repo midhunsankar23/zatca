@@ -123,11 +123,15 @@ class ZatcaManager {
       previousInvoiceHash: previousInvoiceHash,
     );
 
-    final xmlString = generateZATCAXml(invoice);
-
+     final invoiceXml = generateZATCAXml(invoice);
+     final xmlString= invoiceXml.toXmlString(pretty: true,indent: '    ');
     // final canonicalizeXmlString=canonicalizeXml(xmlString);
-
-    final xmlHash = generateHash(xmlString);
+    String hashableXml = invoiceXml.rootElement.toXmlString(pretty: true,indent: '    ');
+    hashableXml=hashableXml.replaceFirst('<cbc:ProfileID>reporting:1.0</cbc:ProfileID>', '\n    <cbc:ProfileID>reporting:1.0</cbc:ProfileID>');
+    hashableXml=hashableXml.replaceFirst('<cac:AccountingSupplierParty>', '\n    \n    <cac:AccountingSupplierParty>');
+    final xmlHash = generateHash(hashableXml);
+    print("xmlHash $hashableXml");
+    print("xmlHash $xmlHash");
 
     final privateKey = parsePrivateKey(_privateKeyBase64!);
 
@@ -186,7 +190,6 @@ class ZatcaManager {
   }) {
     final cleanedCertificate=cleanCertificatePem(certificateString);
     final certificateInfo = getCertificateInfo(cleanedCertificate);
-
     final defaultUBLExtensionsSignedPropertiesForSigningXML =
         defaultUBLExtensionsSignedPropertiesForSigning(
           signingTime: signingTime,
@@ -209,8 +212,6 @@ class ZatcaManager {
           certificateIssuer: certificateInfo.issuer,
           certificateSerialNumber: certificateInfo.serialNumber,
         );
-    print("invoiceHash $invoiceHash");
-    print("signedPropertiesHashBase64 $signedPropertiesHashBase64");
     final ublStandardXML= generateUBLSignExtensionsXml(
       invoiceHash: invoiceHash,
       signedPropertiesHash: signedPropertiesHashBase64,

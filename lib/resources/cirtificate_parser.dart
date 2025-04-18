@@ -120,7 +120,7 @@ CertificateInfo getCertificateInfo(String pemContent) {
   final issuer = _parseName(issuerSeq);
 
 
-  print('Issuer: $issuer');
+  print('serialNumber----: $serialNumber');
 
   return CertificateInfo(
     hash: hash,
@@ -152,7 +152,7 @@ String _parseName(ASN1Sequence seq) {
     final decodedValue = _decodeASN1String(value);
     parts.add('${_oidToName(oid.identifier!)}=$decodedValue');
   }
-  return parts.join(', ');
+  return parts.reversed.join(', ');
 }
 
 String _oidToName(String oid) {
@@ -165,6 +165,8 @@ String _oidToName(String oid) {
       return 'OU'; // Organizational Unit
     case '2.5.4.3':
       return 'CN'; // Common Name
+    case '0.9.2342.19200300.100.1.25':
+      return 'DC'; // Domain Component
     default:
       return oid;
   }

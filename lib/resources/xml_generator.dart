@@ -2,7 +2,7 @@ import 'package:xml/xml.dart';
 import 'package:zatca/models/invoice_data_model.dart';
 
 ///     Generate a ZATCA-compliant XML string for the invoice data.
-String generateZATCAXml(ZatcaInvoice data) {
+XmlDocument generateZATCAXml(ZatcaInvoice data) {
   final builder = XmlBuilder();
   builder.processing('xml', 'version="1.0" encoding="UTF-8"');
   builder.element(
@@ -24,7 +24,6 @@ String generateZATCAXml(ZatcaInvoice data) {
         'xmlns:ext',
         'urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2',
       );
-
       builder.element('cbc:ProfileID', nest: data.profileID);
       builder.element('cbc:ID', nest: data.id);
       builder.element('cbc:UUID', nest: data.uuid);
@@ -262,9 +261,8 @@ String generateZATCAXml(ZatcaInvoice data) {
                 'cbc:TaxableAmount',
                 nest: () {
                   builder.attribute('currencyID', 'SAR');
-                  builder.text(
-                    double.parse(data.totalAmount) -
-                        double.parse(data.taxAmount),
+                  builder.text((double.parse(data.totalAmount) - double.parse(data.taxAmount))
+                      .toStringAsFixed(1).replaceAll(RegExp(r'\.0$'), ''),
                   );
                 },
               );
@@ -447,8 +445,8 @@ String generateZATCAXml(ZatcaInvoice data) {
   /// Build the XML document
   final document = builder.buildDocument();
 
-  /// Convert the XML document to a string
-  return document.toXmlString(pretty: true);
+ return document;
+
 }
 
 ///     Generate a ZATCA-compliant UBLExtensions XML string for the invoice data.
@@ -600,7 +598,7 @@ XmlDocument generateUBLSignExtensionsXml({
                                    );
                                    builder.element(
                                      'ds:DigestValue',
-                                     nest: signedPropertiesHash,
+                                     nest: invoiceHash,
                                    );
                                  },
                                );
@@ -626,7 +624,7 @@ XmlDocument generateUBLSignExtensionsXml({
                                    );
                                    builder.element(
                                      'ds:DigestValue',
-                                     nest: invoiceHash,
+                                     nest: signedPropertiesHash,
                                    );
                                  },
                                );
