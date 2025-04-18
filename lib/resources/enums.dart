@@ -3,16 +3,18 @@ enum InvoiceType {
   /// Standard Invoices and Simplified Invoices
   standardInvoicesAndSimplifiedInvoices(
     "Standard Invoices and Simplified Invoices",
+    "0200000"
   ),
 
   ///Simplified Credit Note
-  simplifiedCreditNote("SimplifiedCreditNote");
+  simplifiedCreditNote("SimplifiedCreditNote", "0200000");
 
   /// enum string value.
+  final String name;
   final String value;
 
   /// Constructor for [InvoiceType] enum.
-  const InvoiceType(this.value);
+  const InvoiceType(this.name,this.value);
 }
 
 /// This enum represents the type of invoice relation.

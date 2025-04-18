@@ -13,6 +13,7 @@ void main() {
       sellerTRN: "310175397400003",
       supplier: Supplier(
         companyID: "310175397400003",
+        companyCRN: "454634645645654",
         registrationName: "My Branch",
         address: Address(
           streetName: "King Fahahd st",
@@ -22,12 +23,14 @@ void main() {
           postalZone: "31952",
         ),
       ),
-      privateKeyBase64: "",
 
       ///PrivateKey
-      certificateBase64: "",
+      privateKeyBase64:
+          "MHQCAQEEIDzVBdqqr6WdCemM/+M78r/oVEY5ZT683OzIyCln4T68oAcGBSuBBAAKoUQDQgAER8D8uQYrEOLw52BqwDi+suE6N7HK1yYQs30q2kTbCEia69jyR8YfNNDleO8HRjVHQSxbRTv3tlvxfUMOEmXJwg==",
 
       ///"""-----BEGIN CERTIFICATE REQUEST-----\nCSRKEY\n-----END CERTIFICATE REQUEST-----",
+      certificateRequestBase64:
+          "-----BEGIN CERTIFICATE REQUEST-----\nMIICATCCAacCAQAwTTENMAsGA1UEAwwERUdTMjEXMBUGA1UECwwOTXkgQnJhbmNoIE5hbWUxFjAUBgNVBAoMDVdlc2FtIEFsemFoaXIxCzAJBgNVBAYTAlNBMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAER8D8uQYrEOLw52BqwDi+suE6N7HK1yYQs30q2kTbCEia69jyR8YfNNDleO8HRjVHQSxbRTv3tlvxfUMOEmXJwqCB+jCB9wYJKoZIhvcNAQkOMYHpMIHmMCQGCSsGAQQBgjcUAgQXDBVQUkVaQVRDQS1Db2RlLVNpZ25pbmcwgb0GA1UdEQSBtTCBsqSBrzCBrDFFMEMGA1UEBAw8MS1zb2x1dGlvbl9uYW1lfDItSU9TfDMtNmY0ZDIwZTAtNmJmZS00YTgwLTkzODktN2RhYmU2NjIwZjE0MR8wHQYKCZImiZPyLGQBAQwPMzk5OTk5OTk5OTAwMDAzMQ0wCwYDVQQMDAQxMTAwMSQwIgYDVQQaDBswMDAwIEtpbmcgRmFoYWhkIHN0LCBLaG9iYXIxDTALBgNVBA8MBEZvb2QwCgYIKoZIzj0EAwIDSAAwRQIhAOB7u3iDWL76C4ILxX0UiBj0Z7fdEYxMSfOqtjOQ3elZAiAVxCtpwCOO6hob5VRlP6EMkZD74rSrxSAFmWylcH4d8Q==\n-----END CERTIFICATE REQUEST-----",
     );
 
     final qrData = zatcaManager.generateZatcaQrInit(
@@ -62,11 +65,25 @@ void main() {
       previousInvoiceHash: "zDnQnE05P6rFMqF1ai21V5hIRlUq/EXvrpsaoPkWRVI=",
       invoiceRelationType: InvoiceRelationType.b2c,
     );
-    String xml = qrData.xmlString;
-    String qr = zatcaManager.getQrString(qrData);
-    if (kDebugMode) {
-      print("XML: $xml");
-      print("qr: $qr");
-    }
+
+    String invoiceHash = qrData.invoiceHash;
+    String invoiceXmlString = qrData.xmlString;
+    String qrString = zatcaManager.getQrString(qrData);
+
+
+
+
+
+    String ublXML = zatcaManager.generateUBLXml(
+      invoiceHash: invoiceHash,
+      signingTime: qrData.issueDateTime,
+      digitalSignature: qrData.digitalSignature,
+      invoiceXmlString: invoiceXmlString,
+      certificateString:"-----BEGIN CERTIFICATE-----\nMIICJjCCAcugAwIBAgIGAZY+aKMzMAoGCCqGSM49BAMCMBUxEzARBgNVBAMMCmVJbnZvaWNpbmcwHhcNMjUwNDE2MTE0MjQyWhcNMzAwNDE1MjEwMDAwWjBNMQ0wCwYDVQQDDARFR1MyMRcwFQYDVQQLDA5NeSBCcmFuY2ggTmFtZTEWMBQGA1UECgwNV2VzYW0gQWx6YWhpcjELMAkGA1UEBhMCU0EwVjAQBgcqhkjOPQIBBgUrgQQACgNCAARHwPy5BisQ4vDnYGrAOL6y4To3scrXJhCzfSraRNsISJrr2PJHxh800OV47wdGNUdBLFtFO/e2W/F9Qw4SZcnCo4HRMIHOMAwGA1UdEwEB/wQCMAAwgb0GA1UdEQSBtTCBsqSBrzCBrDFFMEMGA1UEBAw8MS1zb2x1dGlvbl9uYW1lfDItSU9TfDMtNmY0ZDIwZTAtNmJmZS00YTgwLTkzODktN2RhYmU2NjIwZjE0MR8wHQYKCZImiZPyLGQBAQwPMzk5OTk5OTk5OTAwMDAzMQ0wCwYDVQQMDAQxMTAwMSQwIgYDVQQaDBswMDAwIEtpbmcgRmFoYWhkIHN0LCBLaG9iYXIxDTALBgNVBA8MBEZvb2QwCgYIKoZIzj0EAwIDSQAwRgIhAKqAfNuHQghUGtz543jAHWddoAAWVra9IaD+LO/P6TT3AiEA6P9hv9F4+XGweROZXJk8b6d1wvIscHt5Vdqpo/EICcY=\n-----END CERTIFICATE-----",
+      qrString: qrString,
+    );
+
+    print("invoiceXmlString: $ublXML");
+
   });
 }

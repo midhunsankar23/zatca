@@ -1,9 +1,11 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
+import 'package:crypto/crypto.dart';
+import 'package:xml/xml.dart';
 import 'package:zatca/models/qr_data_model.dart';
+import 'package:zatca/resources/cirtificate_parser.dart';
 import 'package:zatca/resources/enums.dart';
-import 'package:zatca/resources/public_key_signature_generator.dart';
+import 'package:zatca/resources/qr_generator.dart';
 import 'package:zatca/resources/signature_generator.dart';
 import 'package:zatca/resources/xml_generator.dart';
 import 'package:zatca/resources/xml_hashing.dart';
@@ -17,34 +19,38 @@ class ZatcaManager {
   static ZatcaManager instance = ZatcaManager._();
   Supplier? _supplier;
   String? _privateKeyBase64;
-  String? _certificateBase64;
+  String? _certificateRequestBase64;
   String? _sellerName;
   String? _sellerTRN;
+  String _issuedCertificateBase64 = '';
 
   /// Initializes the ZATCA manager with the required supplier and cryptographic details.
-  ///
+
   /// [supplier] - The supplier information.
   /// [privateKeyBase64] - The private key in Base64 format.
-  /// [certificateBase64] - The certificate in Base64 format.
+  /// [certificateRequestBase64] - (CSR) The certificate request in Base64 format.
   /// [sellerName] - The name of the seller.
   /// [sellerTRN] - The Tax Registration Number (TRN) of the seller.
+  /// [issuedCertificateBase64] - The issued certificate from zatca compliance.  only required for generating UBL standard XML
 
   initializeZacta({
     required Supplier supplier,
     required String privateKeyBase64,
-    required String certificateBase64,
+    required String certificateRequestBase64,
     required String sellerName,
     required String sellerTRN,
+    String issuedCertificateBase64 = "",
   }) {
     _supplier = supplier;
     _privateKeyBase64 = privateKeyBase64;
-    _certificateBase64 = certificateBase64;
+    _certificateRequestBase64 = certificateRequestBase64;
     _sellerName = sellerName;
     _sellerTRN = sellerTRN;
+    _sellerTRN = sellerTRN;
+    _issuedCertificateBase64 = issuedCertificateBase64;
   }
 
   /// /// Generates a ZATCA-compliant QR code and invoice data.
-  ///   ///
   ///   /// [invoiceLines] - The list of invoice lines.
   ///   /// [invoiceType] - The type of the invoice.
   ///   /// [invoiceRelationType] - The relation type of the invoice (default is `b2c`).
@@ -56,7 +62,7 @@ class ZatcaManager {
   ///   /// [totalWithVat] - The total amount including VAT.
   ///   /// [totalVat] - The total VAT amount.
   ///   /// [previousInvoiceHash] - The hash of the previous invoice.
-  ///   ///
+
   ///   /// Returns a `ZatcaQr` object containing the QR code and invoice data.
   ZatcaQr generateZatcaQrInit({
     required List<InvoiceLine> invoiceLines,
@@ -73,7 +79,7 @@ class ZatcaManager {
   }) {
     if (_supplier == null ||
         _privateKeyBase64 == null ||
-        _certificateBase64 == null ||
+        _certificateRequestBase64 == null ||
         _sellerName == null ||
         _sellerTRN == null) {
       throw Exception(
@@ -93,7 +99,7 @@ class ZatcaManager {
       issueTime: issueTime,
       invoiceTypeCode: '388',
       invoiceTypeName: invoiceType.value,
-      note: invoiceType.value,
+      note: invoiceType.name,
       currencyCode: 'SAR',
       taxCurrencyCode: 'SAR',
       supplier: _supplier!,
@@ -119,21 +125,26 @@ class ZatcaManager {
 
     final xmlString = generateZATCAXml(invoice);
 
+    // final canonicalizeXmlString=canonicalizeXml(xmlString);
+
     final xmlHash = generateHash(xmlString);
+
     final privateKey = parsePrivateKey(_privateKeyBase64!);
 
     // Example XML hash
 
     // Generate the ECDSA signature
     final signature = generateECDSASignature(xmlHash, privateKey);
-    final result = parseCSR(_certificateBase64!);
-    final publicKey = result['publicKey'];
-    final certificateSignature = base64.encode(result['signature']);
+    final csrInfo = parseCSR(_certificateRequestBase64!);
+    final publicKey = csrInfo.publicKey;
+    final certificateSignature = base64.encode(csrInfo.signature);
+
+    final issueDateTime=DateTime.parse('$issueDate $issueTime');
 
     return ZatcaQr(
       sellerName: _sellerName!,
       sellerTRN: _sellerTRN!,
-      issueDate: issueDate,
+      issueDateTime: issueDateTime.toIso8601String(),
       invoiceHash: xmlHash,
       digitalSignature: signature,
       publicKey: publicKey,
@@ -152,7 +163,7 @@ class ZatcaManager {
     Map<int, String> invoiceData = {
       1: qrDataModel.sellerName,
       2: qrDataModel.sellerTRN,
-      3: qrDataModel.issueDate,
+      3: qrDataModel.issueDateTime,
       4: qrDataModel.invoiceData.totalAmount,
       5: qrDataModel.invoiceData.taxAmount,
       6: qrDataModel.invoiceHash,
@@ -160,63 +171,64 @@ class ZatcaManager {
       8: qrDataModel.publicKey,
     };
 
-    String tlvString = _generateTlv(invoiceData);
-    final qrContent = utf8.encode(_tlvToBase64(tlvString));
+    String tlvString = generateTlv(invoiceData);
+    final qrContent = utf8.encode(tlvToBase64(tlvString));
     return String.fromCharCodes(qrContent);
   }
 
-  /// Converts a string to its hexadecimal representation.
-  ///
-  /// [input] - The input string to convert.
-  ///
-  /// Returns the hexadecimal representation of the string.
-  String _stringToHex(String input) {
-    return input.codeUnits
-        .map((unit) => unit.toRadixString(16).padLeft(2, '0'))
-        .join();
-  }
+  String generateUBLXml({
+    required String invoiceHash,
+    required String signingTime,
+    required String digitalSignature,
+    required String certificateString,
+    required String invoiceXmlString,
+    required String qrString,
+  }) {
+    final cleanedCertificate=cleanCertificatePem(certificateString);
+    final certificateInfo = getCertificateInfo(cleanedCertificate);
 
-  /// Generates a TLV (Tag-Length-Value) string from the given data.
-  ///
-  /// [data] - A map where the key is the tag and the value is the associated data.
-  ///
-  /// Returns the TLV string.
-  String _generateTlv(Map<int, String> data) {
-    StringBuffer tlv = StringBuffer();
+    final defaultUBLExtensionsSignedPropertiesForSigningXML =
+        defaultUBLExtensionsSignedPropertiesForSigning(
+          signingTime: signingTime,
+          certificateHash: certificateInfo.hash,
+          certificateIssuer: certificateInfo.issuer,
+          certificateSerialNumber: certificateInfo.serialNumber,
+        );
 
-    data.forEach((tag, value) {
-      String tagHex = tag
-          .toRadixString(16)
-          .padLeft(2, '0'); // Convert tag to hex
-      String valueHex = _stringToHex(value); // Convert value to hex
-      String lengthHex = value.length
-          .toRadixString(16)
-          .padLeft(2, '0'); // Length in hex
+    // 5: Get SignedProperties hash
+    final signedPropertiesBytes = utf8.encode(
+      defaultUBLExtensionsSignedPropertiesForSigningXML.toXmlString(pretty: true),
+    );
+    final signedPropertiesHash = sha256.convert(signedPropertiesBytes).bytes;
+    final signedPropertiesHashBase64 = base64.encode(signedPropertiesHash);
 
-      // Concatenate tag, length, and value into the TLV structure
-      tlv.write(tagHex);
-      tlv.write(lengthHex);
-      tlv.write(valueHex);
-    });
+    final defaultUBLExtensionsSignedPropertiesXML =
+        defaultUBLExtensionsSignedProperties(
+          signingTime: signingTime,
+          certificateHash: certificateInfo.hash,
+          certificateIssuer: certificateInfo.issuer,
+          certificateSerialNumber: certificateInfo.serialNumber,
+        );
+    print("invoiceHash $invoiceHash");
+    print("signedPropertiesHashBase64 $signedPropertiesHashBase64");
+    final ublStandardXML= generateUBLSignExtensionsXml(
+      invoiceHash: invoiceHash,
+      signedPropertiesHash: signedPropertiesHashBase64,
+      digitalSignature: digitalSignature,
+      certificateString: cleanedCertificate,
+      ublSignatureSignedPropertiesXML:
+          defaultUBLExtensionsSignedPropertiesXML,
+    );
 
-    return tlv.toString();
-  }
+    final xmlDocument = XmlDocument.parse(invoiceXmlString);
+    xmlDocument.rootElement.children.insert(0, ublStandardXML.rootElement.copy());
 
-  /// Converts a TLV string to its Base64 representation.
-  ///
-  /// [tlv] - The TLV string to convert.
-  ///
-  /// Returns the Base64 representation of the TLV string.
-  String _tlvToBase64(String tlv) {
-    List<int> bytes = [];
+    final qrXml=generateQrAndSignatureXMl(qrString: qrString);
+    xmlDocument.rootElement.children.insertAll(21, qrXml.children.map((node) => node.copy()).toList());
 
-    for (int i = 0; i < tlv.length; i += 2) {
-      String hexStr = tlv.substring(i, i + 2); // Two hex characters at a time
-      int byte = int.parse(hexStr, radix: 16); // Parse as a byte
-      bytes.add(byte);
-    }
 
-    Uint8List byteArray = Uint8List.fromList(bytes);
-    return base64Encode(byteArray); // Convert to Base64
+
+
+    return xmlDocument.toXmlString(pretty: true, indent: '    ');
   }
 }

@@ -9,7 +9,7 @@ class ZatcaQr {
   final String sellerTRN;
 
   /// ISO 8601 format date and time
-  final String issueDate;
+  final String issueDateTime;
 
   /// SHA-256 hash of the invoice
   final String invoiceHash;
@@ -32,7 +32,7 @@ class ZatcaQr {
   ZatcaQr({
     required this.sellerName,
     required this.sellerTRN,
-    required this.issueDate,
+    required this.issueDateTime,
     required this.invoiceHash,
     required this.digitalSignature,
     required this.publicKey,
@@ -46,7 +46,7 @@ class ZatcaQr {
     return ZatcaQr(
       sellerName: json['sellerName'] ?? '',
       sellerTRN: json['sellerTRN'] ?? '',
-      issueDate: json['issueDate'] ?? '',
+      issueDateTime: json['issueDateTime'] ?? '',
       invoiceHash: json['invoiceHash'] ?? '',
       digitalSignature: json['digitalSignature'] ?? '',
       publicKey: json['publicKey'] ?? '',
@@ -61,7 +61,7 @@ class ZatcaQr {
     return {
       'sellerName': sellerName,
       'sellerTRN': sellerTRN,
-      'issueDate': issueDate,
+      'issueDate': issueDateTime,
       'invoiceHash': invoiceHash,
       'digitalSignature': digitalSignature,
       'publicKey': publicKey,

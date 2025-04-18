@@ -71,22 +71,50 @@ ECPrivateKey parsePrivateKey(String base64Key) {
 }
 
 /// Generate ECDSA Signature
-String generateECDSASignature(String data, ECPrivateKey privateKey) {
+// String generateECDSASignature(String data, ECPrivateKey privateKey) {
+//   final signer = Signer('SHA-256/ECDSA');
+//   final params = PrivateKeyParameter<ECPrivateKey>(privateKey);
+//
+//   /// Initialize the signer with SecureRandom
+//   signer.init(true, ParametersWithRandom(params, createSecureRandom()));
+//
+//   /// Hash the data
+//   final hash = Uint8List.fromList(utf8.encode(data));
+//
+//   /// Generate the signature
+//   final ECSignature signature = signer.generateSignature(hash) as ECSignature;
+//
+//   /// Encode R and S as Base64
+//   final r = base64.encode(bigIntToByteArray(signature.r));
+//   final s = base64.encode(bigIntToByteArray(signature.s));
+//
+//   print("xmlHash, $r");
+//   print("xmlHash, $s");
+//
+//   return '$r:$s'; // Combine R and S
+// }
+
+
+
+String generateECDSASignature(String invoiceHashBase64, ECPrivateKey privateKey) {
+  // Decode the Base64-encoded invoice hash
+  final invoiceHashBytes = base64.decode(invoiceHashBase64);
+
+  // Initialize the signer
   final signer = Signer('SHA-256/ECDSA');
   final params = PrivateKeyParameter<ECPrivateKey>(privateKey);
-
-  /// Initialize the signer with SecureRandom
   signer.init(true, ParametersWithRandom(params, createSecureRandom()));
 
-  /// Hash the data
-  final hash = Uint8List.fromList(utf8.encode(data));
+  // Generate the signature
+  final ECSignature signature = signer.generateSignature(invoiceHashBytes) as ECSignature;
 
-  /// Generate the signature
-  final ECSignature signature = signer.generateSignature(hash) as ECSignature;
+// Encode the signature as a single DER-encoded structure
+  final asn1Sequence = ASN1Sequence();
+  asn1Sequence.add(ASN1Integer(signature.r));
+  asn1Sequence.add(ASN1Integer(signature.s));
+  final derEncodedSignature = asn1Sequence.encodedBytes;
 
-  /// Encode R and S as Base64
-  final r = base64.encode(bigIntToByteArray(signature.r));
-  final s = base64.encode(bigIntToByteArray(signature.s));
-
-  return '$r:$s'; // Combine R and S
+// Encode the DER-encoded signature as Base64
+  final digitalSignature= base64.encode(derEncodedSignature);
+   return  digitalSignature;
 }

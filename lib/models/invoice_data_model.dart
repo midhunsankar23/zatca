@@ -121,6 +121,8 @@ class Supplier {
   /// The company ID of the supplier.
   final String companyID;
 
+  final String companyCRN;
+
   /// The registration name of the supplier.
   final String registrationName;
 
@@ -130,6 +132,7 @@ class Supplier {
   /// Creates a new [Supplier] instance.
   Supplier({
     required this.companyID,
+    required this.companyCRN,
     required this.registrationName,
     required this.address,
   });
@@ -138,6 +141,7 @@ class Supplier {
   factory Supplier.fromMap(Map<String, dynamic> map) {
     return Supplier(
       companyID: map['companyID'] ?? '',
+      companyCRN: map['companyCRN'] ?? '',
       registrationName: map['registrationName'] ?? '',
       address: Address.fromMap(map['address']),
     );

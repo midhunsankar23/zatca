@@ -10,6 +10,7 @@ void main() {
     sellerTRN: "310175397400003",
     supplier: Supplier(
       companyID: "310175397400003",
+      companyCRN: "454634645645654",
       registrationName: "My Branch",
       address: Address(
         streetName: "King Fahahd st",
@@ -22,7 +23,7 @@ void main() {
     privateKeyBase64: "",
 
     ///PrivateKey
-    certificateBase64: "",
+    certificateRequestBase64: "",
 
     ///"""-----BEGIN CERTIFICATE REQUEST-----\nCSRKEY\n-----END CERTIFICATE REQUEST-----",
   );
