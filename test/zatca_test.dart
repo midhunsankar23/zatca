@@ -79,7 +79,7 @@ void main() {
 
     String ublXML = zatcaManager.generateUBLXml(
       invoiceHash: invoiceHash,
-      signingTime: qrData.issueDateTime,
+      signingTime:  DateTime.now().toUtc().toIso8601String(),
       digitalSignature: qrData.digitalSignature,
       invoiceXmlString: invoiceXmlString,
       certificateString:"""-----BEGIN CERTIFICATE-----
@@ -88,7 +88,6 @@ MIID3jCCA4SgAwIBAgITEQAAOAPF90Ajs/xcXwABAAA4AzAKBggqhkjOPQQDAjBiMRUwEwYKCZImiZPy
       qrString: qrString,
     );
 
-    // print("invoiceXmlString: $ublXML");
 
   });
 }

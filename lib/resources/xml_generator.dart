@@ -514,6 +514,7 @@ XmlDocument generateUBLSignExtensionsXml({
                                      'Algorithm',
                                      'http://www.w3.org/2006/12/xml-c14n11',
                                    );
+                                   builder.text('');
                                  },
                                );
                                builder.element(
@@ -523,6 +524,7 @@ XmlDocument generateUBLSignExtensionsXml({
                                      'Algorithm',
                                      'http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256',
                                    );
+                                   builder.text('');
                                  },
                                );
                                builder.element(
@@ -582,6 +584,7 @@ XmlDocument generateUBLSignExtensionsXml({
                                              'Algorithm',
                                              'http://www.w3.org/2006/12/xml-c14n11',
                                            );
+                                           builder.text('');
                                          },
                                        );
                                      },
@@ -593,6 +596,7 @@ XmlDocument generateUBLSignExtensionsXml({
                                          'Algorithm',
                                          'http://www.w3.org/2001/04/xmlenc#sha256',
                                        );
+                                       builder.text('');
                                      },
                                    );
                                    builder.element(
@@ -619,6 +623,7 @@ XmlDocument generateUBLSignExtensionsXml({
                                          'Algorithm',
                                          'http://www.w3.org/2001/04/xmlenc#sha256',
                                        );
+                                       builder.text('');
                                      },
                                    );
                                    builder.element(
@@ -782,6 +787,7 @@ XmlDocument defaultUBLExtensionsSignedProperties({
                             'Algorithm',
                             'http://www.w3.org/2001/04/xmlenc#sha256',
                           );
+                          builder.text('');
                         },
                       );
                       builder.element('ds:DigestValue', nest: certificateHash);

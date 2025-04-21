@@ -199,11 +199,9 @@ class ZatcaManager {
         );
 
     // 5: Get SignedProperties hash
-    final signedPropertiesBytes = utf8.encode(
-      defaultUBLExtensionsSignedPropertiesForSigningXML.toXmlString(pretty: true),
-    );
-    final signedPropertiesHash = sha256.convert(signedPropertiesBytes).bytes;
-    final signedPropertiesHashBase64 = base64.encode(signedPropertiesHash);
+    final signedPropertiesBytes = utf8.encode(defaultUBLExtensionsSignedPropertiesForSigningXML.toXmlString(pretty: true,indent: '    '));
+    final signedPropertiesHash = sha256.convert(signedPropertiesBytes).toString();
+    final signedPropertiesHashBase64 = base64.encode(utf8.encode(signedPropertiesHash));
 
     final defaultUBLExtensionsSignedPropertiesXML =
         defaultUBLExtensionsSignedProperties(
