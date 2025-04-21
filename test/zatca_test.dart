@@ -43,9 +43,9 @@ void main() {
           id: '1',
           quantity: '1',
           unitCode: 'PCE',
-          lineExtensionAmount: '10.00',
-          itemName: 'Item 1',
-          taxPercent: '15',
+          lineExtensionAmount: 10,
+          itemName: 'TEST NAME',
+          taxPercent: 15,
         ),
       ],
       invoiceType: InvoiceType.standardInvoicesAndSimplifiedInvoices,
@@ -53,8 +53,8 @@ void main() {
       issueTime: "11:40:40",
       invoiceUUid: "6f4d20e0-6bfe-4a80-9389-7dabe6620f14",
       invoiceNumber: "EGS1-886431145-101",
-      totalVat: "1.50",
-      totalWithVat: "11.50",
+      totalVat: 1.50,
+      totalWithVat: 11.50,
       customer: Customer(
         companyID: '300000000000003',
         registrationName: 'S7S',
@@ -73,7 +73,6 @@ void main() {
     String invoiceHash = qrData.invoiceHash;
     String invoiceXmlString = qrData.xmlString;
     String qrString = zatcaManager.getQrString(qrData);
-
 
 
 

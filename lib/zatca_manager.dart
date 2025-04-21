@@ -73,8 +73,8 @@ class ZatcaManager {
     required String invoiceUUid,
     required String invoiceNumber,
     required String issueTime,
-    required String totalWithVat,
-    required String totalVat,
+    required double totalWithVat,
+    required double totalVat,
     required String previousInvoiceHash,
   }) {
     if (_supplier == null ||
@@ -125,17 +125,15 @@ class ZatcaManager {
 
      final invoiceXml = generateZATCAXml(invoice);
      final xmlString= invoiceXml.toXmlString(pretty: true,indent: '    ');
-    // final canonicalizeXmlString=canonicalizeXml(xmlString);
     String hashableXml = invoiceXml.rootElement.toXmlString(pretty: true,indent: '    ');
+
+    hashableXml=normalizeXml(hashableXml);
     hashableXml=hashableXml.replaceFirst('<cbc:ProfileID>reporting:1.0</cbc:ProfileID>', '\n    <cbc:ProfileID>reporting:1.0</cbc:ProfileID>');
     hashableXml=hashableXml.replaceFirst('<cac:AccountingSupplierParty>', '\n    \n    <cac:AccountingSupplierParty>');
-    final xmlHash = generateHash(hashableXml);
-    print("xmlHash $hashableXml");
-    print("xmlHash $xmlHash");
 
+    final xmlHash = generateHash(hashableXml);
     final privateKey = parsePrivateKey(_privateKeyBase64!);
 
-    // Example XML hash
 
     // Generate the ECDSA signature
     final signature = generateECDSASignature(xmlHash, privateKey);
@@ -144,6 +142,8 @@ class ZatcaManager {
     final certificateSignature = base64.encode(csrInfo.signature);
 
     final issueDateTime=DateTime.parse('$issueDate $issueTime');
+
+
 
     return ZatcaQr(
       sellerName: _sellerName!,
@@ -168,8 +168,8 @@ class ZatcaManager {
       1: qrDataModel.sellerName,
       2: qrDataModel.sellerTRN,
       3: qrDataModel.issueDateTime,
-      4: qrDataModel.invoiceData.totalAmount,
-      5: qrDataModel.invoiceData.taxAmount,
+      4: qrDataModel.invoiceData.totalAmount.toStringAsFixed(2),
+      5: qrDataModel.invoiceData.taxAmount.toStringAsFixed(2),
       6: qrDataModel.invoiceHash,
       7: qrDataModel.digitalSignature,
       8: qrDataModel.publicKey,
@@ -232,4 +232,12 @@ class ZatcaManager {
 
     return xmlDocument.toXmlString(pretty: true, indent: '    ');
   }
+}
+
+
+String normalizeXml(String hashableXml) {
+  return hashableXml
+      .replaceAll('\r\n', '\n')                  // Normalize all line endings to \n
+      .replaceAll(RegExp(r'\s+$', multiLine: true), '') // Remove trailing spaces per line
+      .trim();                                   // Trim leading/trailing whitespace
 }

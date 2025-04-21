@@ -1,9 +1,11 @@
+import 'package:intl/intl.dart';
 import 'package:xml/xml.dart';
 import 'package:zatca/models/invoice_data_model.dart';
 
 ///     Generate a ZATCA-compliant XML string for the invoice data.
 XmlDocument generateZATCAXml(ZatcaInvoice data) {
   final builder = XmlBuilder();
+  final formatter = NumberFormat("#.##");
   builder.processing('xml', 'version="1.0" encoding="UTF-8"');
   builder.element(
     'Invoice',
@@ -170,6 +172,7 @@ XmlDocument generateZATCAXml(ZatcaInvoice data) {
                     'cbc:ID',
                     nest: () {
                       builder.attribute('schemeID', 'CRN');
+                      builder.text('');
                     },
                   );
                 },
@@ -251,7 +254,7 @@ XmlDocument generateZATCAXml(ZatcaInvoice data) {
             'cbc:TaxAmount',
             nest: () {
               builder.attribute('currencyID', 'SAR');
-              builder.text(data.taxAmount);
+              builder.text(data.taxAmount.toStringAsFixed(2));
             },
           );
           builder.element(
@@ -261,16 +264,15 @@ XmlDocument generateZATCAXml(ZatcaInvoice data) {
                 'cbc:TaxableAmount',
                 nest: () {
                   builder.attribute('currencyID', 'SAR');
-                  builder.text((double.parse(data.totalAmount) - double.parse(data.taxAmount))
-                      .toStringAsFixed(1).replaceAll(RegExp(r'\.0$'), ''),
-                  );
+                  builder.text(formatter.format(data.totalAmount - data.taxAmount));
+                  
                 },
               );
               builder.element(
                 'cbc:TaxAmount',
                 nest: () {
                   builder.attribute('currencyID', 'SAR');
-                  builder.text(data.taxAmount);
+                  builder.text(formatter.format(data.taxAmount));
                 },
               );
               builder.element(
@@ -311,7 +313,7 @@ XmlDocument generateZATCAXml(ZatcaInvoice data) {
             'cbc:TaxAmount',
             nest: () {
               builder.attribute('currencyID', 'SAR');
-              builder.text(data.taxAmount);
+              builder.text(data.taxAmount.toStringAsFixed(2));
             },
           );
         },
@@ -320,8 +322,7 @@ XmlDocument generateZATCAXml(ZatcaInvoice data) {
       builder.element(
         'cac:LegalMonetaryTotal',
         nest: () {
-          double taxableAmount =
-              double.parse(data.totalAmount) - double.parse(data.taxAmount);
+          double taxableAmount =data.totalAmount - data.taxAmount;
           builder.element(
             'cbc:LineExtensionAmount',
             nest: () {
@@ -333,14 +334,14 @@ XmlDocument generateZATCAXml(ZatcaInvoice data) {
             'cbc:TaxExclusiveAmount',
             nest: () {
               builder.attribute('currencyID', 'SAR');
-              builder.text(taxableAmount.toStringAsFixed(2));
+              builder.text(formatter.format(taxableAmount));
             },
           );
           builder.element(
             'cbc:TaxInclusiveAmount',
             nest: () {
               builder.attribute('currencyID', 'SAR');
-              builder.text(data.totalAmount);
+              builder.text(data.totalAmount.toStringAsFixed(2));
             },
           );
           builder.element(
@@ -354,7 +355,7 @@ XmlDocument generateZATCAXml(ZatcaInvoice data) {
             'cbc:PayableAmount',
             nest: () {
               builder.attribute('currencyID', 'SAR');
-              builder.text(data.totalAmount);
+              builder.text(data.totalAmount.toStringAsFixed(2));
             },
           );
         },
@@ -377,15 +378,14 @@ XmlDocument generateZATCAXml(ZatcaInvoice data) {
               'cbc:LineExtensionAmount',
               nest: () {
                 builder.attribute('currencyID', 'SAR');
-                builder.text(line.lineExtensionAmount);
+                builder.text(line.lineExtensionAmount.toStringAsFixed(2));
               },
             );
             builder.element(
               'cac:TaxTotal',
               nest: () {
                 double taxAmount =
-                    (double.parse(line.lineExtensionAmount) *
-                        double.parse(line.taxPercent) /
+                    (line.lineExtensionAmount* line.taxPercent /
                         100);
                 builder.element(
                   'cbc:TaxAmount',
@@ -394,13 +394,12 @@ XmlDocument generateZATCAXml(ZatcaInvoice data) {
                     builder.text(taxAmount.toStringAsFixed(2));
                   },
                 );
-                double roundingAmopunt =
-                    double.parse(line.lineExtensionAmount) + taxAmount;
+                double roundingAmount =line.lineExtensionAmount + taxAmount;
                 builder.element(
                   'cbc:RoundingAmount',
                   nest: () {
                     builder.attribute('currencyID', 'SAR');
-                    builder.text(roundingAmopunt.toStringAsFixed(2));
+                    builder.text(roundingAmount.toStringAsFixed(2));
                   },
                 );
               },
@@ -413,7 +412,7 @@ XmlDocument generateZATCAXml(ZatcaInvoice data) {
                   'cac:ClassifiedTaxCategory',
                   nest: () {
                     builder.element('cbc:ID', nest: 'S');
-                    builder.element('cbc:Percent', nest: line.taxPercent);
+                    builder.element('cbc:Percent', nest: formatter.format(line.taxPercent));
                     builder.element(
                       'cac:TaxScheme',
                       nest: () {
@@ -431,7 +430,7 @@ XmlDocument generateZATCAXml(ZatcaInvoice data) {
                   'cbc:PriceAmount',
                   nest: () {
                     builder.attribute('currencyID', 'SAR');
-                    builder.text(line.lineExtensionAmount);
+                    builder.text(line.lineExtensionAmount.toStringAsFixed(14));
                   },
                 );
               },

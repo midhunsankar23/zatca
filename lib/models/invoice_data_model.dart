@@ -40,10 +40,10 @@ class ZatcaInvoice {
   final List<InvoiceLine> invoiceLines;
 
   /// The total tax amount for the invoice.
-  final String taxAmount;
+  final double taxAmount;
 
   /// The total amount for the invoice.
-  final String totalAmount;
+  final double totalAmount;
 
   /// The hash of the previous invoice, if applicable.
   final String previousInvoiceHash;
@@ -253,9 +253,9 @@ class InvoiceLine {
   final String id;
   final String quantity;
   final String unitCode;
-  final String lineExtensionAmount;
+  final double lineExtensionAmount;
   final String itemName;
-  final String taxPercent;
+  final double taxPercent;
 
   /// Creates a new [InvoiceLine] instance.
   InvoiceLine({
