@@ -724,7 +724,16 @@ XmlDocument defaultUBLExtensionsSignedPropertiesForSigning({
                           );
                         },
                       );
-                      builder.element('ds:DigestValue', nest: certificateHash);
+                      builder.element(
+                        'ds:DigestValue',
+                        nest:(){
+                          builder.attribute(
+                            'xmlns:ds',
+                            'http://www.w3.org/2000/09/xmldsig#',
+                          );
+                          builder.text(certificateHash);
+                        },
+                      );
                     },
                   );
 
@@ -733,11 +742,23 @@ XmlDocument defaultUBLExtensionsSignedPropertiesForSigning({
                     nest: () {
                       builder.element(
                         'ds:X509IssuerName',
-                        nest: certificateIssuer,
+                        nest: (){
+                          builder.attribute(
+                            'xmlns:ds',
+                            'http://www.w3.org/2000/09/xmldsig#',
+                          );
+                          builder.text(certificateIssuer);
+                        },
                       );
                       builder.element(
                         'ds:X509SerialNumber',
-                        nest: certificateSerialNumber,
+                        nest: (){
+                          builder.attribute(
+                            'xmlns:ds',
+                            'http://www.w3.org/2000/09/xmldsig#',
+                          );
+                          builder.text(certificateSerialNumber);
+                        },
                       );
                     },
                   );

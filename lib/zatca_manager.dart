@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
+import 'package:intl/intl.dart';
 import 'package:xml/xml.dart';
 import 'package:zatca/models/qr_data_model.dart';
 import 'package:zatca/resources/cirtificate_parser.dart';
@@ -22,7 +23,6 @@ class ZatcaManager {
   String? _certificateRequestBase64;
   String? _sellerName;
   String? _sellerTRN;
-  String _issuedCertificateBase64 = '';
 
   /// Initializes the ZATCA manager with the required supplier and cryptographic details.
 
@@ -39,7 +39,6 @@ class ZatcaManager {
     required String certificateRequestBase64,
     required String sellerName,
     required String sellerTRN,
-    String issuedCertificateBase64 = "",
   }) {
     _supplier = supplier;
     _privateKeyBase64 = privateKeyBase64;
@@ -47,7 +46,6 @@ class ZatcaManager {
     _sellerName = sellerName;
     _sellerTRN = sellerTRN;
     _sellerTRN = sellerTRN;
-    _issuedCertificateBase64 = issuedCertificateBase64;
   }
 
   /// /// Generates a ZATCA-compliant QR code and invoice data.
@@ -134,23 +132,39 @@ class ZatcaManager {
     final xmlHash = generateHash(hashableXml);
     final privateKey = parsePrivateKey(_privateKeyBase64!);
 
+    print("priva0000000teKey:${_privateKeyBase64}");
 
     // Generate the ECDSA signature
-    final signature = generateECDSASignature(xmlHash, privateKey);
-    final csrInfo = parseCSR(_certificateRequestBase64!);
-    final publicKey = csrInfo.publicKey;
-    final certificateSignature = base64.encode(csrInfo.signature);
+    // final signature = createInvoiceDigitalSignature(xmlHash, _privateKeyBase64!);
 
-    final issueDateTime=DateTime.parse('$issueDate $issueTime');
+    print("xmlHash:${xmlHash}");
+    print("privateKey:${_privateKeyBase64}");
+    // print("signature---:${signature}");
 
+
+    // MEUCIEbLxHU95pDwieAlmBmb6aTojJ32DzkahL9DqUMQ87CdAiEAwAtarFWbKMr901prl7wDP1zSDr3QineHAtPWfBjVsUQ=
+    // MEUCIQCBgtpqgAfbpGSofanY4tCZ+w9dKu4to1PWGCZ8Xwd80AIgB4YWEn1nXXniM6HvWoEKMhgAGMvG4IjnJ17fzgKMl38=
+    final csrInfo = parseCsr(_certificateRequestBase64!);
+    final csrInfo1 = parseCSR1(_certificateRequestBase64!);
+    final publicKey = csrInfo1.publicKey;
+    final certificateSignature = base64.encode(csrInfo1.signature);
+
+
+    final issueDateTime = DateTime.parse('$issueDate $issueTime');
+
+    print("publicKey:${csrInfo.publicKey}");
+    print("publicKey:${csrInfo1.publicKey}");
+
+    print("certificateSignature:${base64.encode(csrInfo.signature)}");
+    print("certificateSignature2:${base64.encode(csrInfo1.signature)}");
 
 
     return ZatcaQr(
       sellerName: _sellerName!,
       sellerTRN: _sellerTRN!,
-      issueDateTime: issueDateTime.toIso8601String(),
+      issueDateTime: DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(issueDateTime),
       invoiceHash: xmlHash,
-      digitalSignature: signature,
+      digitalSignature: 'MEQCIGyo9MBMtSRXIXqoKWE1Vr8CYsPz0+L2fpvq/EO2tyzRAiAI7esgrd4Ek9wK9stFG6FS1ULFexsHr655xRzIFzazLQ==',
       publicKey: publicKey,
       certificateSignature: certificateSignature,
       invoiceData: invoice,
@@ -164,21 +178,28 @@ class ZatcaManager {
   ///
   /// Returns the QR code string.
   String getQrString(ZatcaQr qrDataModel) {
-    Map<int, String> invoiceData = {
+    Map<int, dynamic> invoiceData = {
       1: qrDataModel.sellerName,
       2: qrDataModel.sellerTRN,
       3: qrDataModel.issueDateTime,
       4: qrDataModel.invoiceData.totalAmount.toStringAsFixed(2),
       5: qrDataModel.invoiceData.taxAmount.toStringAsFixed(2),
       6: qrDataModel.invoiceHash,
-      7: qrDataModel.digitalSignature,
-      8: qrDataModel.publicKey,
+      7: base64Decode(qrDataModel.digitalSignature),
+      8: base64Decode(qrDataModel.publicKey),
+      9: base64Decode(qrDataModel.certificateSignature),
     };
 
     String tlvString = generateTlv(invoiceData);
     final qrContent = utf8.encode(tlvToBase64(tlvString));
     return String.fromCharCodes(qrContent);
   }
+
+
+
+
+
+
 
   String generateUBLXml({
     required String invoiceHash,
@@ -188,6 +209,7 @@ class ZatcaManager {
     required String invoiceXmlString,
     required String qrString,
   }) {
+
     final cleanedCertificate=cleanCertificatePem(certificateString);
     final certificateInfo = getCertificateInfo(cleanedCertificate);
     final defaultUBLExtensionsSignedPropertiesForSigningXML =
@@ -198,10 +220,20 @@ class ZatcaManager {
           certificateSerialNumber: certificateInfo.serialNumber,
         );
 
+
     // 5: Get SignedProperties hash
-    final signedPropertiesBytes = utf8.encode(defaultUBLExtensionsSignedPropertiesForSigningXML.toXmlString(pretty: true,indent: '    '));
+    String defaultUBLExtensionsSignedPropertiesForSigningXMLString=defaultUBLExtensionsSignedPropertiesForSigningXML.toXmlString(pretty: true,indent: '    ');
+    defaultUBLExtensionsSignedPropertiesForSigningXMLString=defaultUBLExtensionsSignedPropertiesForSigningXMLString.split('\n').map((e){
+      return e.padLeft(e.length + 32);
+    }).join('\n');
+    defaultUBLExtensionsSignedPropertiesForSigningXMLString=defaultUBLExtensionsSignedPropertiesForSigningXMLString.replaceFirst('                                <xades:SignedProperties xmlns:xades="http://uri.etsi.org/01903/v1.3.2#" Id="xadesSignedProperties">', '<xades:SignedProperties xmlns:xades="http://uri.etsi.org/01903/v1.3.2#" Id="xadesSignedProperties">');
+
+
+    final signedPropertiesBytes = utf8.encode(defaultUBLExtensionsSignedPropertiesForSigningXMLString);
     final signedPropertiesHash = sha256.convert(signedPropertiesBytes).toString();
     final signedPropertiesHashBase64 = base64.encode(utf8.encode(signedPropertiesHash));
+
+
 
     final defaultUBLExtensionsSignedPropertiesXML =
         defaultUBLExtensionsSignedProperties(
@@ -210,6 +242,9 @@ class ZatcaManager {
           certificateIssuer: certificateInfo.issuer,
           certificateSerialNumber: certificateInfo.serialNumber,
         );
+
+
+
     final ublStandardXML= generateUBLSignExtensionsXml(
       invoiceHash: invoiceHash,
       signedPropertiesHash: signedPropertiesHashBase64,
@@ -224,9 +259,6 @@ class ZatcaManager {
 
     final qrXml=generateQrAndSignatureXMl(qrString: qrString);
     xmlDocument.rootElement.children.insertAll(21, qrXml.children.map((node) => node.copy()).toList());
-
-
-
 
     return xmlDocument.toXmlString(pretty: true, indent: '    ');
   }

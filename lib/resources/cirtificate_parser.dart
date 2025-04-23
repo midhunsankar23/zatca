@@ -4,19 +4,60 @@ import 'dart:typed_data';
 import 'package:asn1lib/asn1lib.dart';
 import 'package:crypto/crypto.dart';
 import 'package:pointycastle/ecc/api.dart';
+import 'package:convert/convert.dart';
+
+import 'package:basic_utils/basic_utils.dart' as bUtil;
 
 import '../models/cirtificate_info.dart';
 import '../models/csr_info.dart';
 
+
+/// Helper: Convert HEX string to bytes
+Uint8List hexToBytes(String hex) {
+  hex = hex.replaceAll(RegExp(r'\s+'), ''); // remove spaces/newlines
+  Uint8List bytes = Uint8List(hex.length ~/ 2);
+  for (int i = 0; i < hex.length; i += 2) {
+    bytes[i ~/ 2] = int.parse(hex.substring(i, i + 2), radix: 16);
+  }
+  return bytes;
+}
+
+/// Optional helper: Wrap base64 string into 64-character lines (PEM standard)
+String wrapBase64(String input, {int chunkSize = 64}) {
+  final buffer = StringBuffer();
+  for (var i = 0; i < input.length; i += chunkSize) {
+    buffer.writeln(input.substring(i, i + chunkSize > input.length ? input.length : i + chunkSize));
+  }
+  return buffer.toString().trim();
+}
 /// Parse the csr .
-CsrInfo parseCSR(String csrPem) {
+CsrInfo parseCsr(String csrPem){
+  bUtil.CertificateSigningRequestData a= bUtil.X509Utils.csrFromPem(csrPem);
+
+  print(a.certificationRequestInfo!.publicKeyInfo!.bytes);
+  // Convert HEX string to bytes
+  Uint8List publicKeyBytes = hexToBytes(a.certificationRequestInfo!.publicKeyInfo!.bytes!);
+  Uint8List signatureBytes = hexToBytes(a.signature!);
+
+  // Encode bytes to base64
+  String publicKey = base64Encode(publicKeyBytes);
+  String signature = base64Encode(signatureBytes);
+
+  return CsrInfo(
+    publicKey: publicKey,
+    publicKeyRaw: publicKeyBytes,
+    signature: signatureBytes,
+  );
+}
+
+CsrInfo parseCSR1(String csrPem) {
   /// Remove the PEM headers and footers
   final pemContent = csrPem
       .replaceAll("-----BEGIN CERTIFICATE REQUEST-----", "")
       .replaceAll("-----END CERTIFICATE REQUEST-----", "")
       .replaceAll("\n", "")
-      .replaceAll("\r", ""); // Handle potential carriage returns
-
+      .replaceAll("\r", "") // Handle potential carriage returns
+      .replaceAll(" ", ""); // Handle spaces
   /// Decode the Base64 PEM content
   final bytes = base64.decode(pemContent);
 
@@ -26,7 +67,7 @@ CsrInfo parseCSR(String csrPem) {
 
   /// Extract the certification request information
   final certificationRequestInfo = topLevelSeq.elements[0] as ASN1Sequence;
-
+  final certificationRequestInfoBytes = certificationRequestInfo.encodedBytes;
   /// Extract the public key
   final publicKeyInfo = certificationRequestInfo.elements[2] as ASN1Sequence;
   final publicKeyBitString = publicKeyInfo.elements[1] as ASN1BitString;
@@ -46,7 +87,8 @@ CsrInfo parseCSR(String csrPem) {
       radix: 16,
     );
     domainParams.curve.decompressPoint(prefix, x);
-  } else if (rawPublicKeyBytes.length == 65) {
+  }
+  else if (rawPublicKeyBytes.length == 65) {
     final x = BigInt.parse(
       rawPublicKeyBytes
           .sublist(1, 33)
@@ -76,9 +118,12 @@ CsrInfo parseCSR(String csrPem) {
     ...rawPublicKeyBytes,
   ];
 
+
+  print("publicKeyDER:------- ${base64.encode(publicKeyDER)}");
   /// Extract the signature
   final signature = topLevelSeq.elements[2] as ASN1BitString;
-  final signatureBytes = signature.contentBytes();
+  // final signatureBytes = signature.contentBytes();
+  final signatureBytes = signature.valueBytes().sublist(1);
 
   return CsrInfo(
     publicKey: base64.encode(publicKeyDER),
@@ -87,7 +132,8 @@ CsrInfo parseCSR(String csrPem) {
   );
 }
 
-/// Extracts the PEM content by removing headers, footers, and line breaks.
+
+
 String cleanCertificatePem(String pem) {
   return pem
       .replaceAll("-----BEGIN CERTIFICATE-----", "")
@@ -99,8 +145,36 @@ String cleanCertificatePem(String pem) {
 /// Parses the certificate and extracts information such as hash, issuer, serial number, public key, and signature.
 CertificateInfo getCertificateInfo(String pemContent) {
   // Generate hash
-  final hash =
-      sha256.convert(utf8.encode(pemContent)).toString();
+  final hash = sha256.convert(utf8.encode(pemContent)).toString();
+  final hashBase64Encoded = base64.encode(utf8.encode(hash));
+
+  final bytes = _decodePem(pemContent);
+  final asn1Parser = ASN1Parser(bytes);
+  final topLevelSeq = asn1Parser.nextObject() as ASN1Sequence;
+
+  // tbsCertificate is the first element in the certificate sequence
+  final tbsCertificate = topLevelSeq.elements[0] as ASN1Sequence;
+
+  // Serial number is usually the second element in tbsCertificate
+  final serialNumberASN1 = tbsCertificate.elements[1] as ASN1Integer;
+  final serialNumber=serialNumberASN1.valueAsBigInteger;
+
+  print("serialNumber ${serialNumber.toString()}");
+
+  // Issuer is usually the fourth element in tbsCertificate
+  final issuerSeq = tbsCertificate.elements[3] as ASN1Sequence;
+  final issuer = _parseName(issuerSeq);
+
+  return CertificateInfo(
+    hash: hashBase64Encoded,
+    issuer: issuer,
+    serialNumber: serialNumber.toString(),
+  );
+}
+CertificateInfo getCertificateInfo1(String pemContent) {
+  // Generate hash
+  final hash = sha256.convert(utf8.encode(pemContent)).toString();
+  final hashBase64Encoded = base64.encode(utf8.encode(hash));
 
 
 
@@ -119,15 +193,10 @@ CertificateInfo getCertificateInfo(String pemContent) {
   final issuerSeq = tbsCertificate.elements[3] as ASN1Sequence;
   final issuer = _parseName(issuerSeq);
 
-
-  print('serialNumber----: $serialNumber');
-
   return CertificateInfo(
-    hash: hash,
+    hash: hashBase64Encoded,
     issuer: issuer,
     serialNumber: serialNumber.toString(),
-    publicKey: '',
-    signature: '',
   );
 }
 

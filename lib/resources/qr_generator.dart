@@ -6,9 +6,30 @@ import 'dart:typed_data';
 /// [data] - A map where the key is the tag and the value is the associated data.
 ///
 /// Returns the TLV string.
-String generateTlv(Map<int, String> data) {
+String generateTlv(Map<int, dynamic> data) {
   StringBuffer tlv = StringBuffer();
 
+  data.forEach((tag, value) {
+    tlv.write(tag.toRadixString(16).padLeft(2, '0')); // Tag in hex
+
+    List<int> valueBytes;
+    if (value is String) {
+      valueBytes = utf8.encode(value); // String → UTF-8 bytes
+    } else if (value is Uint8List) {
+      valueBytes = value; // Already bytes
+    } else {
+      throw ArgumentError('Unsupported value type for tag $tag');
+    }
+
+    tlv.write(valueBytes.length.toRadixString(16).padLeft(2, '0')); // Length
+    tlv.write(valueBytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join()); // Value as hex
+  });
+
+  return tlv.toString();
+}
+
+String generateTlv1(Map<int, String> data) {
+  StringBuffer tlv = StringBuffer();
   data.forEach((tag, value) {
     String tagHex = tag.toRadixString(16).padLeft(2, '0'); // Convert tag to hex
     String valueHex = _stringToHex(value); // Convert value to hex
@@ -52,4 +73,13 @@ String _stringToHex(String input) {
   return input.codeUnits
       .map((unit) => unit.toRadixString(16).padLeft(2, '0'))
       .join();
+}
+
+String _hexToString(String hex) {
+  List<int> codeUnits = [];
+  for (int i = 0; i < hex.length; i += 2) {
+    String hexPair = hex.substring(i, i + 2);
+    codeUnits.add(int.parse(hexPair, radix: 16));
+  }
+  return String.fromCharCodes(codeUnits);
 }
