@@ -17,8 +17,6 @@ dependencies:
   xml: ^6.5.0
   crypto: ^3.0.6
   intl: ^0.20.2
-  basic_utils: ^5.8.2
-  convert: ^3.0.0
 
 dev_dependencies:
   flutter_test:
