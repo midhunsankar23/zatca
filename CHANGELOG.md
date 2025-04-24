@@ -1,3 +1,3 @@
-## 0.1.0
+## 0.2.0
 
-* TODO: Describe initial release.
+* Added new feature: `generateUBLXml` for generating UBL XML with digital signatures and QR code integration.
