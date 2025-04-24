@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/intl.dart';
 import 'package:zatca/models/invoice_data_model.dart';
 import 'package:zatca/resources/enums.dart';
 
@@ -22,17 +23,8 @@ void main() {
           postalZone: "31952",
         ),
       ),
-
-
-      ///PrivateKey
-      privateKeyBase64:"""-----BEGIN EC PRIVATE KEY-----
------END EC PRIVATE KEY-----""",
-          
-
-      ///"""-----BEGIN CERTIFICATE REQUEST-----\nCSRKEY\n-----END CERTIFICATE REQUEST-----",
-      certificateRequestBase64:
-          """-----BEGIN CERTIFICATE REQUEST-----
------END CERTIFICATE REQUEST-----""",
+      privateKeyPem: """-----BEGIN EC PRIVATE KEY-----\npemContent\n-----END EC PRIVATE KEY-----""",
+      certificatePem: """-----BEGIN CERTIFICATE-----\npemContent\n-----END CERTIFICATE-----""",
     );
 
     final qrData = zatcaManager.generateZatcaQrInit(
@@ -72,16 +64,13 @@ void main() {
     String invoiceXmlString = qrData.xmlString;
     String qrString = zatcaManager.getQrString(qrData);
 
-
-
-
+    print("qr: $qrString");
     String ublXML = zatcaManager.generateUBLXml(
       invoiceHash: invoiceHash,
-      signingTime:  DateTime.now().toUtc().toIso8601String(),
+      signingTime:
+          "${DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateTime.now().toUtc())}Z",
       digitalSignature: qrData.digitalSignature,
       invoiceXmlString: invoiceXmlString,
-      certificateString: """-----BEGIN CERTIFICATE-----
------END CERTIFICATE-----""",
       qrString: qrString,
     );
 
