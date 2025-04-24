@@ -5,6 +5,7 @@ import 'package:zatca/resources/enums.dart';
 import 'package:zatca/zatca_manager.dart';
 
 void main() {
+  /// Initialize the ZatcaManager singleton instance with seller and supplier details.
   final zatcaManager = ZatcaManager.instance;
   zatcaManager.initializeZacta(
     sellerName: "My Branch",
@@ -27,6 +28,7 @@ void main() {
         """-----BEGIN CERTIFICATE-----\ncertificate_pem_content\n-----END CERTIFICATE-----""",
   );
 
+  /// Generate QR data for the invoice using the ZatcaManager.
   final qrData = zatcaManager.generateZatcaQrInit(
     invoiceLines: [
       InvoiceLine(
@@ -59,13 +61,17 @@ void main() {
     previousInvoiceHash: "zDnQnE05P6rFMqF1ai21V5hIRlUq/EXvrpsaoPkWRVI=",
     invoiceRelationType: InvoiceRelationType.b2c,
   );
+
+  /// Extract XML and QR string from the generated QR data.
   String xml = qrData.xmlString;
   String qr = zatcaManager.getQrString(qrData);
 
+  /// Extract additional details like invoice hash and digital signature.
   String invoiceHash = qrData.invoiceHash;
   String invoiceXmlString = qrData.xmlString;
   String qrString = zatcaManager.getQrString(qrData);
 
+  /// Generate UBL XML using the extracted details.
   String ublXML = zatcaManager.generateUBLXml(
     invoiceHash: invoiceHash,
     signingTime:
@@ -74,6 +80,8 @@ void main() {
     invoiceXmlString: invoiceXmlString,
     qrString: qrString,
   );
+
+  /// Debug output to print the generated XML, QR, and UBL XML.
   if (kDebugMode) {
     print("XML: $xml");
     print("qr: $qr");

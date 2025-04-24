@@ -6,7 +6,11 @@ import 'package:asn1lib/asn1lib.dart';
 import 'package:convert/convert.dart';
 import 'package:pointycastle/export.dart';
 
-/// Parses a Base64-encoded private key in PKCS#8 or SEC1 format.
+/// Parses a Base64-encoded private key in PKCS#8 or SEC1 format and returns an ECPrivateKey object.
+/// 
+/// [base64Key] - The Base64-encoded private key string.
+/// 
+/// Throws [ArgumentError] if the private key format is invalid.
 ECPrivateKey parsePrivateKey(String base64Key) {
   String cleanedBase64Key = base64Key
       .replaceAll('-----BEGIN EC PRIVATE KEY-----', '')
@@ -45,6 +49,12 @@ ECPrivateKey parsePrivateKey(String base64Key) {
   }
 }
 
+/// Creates a digital signature for the given invoice hash using the provided private key.
+/// 
+/// [invoiceHashBase64] - The Base64-encoded hash of the invoice.
+/// [privateKeyPem] - The PEM-encoded EC private key.
+/// 
+/// Returns the Base64-encoded digital signature.
 String createInvoiceDigitalSignature(
   String invoiceHashBase64,
   String privateKeyPem,
@@ -78,7 +88,11 @@ String createInvoiceDigitalSignature(
   return base64.encode(derEncoded);
 }
 
-// Helper to parse EC private key from PEM
+/// Helper method to parse an EC private key from PEM format and return an ECPrivateKey object.
+/// 
+/// [pem] - The PEM-encoded EC private key.
+/// 
+/// Returns an [ECPrivateKey] object.
 ECPrivateKey _parseECPrivateKeyFromPem(String pem) {
   final lines = pem
       .replaceAll('-----BEGIN EC PRIVATE KEY-----', '')
@@ -101,6 +115,9 @@ ECPrivateKey _parseECPrivateKeyFromPem(String pem) {
   return ECPrivateKey(privateKeyNum, domainParams);
 }
 
+/// Generates a secure random number generator using FortunaRandom.
+/// 
+/// Returns a [SecureRandom] instance seeded with a cryptographically secure random value.
 SecureRandom _getSecureRandom() {
   final secureRandom = FortunaRandom();
   final seedSource = Random.secure();
@@ -111,3 +128,4 @@ SecureRandom _getSecureRandom() {
   secureRandom.seed(KeyParameter(seed));
   return secureRandom;
 }
+
