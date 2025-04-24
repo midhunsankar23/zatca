@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:intl/intl.dart';
 import 'package:zatca/models/invoice_data_model.dart';
 import 'package:zatca/resources/enums.dart';
 import 'package:zatca/zatca_manager.dart';
@@ -20,12 +21,12 @@ void main() {
         postalZone: "31952",
       ),
     ),
-    privateKeyBase64: "",
+    privateKeyPem: "",
 
     ///PrivateKey
-    certificateRequestBase64: "",
+    certificatePem: "",
 
-    ///"""-----BEGIN CERTIFICATE REQUEST-----\nCSRKEY\n-----END CERTIFICATE REQUEST-----",
+    ///"""-----BEGIN CERTIFICATE-----\n<pemContent>\n-----END CERTIFICATE-----",
   );
 
   final qrData = zatcaManager.generateZatcaQrInit(
@@ -62,8 +63,22 @@ void main() {
   );
   String xml = qrData.xmlString;
   String qr = zatcaManager.getQrString(qrData);
+
+  String invoiceHash = qrData.invoiceHash;
+  String invoiceXmlString = qrData.xmlString;
+  String qrString = zatcaManager.getQrString(qrData);
+
+  String ublXML = zatcaManager.generateUBLXml(
+    invoiceHash: invoiceHash,
+    signingTime:
+        "${DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateTime.now().toUtc())}Z",
+    digitalSignature: qrData.digitalSignature,
+    invoiceXmlString: invoiceXmlString,
+    qrString: qrString,
+  );
   if (kDebugMode) {
     print("XML: $xml");
     print("qr: $qr");
+    print("UBL XML: $ublXML");
   }
 }

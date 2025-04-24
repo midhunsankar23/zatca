@@ -264,8 +264,9 @@ XmlDocument generateZATCAXml(ZatcaInvoice data) {
                 'cbc:TaxableAmount',
                 nest: () {
                   builder.attribute('currencyID', 'SAR');
-                  builder.text(formatter.format(data.totalAmount - data.taxAmount));
-                  
+                  builder.text(
+                    formatter.format(data.totalAmount - data.taxAmount),
+                  );
                 },
               );
               builder.element(
@@ -322,7 +323,7 @@ XmlDocument generateZATCAXml(ZatcaInvoice data) {
       builder.element(
         'cac:LegalMonetaryTotal',
         nest: () {
-          double taxableAmount =data.totalAmount - data.taxAmount;
+          double taxableAmount = data.totalAmount - data.taxAmount;
           builder.element(
             'cbc:LineExtensionAmount',
             nest: () {
@@ -385,8 +386,7 @@ XmlDocument generateZATCAXml(ZatcaInvoice data) {
               'cac:TaxTotal',
               nest: () {
                 double taxAmount =
-                    (line.lineExtensionAmount* line.taxPercent /
-                        100);
+                    (line.lineExtensionAmount * line.taxPercent / 100);
                 builder.element(
                   'cbc:TaxAmount',
                   nest: () {
@@ -394,7 +394,7 @@ XmlDocument generateZATCAXml(ZatcaInvoice data) {
                     builder.text(taxAmount.toStringAsFixed(2));
                   },
                 );
-                double roundingAmount =line.lineExtensionAmount + taxAmount;
+                double roundingAmount = line.lineExtensionAmount + taxAmount;
                 builder.element(
                   'cbc:RoundingAmount',
                   nest: () {
@@ -412,7 +412,10 @@ XmlDocument generateZATCAXml(ZatcaInvoice data) {
                   'cac:ClassifiedTaxCategory',
                   nest: () {
                     builder.element('cbc:ID', nest: 'S');
-                    builder.element('cbc:Percent', nest: formatter.format(line.taxPercent));
+                    builder.element(
+                      'cbc:Percent',
+                      nest: formatter.format(line.taxPercent),
+                    );
                     builder.element(
                       'cac:TaxScheme',
                       nest: () {
@@ -444,8 +447,7 @@ XmlDocument generateZATCAXml(ZatcaInvoice data) {
   /// Build the XML document
   final document = builder.buildDocument();
 
- return document;
-
+  return document;
 }
 
 ///     Generate a ZATCA-compliant UBLExtensions XML string for the invoice data.
@@ -458,226 +460,227 @@ XmlDocument generateUBLSignExtensionsXml({
 }) {
   final builder = XmlBuilder();
   builder.element(
-      'ext:UBLExtensions',
-     nest:  () {
-       builder.element(
-         'ext:UBLExtension',
-         nest: () {
-           builder.element(
-             'ext:ExtensionURI',
-             nest: 'urn:oasis:names:specification:ubl:dsig:enveloped:xades',
-           );
-           builder.element(
-             'ext:ExtensionContent',
-             nest: () {
-               builder.element(
-                 'sig:UBLDocumentSignatures',
-                 nest: () {
-                   builder.attribute(
-                     'xmlns:sac',
-                     'urn:oasis:names:specification:ubl:schema:xsd:SignatureAggregateComponents-2',
-                   );
-                   builder.attribute(
-                     'xmlns:sbc',
-                     'urn:oasis:names:specification:ubl:schema:xsd:SignatureBasicComponents-2',
-                   );
-                   builder.attribute(
-                     'xmlns:sig',
-                     'urn:oasis:names:specification:ubl:schema:xsd:CommonSignatureComponents-2',
-                   );
-                   builder.element(
-                     'sac:SignatureInformation',
-                     nest: () {
-                       builder.element(
-                         'cbc:ID',
-                         nest: 'urn:oasis:names:specification:ubl:signature:1',
-                       );
-                       builder.element(
-                         'sbc:ReferencedSignatureID',
-                         nest: 'urn:oasis:names:specification:ubl:signature:Invoice',
-                       );
-                       builder.element(
-                         'ds:Signature',
-                         nest: () {
-                           builder.attribute('Id', 'signature');
-                           builder.attribute(
-                             'xmlns:ds',
-                             'http://www.w3.org/2000/09/xmldsig#',
-                           );
-                           builder.element(
-                             'ds:SignedInfo',
-                             nest: () {
-                               builder.element(
-                                 'ds:CanonicalizationMethod',
-                                 nest: () {
-                                   builder.attribute(
-                                     'Algorithm',
-                                     'http://www.w3.org/2006/12/xml-c14n11',
-                                   );
-                                   builder.text('');
-                                 },
-                               );
-                               builder.element(
-                                 'ds:SignatureMethod',
-                                 nest: () {
-                                   builder.attribute(
-                                     'Algorithm',
-                                     'http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256',
-                                   );
-                                   builder.text('');
-                                 },
-                               );
-                               builder.element(
-                                 'ds:Reference',
-                                 nest: () {
-                                   builder.attribute('Id', 'invoiceSignedData');
-                                   builder.attribute('URI', '');
-                                   builder.element(
-                                     'ds:Transforms',
-                                     nest: () {
-                                       builder.element(
-                                         'ds:Transform',
-                                         nest: () {
-                                           builder.attribute(
-                                             'Algorithm',
-                                             'http://www.w3.org/TR/1999/REC-xpath-19991116',
-                                           );
-                                           builder.element(
-                                             'ds:XPath',
-                                             nest:
-                                             'not(//ancestor-or-self::ext:UBLExtensions)',
-                                           );
-                                         },
-                                       );
-                                       builder.element(
-                                         'ds:Transform',
-                                         nest: () {
-                                           builder.attribute(
-                                             'Algorithm',
-                                             'http://www.w3.org/TR/1999/REC-xpath-19991116',
-                                           );
-                                           builder.element(
-                                             'ds:XPath',
-                                             nest:
-                                             'not(//ancestor-or-self::cac:Signature)',
-                                           );
-                                         },
-                                       );
-                                       builder.element(
-                                         'ds:Transform',
-                                         nest: () {
-                                           builder.attribute(
-                                             'Algorithm',
-                                             'http://www.w3.org/TR/1999/REC-xpath-19991116',
-                                           );
-                                           builder.element(
-                                             'ds:XPath',
-                                             nest:
-                                             'not(//ancestor-or-self::cac:AdditionalDocumentReference[cbc:ID=\'QR\'])',
-                                           );
-                                         },
-                                       );
-                                       builder.element(
-                                         'ds:Transform',
-                                         nest: () {
-                                           builder.attribute(
-                                             'Algorithm',
-                                             'http://www.w3.org/2006/12/xml-c14n11',
-                                           );
-                                           builder.text('');
-                                         },
-                                       );
-                                     },
-                                   );
-                                   builder.element(
-                                     'ds:DigestMethod',
-                                     nest: () {
-                                       builder.attribute(
-                                         'Algorithm',
-                                         'http://www.w3.org/2001/04/xmlenc#sha256',
-                                       );
-                                       builder.text('');
-                                     },
-                                   );
-                                   builder.element(
-                                     'ds:DigestValue',
-                                     nest: invoiceHash,
-                                   );
-                                 },
-                               );
-                               builder.element(
-                                 'ds:Reference',
-                                 nest: () {
-                                   builder.attribute(
-                                     'Type',
-                                     'http://www.w3.org/2000/09/xmldsig#SignatureProperties',
-                                   );
-                                   builder.attribute(
-                                     'URI',
-                                     '#xadesSignedProperties',
-                                   );
-                                   builder.element(
-                                     'ds:DigestMethod',
-                                     nest: () {
-                                       builder.attribute(
-                                         'Algorithm',
-                                         'http://www.w3.org/2001/04/xmlenc#sha256',
-                                       );
-                                       builder.text('');
-                                     },
-                                   );
-                                   builder.element(
-                                     'ds:DigestValue',
-                                     nest: signedPropertiesHash,
-                                   );
-                                 },
-                               );
-                             },
-                           );
-                           builder.element(
-                             'ds:SignatureValue',
-                             nest: digitalSignature,
-                           );
-                           builder.element(
-                             'ds:KeyInfo',
-                             nest: () {
-                               builder.element(
-                                 'ds:X509Data',
-                                 nest: () {
-                                   builder.element(
-                                     'ds:X509Certificate',
-                                     nest: certificateString,
-                                   );
-                                 },
-                               );
-                             },
-                           );
-                           builder.element(
-                             'ds:Object',
-                             nest: () {
-                               builder.element(
-                                 'xades:QualifyingProperties',
-                                 nest: ublSignatureSignedPropertiesXML
-                                     .rootElement,
-                                 attributes: {
-                                   'Target': 'signature',
-                                   'xmlns:xades':
-                                   'http://uri.etsi.org/01903/v1.3.2#',
-                                 },
-                               );
-                             },
-                           );
-                         },
-                       );
-                     },
-                   );
-                 },
-               );
-             },
-           );
-         },
-       );
-     }
+    'ext:UBLExtensions',
+    nest: () {
+      builder.element(
+        'ext:UBLExtension',
+        nest: () {
+          builder.element(
+            'ext:ExtensionURI',
+            nest: 'urn:oasis:names:specification:ubl:dsig:enveloped:xades',
+          );
+          builder.element(
+            'ext:ExtensionContent',
+            nest: () {
+              builder.element(
+                'sig:UBLDocumentSignatures',
+                nest: () {
+                  builder.attribute(
+                    'xmlns:sac',
+                    'urn:oasis:names:specification:ubl:schema:xsd:SignatureAggregateComponents-2',
+                  );
+                  builder.attribute(
+                    'xmlns:sbc',
+                    'urn:oasis:names:specification:ubl:schema:xsd:SignatureBasicComponents-2',
+                  );
+                  builder.attribute(
+                    'xmlns:sig',
+                    'urn:oasis:names:specification:ubl:schema:xsd:CommonSignatureComponents-2',
+                  );
+                  builder.element(
+                    'sac:SignatureInformation',
+                    nest: () {
+                      builder.element(
+                        'cbc:ID',
+                        nest: 'urn:oasis:names:specification:ubl:signature:1',
+                      );
+                      builder.element(
+                        'sbc:ReferencedSignatureID',
+                        nest:
+                            'urn:oasis:names:specification:ubl:signature:Invoice',
+                      );
+                      builder.element(
+                        'ds:Signature',
+                        nest: () {
+                          builder.attribute('Id', 'signature');
+                          builder.attribute(
+                            'xmlns:ds',
+                            'http://www.w3.org/2000/09/xmldsig#',
+                          );
+                          builder.element(
+                            'ds:SignedInfo',
+                            nest: () {
+                              builder.element(
+                                'ds:CanonicalizationMethod',
+                                nest: () {
+                                  builder.attribute(
+                                    'Algorithm',
+                                    'http://www.w3.org/2006/12/xml-c14n11',
+                                  );
+                                  builder.text('');
+                                },
+                              );
+                              builder.element(
+                                'ds:SignatureMethod',
+                                nest: () {
+                                  builder.attribute(
+                                    'Algorithm',
+                                    'http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256',
+                                  );
+                                  builder.text('');
+                                },
+                              );
+                              builder.element(
+                                'ds:Reference',
+                                nest: () {
+                                  builder.attribute('Id', 'invoiceSignedData');
+                                  builder.attribute('URI', '');
+                                  builder.element(
+                                    'ds:Transforms',
+                                    nest: () {
+                                      builder.element(
+                                        'ds:Transform',
+                                        nest: () {
+                                          builder.attribute(
+                                            'Algorithm',
+                                            'http://www.w3.org/TR/1999/REC-xpath-19991116',
+                                          );
+                                          builder.element(
+                                            'ds:XPath',
+                                            nest:
+                                                'not(//ancestor-or-self::ext:UBLExtensions)',
+                                          );
+                                        },
+                                      );
+                                      builder.element(
+                                        'ds:Transform',
+                                        nest: () {
+                                          builder.attribute(
+                                            'Algorithm',
+                                            'http://www.w3.org/TR/1999/REC-xpath-19991116',
+                                          );
+                                          builder.element(
+                                            'ds:XPath',
+                                            nest:
+                                                'not(//ancestor-or-self::cac:Signature)',
+                                          );
+                                        },
+                                      );
+                                      builder.element(
+                                        'ds:Transform',
+                                        nest: () {
+                                          builder.attribute(
+                                            'Algorithm',
+                                            'http://www.w3.org/TR/1999/REC-xpath-19991116',
+                                          );
+                                          builder.element(
+                                            'ds:XPath',
+                                            nest:
+                                                'not(//ancestor-or-self::cac:AdditionalDocumentReference[cbc:ID=\'QR\'])',
+                                          );
+                                        },
+                                      );
+                                      builder.element(
+                                        'ds:Transform',
+                                        nest: () {
+                                          builder.attribute(
+                                            'Algorithm',
+                                            'http://www.w3.org/2006/12/xml-c14n11',
+                                          );
+                                          builder.text('');
+                                        },
+                                      );
+                                    },
+                                  );
+                                  builder.element(
+                                    'ds:DigestMethod',
+                                    nest: () {
+                                      builder.attribute(
+                                        'Algorithm',
+                                        'http://www.w3.org/2001/04/xmlenc#sha256',
+                                      );
+                                      builder.text('');
+                                    },
+                                  );
+                                  builder.element(
+                                    'ds:DigestValue',
+                                    nest: invoiceHash,
+                                  );
+                                },
+                              );
+                              builder.element(
+                                'ds:Reference',
+                                nest: () {
+                                  builder.attribute(
+                                    'Type',
+                                    'http://www.w3.org/2000/09/xmldsig#SignatureProperties',
+                                  );
+                                  builder.attribute(
+                                    'URI',
+                                    '#xadesSignedProperties',
+                                  );
+                                  builder.element(
+                                    'ds:DigestMethod',
+                                    nest: () {
+                                      builder.attribute(
+                                        'Algorithm',
+                                        'http://www.w3.org/2001/04/xmlenc#sha256',
+                                      );
+                                      builder.text('');
+                                    },
+                                  );
+                                  builder.element(
+                                    'ds:DigestValue',
+                                    nest: signedPropertiesHash,
+                                  );
+                                },
+                              );
+                            },
+                          );
+                          builder.element(
+                            'ds:SignatureValue',
+                            nest: digitalSignature,
+                          );
+                          builder.element(
+                            'ds:KeyInfo',
+                            nest: () {
+                              builder.element(
+                                'ds:X509Data',
+                                nest: () {
+                                  builder.element(
+                                    'ds:X509Certificate',
+                                    nest: certificateString,
+                                  );
+                                },
+                              );
+                            },
+                          );
+                          builder.element(
+                            'ds:Object',
+                            nest: () {
+                              builder.element(
+                                'xades:QualifyingProperties',
+                                nest:
+                                    ublSignatureSignedPropertiesXML.rootElement,
+                                attributes: {
+                                  'Target': 'signature',
+                                  'xmlns:xades':
+                                      'http://uri.etsi.org/01903/v1.3.2#',
+                                },
+                              );
+                            },
+                          );
+                        },
+                      );
+                    },
+                  );
+                },
+              );
+            },
+          );
+        },
+      );
+    },
   );
 
   return builder.buildDocument();
@@ -726,7 +729,7 @@ XmlDocument defaultUBLExtensionsSignedPropertiesForSigning({
                       );
                       builder.element(
                         'ds:DigestValue',
-                        nest:(){
+                        nest: () {
                           builder.attribute(
                             'xmlns:ds',
                             'http://www.w3.org/2000/09/xmldsig#',
@@ -742,7 +745,7 @@ XmlDocument defaultUBLExtensionsSignedPropertiesForSigning({
                     nest: () {
                       builder.element(
                         'ds:X509IssuerName',
-                        nest: (){
+                        nest: () {
                           builder.attribute(
                             'xmlns:ds',
                             'http://www.w3.org/2000/09/xmldsig#',
@@ -752,7 +755,7 @@ XmlDocument defaultUBLExtensionsSignedPropertiesForSigning({
                       );
                       builder.element(
                         'ds:X509SerialNumber',
-                        nest: (){
+                        nest: () {
                           builder.attribute(
                             'xmlns:ds',
                             'http://www.w3.org/2000/09/xmldsig#',
@@ -840,7 +843,6 @@ XmlDocument defaultUBLExtensionsSignedProperties({
   return builder.buildDocument();
 }
 
-
 XmlDocument generateQrAndSignatureXMl({required String qrString}) {
   final builder = XmlBuilder();
   builder.element(
@@ -866,13 +868,15 @@ XmlDocument generateQrAndSignatureXMl({required String qrString}) {
         'cbc:ID',
         nest: 'urn:oasis:names:specification:ubl:signature:Invoice',
       );
-      builder.element('cbc:SignatureMethod', nest: "urn:oasis:names:specification:ubl:dsig:enveloped:xades");
+      builder.element(
+        'cbc:SignatureMethod',
+        nest: "urn:oasis:names:specification:ubl:dsig:enveloped:xades",
+      );
     },
   );
 
   return builder.buildDocument();
 }
-
 
 String canonicalizeXml(String xmlString) {
   final document = XmlDocument.parse(xmlString);
@@ -880,8 +884,9 @@ String canonicalizeXml(String xmlString) {
   // Recursively sort attributes and format the nodes
   String normalizeNode(XmlNode node) {
     if (node is XmlElement) {
-      final sortedAttributes = node.attributes.toList()
-        ..sort((a, b) => a.name.toString().compareTo(b.name.toString()));
+      final sortedAttributes =
+          node.attributes.toList()
+            ..sort((a, b) => a.name.toString().compareTo(b.name.toString()));
 
       final buffer = StringBuffer();
       buffer.write('<${node.name}');
@@ -907,6 +912,7 @@ String canonicalizeXml(String xmlString) {
       return node.toXmlString();
     }
   }
+
   final normalizedXml = normalizeNode(document.rootElement);
   return normalizedXml;
 }

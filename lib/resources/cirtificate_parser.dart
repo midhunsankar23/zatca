@@ -4,13 +4,11 @@ import 'dart:typed_data';
 import 'package:asn1lib/asn1lib.dart';
 import 'package:crypto/crypto.dart';
 import 'package:pointycastle/ecc/api.dart';
-import 'package:convert/convert.dart';
 
 import 'package:basic_utils/basic_utils.dart' as bUtil;
 
 import '../models/cirtificate_info.dart';
 import '../models/csr_info.dart';
-
 
 /// Helper: Convert HEX string to bytes
 Uint8List hexToBytes(String hex) {
@@ -26,17 +24,25 @@ Uint8List hexToBytes(String hex) {
 String wrapBase64(String input, {int chunkSize = 64}) {
   final buffer = StringBuffer();
   for (var i = 0; i < input.length; i += chunkSize) {
-    buffer.writeln(input.substring(i, i + chunkSize > input.length ? input.length : i + chunkSize));
+    buffer.writeln(
+      input.substring(
+        i,
+        i + chunkSize > input.length ? input.length : i + chunkSize,
+      ),
+    );
   }
   return buffer.toString().trim();
 }
+
 /// Parse the csr .
-CsrInfo parseCsr(String csrPem){
-  bUtil.CertificateSigningRequestData a= bUtil.X509Utils.csrFromPem(csrPem);
+CsrInfo parseCsr(String csrPem) {
+  bUtil.CertificateSigningRequestData a = bUtil.X509Utils.csrFromPem(csrPem);
 
   print(a.certificationRequestInfo!.publicKeyInfo!.bytes);
   // Convert HEX string to bytes
-  Uint8List publicKeyBytes = hexToBytes(a.certificationRequestInfo!.publicKeyInfo!.bytes!);
+  Uint8List publicKeyBytes = hexToBytes(
+    a.certificationRequestInfo!.publicKeyInfo!.bytes!,
+  );
   Uint8List signatureBytes = hexToBytes(a.signature!);
 
   // Encode bytes to base64
@@ -68,6 +74,7 @@ CsrInfo parseCSR1(String csrPem) {
   /// Extract the certification request information
   final certificationRequestInfo = topLevelSeq.elements[0] as ASN1Sequence;
   final certificationRequestInfoBytes = certificationRequestInfo.encodedBytes;
+
   /// Extract the public key
   final publicKeyInfo = certificationRequestInfo.elements[2] as ASN1Sequence;
   final publicKeyBitString = publicKeyInfo.elements[1] as ASN1BitString;
@@ -87,8 +94,7 @@ CsrInfo parseCSR1(String csrPem) {
       radix: 16,
     );
     domainParams.curve.decompressPoint(prefix, x);
-  }
-  else if (rawPublicKeyBytes.length == 65) {
+  } else if (rawPublicKeyBytes.length == 65) {
     final x = BigInt.parse(
       rawPublicKeyBytes
           .sublist(1, 33)
@@ -118,8 +124,6 @@ CsrInfo parseCSR1(String csrPem) {
     ...rawPublicKeyBytes,
   ];
 
-
-  print("publicKeyDER:------- ${base64.encode(publicKeyDER)}");
   /// Extract the signature
   final signature = topLevelSeq.elements[2] as ASN1BitString;
   // final signatureBytes = signature.contentBytes();
@@ -132,8 +136,6 @@ CsrInfo parseCSR1(String csrPem) {
   );
 }
 
-
-
 String cleanCertificatePem(String pem) {
   return pem
       .replaceAll("-----BEGIN CERTIFICATE-----", "")
@@ -143,12 +145,13 @@ String cleanCertificatePem(String pem) {
 }
 
 /// Parses the certificate and extracts information such as hash, issuer, serial number, public key, and signature.
-CertificateInfo getCertificateInfo(String pemContent) {
+CertificateInfo getCertificateInfo(String pem) {
   // Generate hash
+  final pemContent = cleanCertificatePem(pem);
   final hash = sha256.convert(utf8.encode(pemContent)).toString();
   final hashBase64Encoded = base64.encode(utf8.encode(hash));
 
-  final bytes = _decodePem(pemContent);
+  final bytes = _decodePem(pem);
   final asn1Parser = ASN1Parser(bytes);
   final topLevelSeq = asn1Parser.nextObject() as ASN1Sequence;
 
@@ -157,60 +160,74 @@ CertificateInfo getCertificateInfo(String pemContent) {
 
   // Serial number is usually the second element in tbsCertificate
   final serialNumberASN1 = tbsCertificate.elements[1] as ASN1Integer;
-  final serialNumber=serialNumberASN1.valueAsBigInteger;
-
-  print("serialNumber ${serialNumber.toString()}");
+  final serialNumber = serialNumberASN1.valueAsBigInteger;
 
   // Issuer is usually the fourth element in tbsCertificate
   final issuerSeq = tbsCertificate.elements[3] as ASN1Sequence;
   final issuer = _parseName(issuerSeq);
+  final signature = topLevelSeq.elements[2] as ASN1BitString;
+  final signatureBytes = signature.valueBytes().sublist(1);
+
+  final publicKeyDER = [
+    ...[0x30, 0x56], // SEQUENCE header
+    ...[0x30, 0x10], // OID for EC public key
+    ...[0x06, 0x07, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x02, 0x01],
+    ...[0x06, 0x05, 0x2B, 0x81, 0x04, 0x00, 0x0A],
+    ...[0x03, 0x42, 0x00],
+    ..._extractPublicKey(tbsCertificate),
+  ];
+  print("_extractPublicKey:${publicKeyDER}");
 
   return CertificateInfo(
     hash: hashBase64Encoded,
     issuer: issuer,
     serialNumber: serialNumber.toString(),
-  );
-}
-CertificateInfo getCertificateInfo1(String pemContent) {
-  // Generate hash
-  final hash = sha256.convert(utf8.encode(pemContent)).toString();
-  final hashBase64Encoded = base64.encode(utf8.encode(hash));
-
-
-
-  final bytes = _decodePem(pemContent);
-  final asn1Parser = ASN1Parser(bytes);
-  final topLevelSeq = asn1Parser.nextObject() as ASN1Sequence;
-
-  // tbsCertificate is the first element in the certificate sequence
-  final tbsCertificate = topLevelSeq.elements[0] as ASN1Sequence;
-
-  // Serial number is usually the second element in tbsCertificate
-  final serialNumberASN1 = tbsCertificate.elements[1] as ASN1Integer;
-  final serialNumber=serialNumberASN1.valueAsBigInteger;
-
-  // Issuer is usually the fourth element in tbsCertificate
-  final issuerSeq = tbsCertificate.elements[3] as ASN1Sequence;
-  final issuer = _parseName(issuerSeq);
-
-  return CertificateInfo(
-    hash: hashBase64Encoded,
-    issuer: issuer,
-    serialNumber: serialNumber.toString(),
+    publicKey: base64.encode(publicKeyDER),
+    signature: base64.encode(signatureBytes),
   );
 }
 
+Uint8List _extractPublicKey(ASN1Sequence tbsCertificate) {
+  final subjectPublicKeyInfo = tbsCertificate.elements[6] as ASN1Sequence;
+  final publicKeyBitString = subjectPublicKeyInfo.elements[1] as ASN1BitString;
+  return publicKeyBitString.contentBytes();
+}
 
+// CertificateInfo getCertificateInfo1(String pemContent) {
+//   // Generate hash
+//   final hash = sha256.convert(utf8.encode(pemContent)).toString();
+//   final hashBase64Encoded = base64.encode(utf8.encode(hash));
+//
+//
+//
+//   final bytes = _decodePem(pemContent);
+//   final asn1Parser = ASN1Parser(bytes);
+//   final topLevelSeq = asn1Parser.nextObject() as ASN1Sequence;
+//
+//   // tbsCertificate is the first element in the certificate sequence
+//   final tbsCertificate = topLevelSeq.elements[0] as ASN1Sequence;
+//
+//   // Serial number is usually the second element in tbsCertificate
+//   final serialNumberASN1 = tbsCertificate.elements[1] as ASN1Integer;
+//   final serialNumber=serialNumberASN1.valueAsBigInteger;
+//
+//   // Issuer is usually the fourth element in tbsCertificate
+//   final issuerSeq = tbsCertificate.elements[3] as ASN1Sequence;
+//   final issuer = _parseName(issuerSeq);
+//
+//   return CertificateInfo(
+//     hash: hashBase64Encoded,
+//     issuer: issuer,
+//     serialNumber: serialNumber.toString(),
+//   );
+// }
 
 Uint8List _decodePem(String pem) {
-  final lines = pem
-      .split('\n')
-      .where((line) => !line.startsWith('-----'))
-      .toList();
+  final lines =
+      pem.split('\n').where((line) => !line.startsWith('-----')).toList();
   final base64Str = lines.join('');
   return base64Decode(base64Str);
 }
-
 
 String _parseName(ASN1Sequence seq) {
   final parts = <String>[];
@@ -244,5 +261,3 @@ String _oidToName(String oid) {
 String _decodeASN1String(ASN1Object obj) {
   return utf8.decode(obj.valueBytes());
 }
-
-

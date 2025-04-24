@@ -41,12 +41,12 @@ SecureRandom createSecureRandom() {
 
 /// Parses a Base64-encoded private key in PKCS#8 or SEC1 format.
 ECPrivateKey parsePrivateKey(String base64Key) {
-
   String cleanedBase64Key = base64Key
       .replaceAll('-----BEGIN EC PRIVATE KEY-----', '')
-      .replaceAll('-----END EC PRIVATE KEY-----', '').replaceAll(RegExp(r'\s+'), '')
-      .replaceAll(' ', '')
-  ;
+      .replaceAll('-----END EC PRIVATE KEY-----', '')
+      .replaceAll(RegExp(r'\s+'), '')
+      .replaceAll(' ', '');
+
   /// Decode the Base64 key
   final keyBytes = base64.decode(cleanedBase64Key);
 
@@ -108,9 +108,10 @@ ECPrivateKey parsePrivateKey(String base64Key) {
 //   return '$r:$s'; // Combine R and S
 // }
 
-
-
-String generateECDSASignature1(String invoiceHashBase64, ECPrivateKey privateKey) {
+String generateECDSASignature1(
+  String invoiceHashBase64,
+  ECPrivateKey privateKey,
+) {
   // Decode the Base64-encoded invoice hash
   final invoiceHashBytes = base64.decode(invoiceHashBase64);
 
@@ -120,21 +121,24 @@ String generateECDSASignature1(String invoiceHashBase64, ECPrivateKey privateKey
   signer.init(true, ParametersWithRandom(params, createSecureRandom()));
 
   // Generate the signature
-  final ECSignature signature = signer.generateSignature(invoiceHashBytes) as ECSignature;
+  final ECSignature signature =
+      signer.generateSignature(invoiceHashBytes) as ECSignature;
 
-// Encode the signature as a single DER-encoded structure
+  // Encode the signature as a single DER-encoded structure
   final asn1Sequence = ASN1Sequence();
   asn1Sequence.add(ASN1Integer(signature.r));
   asn1Sequence.add(ASN1Integer(signature.s));
   final derEncodedSignature = asn1Sequence.encodedBytes;
 
-// Encode the DER-encoded signature as Base64
-  final digitalSignature= base64.encode(derEncodedSignature);
-   return  digitalSignature;
+  // Encode the DER-encoded signature as Base64
+  final digitalSignature = base64.encode(derEncodedSignature);
+  return digitalSignature;
 }
 
-
-String createInvoiceDigitalSignature(String invoiceHashBase64, String privateKeyPem) {
+String createInvoiceDigitalSignature(
+  String invoiceHashBase64,
+  String privateKeyPem,
+) {
   final invoiceHashBytes = base64.decode(invoiceHashBase64);
 
   // Parse the EC private key from PEM format
@@ -150,12 +154,15 @@ String createInvoiceDigitalSignature(String invoiceHashBase64, String privateKey
     ),
   );
 
-  ECSignature sig = signer.generateSignature(Uint8List.fromList(invoiceHashBytes)) as ECSignature;
+  ECSignature sig =
+      signer.generateSignature(Uint8List.fromList(invoiceHashBytes))
+          as ECSignature;
 
   // ASN.1 encode (DER format)
-  final asn1Seq = ASN1Sequence()
-    ..add(ASN1Integer(sig.r))
-    ..add(ASN1Integer(sig.s));
+  final asn1Seq =
+      ASN1Sequence()
+        ..add(ASN1Integer(sig.r))
+        ..add(ASN1Integer(sig.s));
   final derEncoded = asn1Seq.encodedBytes;
 
   return base64.encode(derEncoded);
@@ -176,7 +183,8 @@ ECPrivateKey _parseECPrivateKeyFromPem(String pem) {
   final privateKeyInt = (sequence.elements![1] as ASN1OctetString).valueBytes();
   final privateKeyNum = BigInt.parse(hex.encode(privateKeyInt!), radix: 16);
 
-  final curve = ECCurve_secp256r1(); // Matches the curve used in your key (NIST P-256)
+  final curve =
+      ECCurve_secp256r1(); // Matches the curve used in your key (NIST P-256)
   final domainParams = ECDomainParameters('secp256r1');
   final Q = domainParams.G * privateKeyNum;
 

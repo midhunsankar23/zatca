@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:intl/intl.dart';
@@ -19,30 +20,30 @@ class ZatcaManager {
   /// The single instance of the `ZatcaManager` class.
   static ZatcaManager instance = ZatcaManager._();
   Supplier? _supplier;
-  String? _privateKeyBase64;
-  String? _certificateRequestBase64;
+  String? _privateKeyPem;
+  String? _certificatePem;
   String? _sellerName;
   String? _sellerTRN;
 
   /// Initializes the ZATCA manager with the required supplier and cryptographic details.
 
   /// [supplier] - The supplier information.
-  /// [privateKeyBase64] - The private key in Base64 format.
-  /// [certificateRequestBase64] - (CSR) The certificate request in Base64 format.
+  /// [privateKeyPem] - The private key in Base64 format.
+  /// [certificatePem] - (CSR) The certificate request in Base64 format.
   /// [sellerName] - The name of the seller.
   /// [sellerTRN] - The Tax Registration Number (TRN) of the seller.
   /// [issuedCertificateBase64] - The issued certificate from zatca compliance.  only required for generating UBL standard XML
 
   initializeZacta({
     required Supplier supplier,
-    required String privateKeyBase64,
-    required String certificateRequestBase64,
+    required String privateKeyPem,
+    required String certificatePem,
     required String sellerName,
     required String sellerTRN,
   }) {
     _supplier = supplier;
-    _privateKeyBase64 = privateKeyBase64;
-    _certificateRequestBase64 = certificateRequestBase64;
+    _privateKeyPem = privateKeyPem;
+    _certificatePem = certificatePem;
     _sellerName = sellerName;
     _sellerTRN = sellerTRN;
     _sellerTRN = sellerTRN;
@@ -76,8 +77,8 @@ class ZatcaManager {
     required String previousInvoiceHash,
   }) {
     if (_supplier == null ||
-        _privateKeyBase64 == null ||
-        _certificateRequestBase64 == null ||
+        _privateKeyPem == null ||
+        _certificatePem == null ||
         _sellerName == null ||
         _sellerTRN == null) {
       throw Exception(
@@ -121,52 +122,39 @@ class ZatcaManager {
       previousInvoiceHash: previousInvoiceHash,
     );
 
-     final invoiceXml = generateZATCAXml(invoice);
-     final xmlString= invoiceXml.toXmlString(pretty: true,indent: '    ');
-    String hashableXml = invoiceXml.rootElement.toXmlString(pretty: true,indent: '    ');
+    final invoiceXml = generateZATCAXml(invoice);
+    final xmlString = invoiceXml.toXmlString(pretty: true, indent: '    ');
+    String hashableXml = invoiceXml.rootElement.toXmlString(
+      pretty: true,
+      indent: '    ',
+    );
 
-    hashableXml=normalizeXml(hashableXml);
-    hashableXml=hashableXml.replaceFirst('<cbc:ProfileID>reporting:1.0</cbc:ProfileID>', '\n    <cbc:ProfileID>reporting:1.0</cbc:ProfileID>');
-    hashableXml=hashableXml.replaceFirst('<cac:AccountingSupplierParty>', '\n    \n    <cac:AccountingSupplierParty>');
+    hashableXml = normalizeXml(hashableXml);
+    hashableXml = hashableXml.replaceFirst(
+      '<cbc:ProfileID>reporting:1.0</cbc:ProfileID>',
+      '\n    <cbc:ProfileID>reporting:1.0</cbc:ProfileID>',
+    );
+    hashableXml = hashableXml.replaceFirst(
+      '<cac:AccountingSupplierParty>',
+      '\n    \n    <cac:AccountingSupplierParty>',
+    );
 
     final xmlHash = generateHash(hashableXml);
-    final privateKey = parsePrivateKey(_privateKeyBase64!);
-
-    print("priva0000000teKey:${_privateKeyBase64}");
+    final privateKey = parsePrivateKey(_privateKeyPem!);
 
     // Generate the ECDSA signature
-    // final signature = createInvoiceDigitalSignature(xmlHash, _privateKeyBase64!);
-
-    print("xmlHash:${xmlHash}");
-    print("privateKey:${_privateKeyBase64}");
-    // print("signature---:${signature}");
-
-
-    // MEUCIEbLxHU95pDwieAlmBmb6aTojJ32DzkahL9DqUMQ87CdAiEAwAtarFWbKMr901prl7wDP1zSDr3QineHAtPWfBjVsUQ=
-    // MEUCIQCBgtpqgAfbpGSofanY4tCZ+w9dKu4to1PWGCZ8Xwd80AIgB4YWEn1nXXniM6HvWoEKMhgAGMvG4IjnJ17fzgKMl38=
-    final csrInfo = parseCsr(_certificateRequestBase64!);
-    final csrInfo1 = parseCSR1(_certificateRequestBase64!);
-    final publicKey = csrInfo1.publicKey;
-    final certificateSignature = base64.encode(csrInfo1.signature);
-
-
+    final signature = createInvoiceDigitalSignature(xmlHash, _privateKeyPem!);
+    final certificateInfo = getCertificateInfo(_certificatePem!);
     final issueDateTime = DateTime.parse('$issueDate $issueTime');
-
-    print("publicKey:${csrInfo.publicKey}");
-    print("publicKey:${csrInfo1.publicKey}");
-
-    print("certificateSignature:${base64.encode(csrInfo.signature)}");
-    print("certificateSignature2:${base64.encode(csrInfo1.signature)}");
-
 
     return ZatcaQr(
       sellerName: _sellerName!,
       sellerTRN: _sellerTRN!,
       issueDateTime: DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(issueDateTime),
       invoiceHash: xmlHash,
-      digitalSignature: 'MEQCIGyo9MBMtSRXIXqoKWE1Vr8CYsPz0+L2fpvq/EO2tyzRAiAI7esgrd4Ek9wK9stFG6FS1ULFexsHr655xRzIFzazLQ==',
-      publicKey: publicKey,
-      certificateSignature: certificateSignature,
+      digitalSignature: signature,
+      publicKey: certificateInfo.publicKey,
+      certificateSignature: certificateInfo.signature,
       invoiceData: invoice,
       xmlString: xmlString,
     );
@@ -185,33 +173,27 @@ class ZatcaManager {
       4: qrDataModel.invoiceData.totalAmount.toStringAsFixed(2),
       5: qrDataModel.invoiceData.taxAmount.toStringAsFixed(2),
       6: qrDataModel.invoiceHash,
-      7: base64Decode(qrDataModel.digitalSignature),
-      8: base64Decode(qrDataModel.publicKey),
-      9: base64Decode(qrDataModel.certificateSignature),
+      7: utf8.encode(qrDataModel.digitalSignature),
+      8: base64.decode(qrDataModel.publicKey),
+      9: base64.decode(qrDataModel.certificateSignature),
     };
-
     String tlvString = generateTlv(invoiceData);
     final qrContent = utf8.encode(tlvToBase64(tlvString));
     return String.fromCharCodes(qrContent);
   }
 
-
-
-
-
-
+  String toHex(Uint8List data) =>
+      data.map((b) => b.toRadixString(16).padLeft(2, '0')).join(' ');
 
   String generateUBLXml({
     required String invoiceHash,
     required String signingTime,
     required String digitalSignature,
-    required String certificateString,
     required String invoiceXmlString,
     required String qrString,
   }) {
-
-    final cleanedCertificate=cleanCertificatePem(certificateString);
-    final certificateInfo = getCertificateInfo(cleanedCertificate);
+    final cleanedCertificate = cleanCertificatePem(_certificatePem!);
+    final certificateInfo = getCertificateInfo(_certificatePem!);
     final defaultUBLExtensionsSignedPropertiesForSigningXML =
         defaultUBLExtensionsSignedPropertiesForSigning(
           signingTime: signingTime,
@@ -220,20 +202,33 @@ class ZatcaManager {
           certificateSerialNumber: certificateInfo.serialNumber,
         );
 
-
     // 5: Get SignedProperties hash
-    String defaultUBLExtensionsSignedPropertiesForSigningXMLString=defaultUBLExtensionsSignedPropertiesForSigningXML.toXmlString(pretty: true,indent: '    ');
-    defaultUBLExtensionsSignedPropertiesForSigningXMLString=defaultUBLExtensionsSignedPropertiesForSigningXMLString.split('\n').map((e){
-      return e.padLeft(e.length + 32);
-    }).join('\n');
-    defaultUBLExtensionsSignedPropertiesForSigningXMLString=defaultUBLExtensionsSignedPropertiesForSigningXMLString.replaceFirst('                                <xades:SignedProperties xmlns:xades="http://uri.etsi.org/01903/v1.3.2#" Id="xadesSignedProperties">', '<xades:SignedProperties xmlns:xades="http://uri.etsi.org/01903/v1.3.2#" Id="xadesSignedProperties">');
+    String defaultUBLExtensionsSignedPropertiesForSigningXMLString =
+        defaultUBLExtensionsSignedPropertiesForSigningXML.toXmlString(
+          pretty: true,
+          indent: '    ',
+        );
+    defaultUBLExtensionsSignedPropertiesForSigningXMLString =
+        defaultUBLExtensionsSignedPropertiesForSigningXMLString
+            .split('\n')
+            .map((e) {
+              return e.padLeft(e.length + 32);
+            })
+            .join('\n');
+    defaultUBLExtensionsSignedPropertiesForSigningXMLString =
+        defaultUBLExtensionsSignedPropertiesForSigningXMLString.replaceFirst(
+          '                                <xades:SignedProperties xmlns:xades="http://uri.etsi.org/01903/v1.3.2#" Id="xadesSignedProperties">',
+          '<xades:SignedProperties xmlns:xades="http://uri.etsi.org/01903/v1.3.2#" Id="xadesSignedProperties">',
+        );
 
-
-    final signedPropertiesBytes = utf8.encode(defaultUBLExtensionsSignedPropertiesForSigningXMLString);
-    final signedPropertiesHash = sha256.convert(signedPropertiesBytes).toString();
-    final signedPropertiesHashBase64 = base64.encode(utf8.encode(signedPropertiesHash));
-
-
+    final signedPropertiesBytes = utf8.encode(
+      defaultUBLExtensionsSignedPropertiesForSigningXMLString,
+    );
+    final signedPropertiesHash =
+        sha256.convert(signedPropertiesBytes).toString();
+    final signedPropertiesHashBase64 = base64.encode(
+      utf8.encode(signedPropertiesHash),
+    );
 
     final defaultUBLExtensionsSignedPropertiesXML =
         defaultUBLExtensionsSignedProperties(
@@ -242,32 +237,36 @@ class ZatcaManager {
           certificateIssuer: certificateInfo.issuer,
           certificateSerialNumber: certificateInfo.serialNumber,
         );
-
-
-
-    final ublStandardXML= generateUBLSignExtensionsXml(
+    final ublStandardXML = generateUBLSignExtensionsXml(
       invoiceHash: invoiceHash,
       signedPropertiesHash: signedPropertiesHashBase64,
       digitalSignature: digitalSignature,
       certificateString: cleanedCertificate,
-      ublSignatureSignedPropertiesXML:
-          defaultUBLExtensionsSignedPropertiesXML,
+      ublSignatureSignedPropertiesXML: defaultUBLExtensionsSignedPropertiesXML,
     );
 
     final xmlDocument = XmlDocument.parse(invoiceXmlString);
-    xmlDocument.rootElement.children.insert(0, ublStandardXML.rootElement.copy());
+    xmlDocument.rootElement.children.insert(
+      0,
+      ublStandardXML.rootElement.copy(),
+    );
 
-    final qrXml=generateQrAndSignatureXMl(qrString: qrString);
-    xmlDocument.rootElement.children.insertAll(21, qrXml.children.map((node) => node.copy()).toList());
+    final qrXml = generateQrAndSignatureXMl(qrString: qrString);
+    xmlDocument.rootElement.children.insertAll(
+      21,
+      qrXml.children.map((node) => node.copy()).toList(),
+    );
 
     return xmlDocument.toXmlString(pretty: true, indent: '    ');
   }
 }
 
-
 String normalizeXml(String hashableXml) {
   return hashableXml
-      .replaceAll('\r\n', '\n')                  // Normalize all line endings to \n
-      .replaceAll(RegExp(r'\s+$', multiLine: true), '') // Remove trailing spaces per line
-      .trim();                                   // Trim leading/trailing whitespace
+      .replaceAll('\r\n', '\n') // Normalize all line endings to \n
+      .replaceAll(
+        RegExp(r'\s+$', multiLine: true),
+        '',
+      ) // Remove trailing spaces per line
+      .trim(); // Trim leading/trailing whitespace
 }
