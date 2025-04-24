@@ -24,7 +24,7 @@ void main() {
     privateKeyPem:
         """-----BEGIN EC PRIVATE KEY-----\nprivate_key_pem_content\n-----END EC PRIVATE KEY-----""",
     certificatePem:
-        """-----BEGIN CERTIFICATE-----\pcertificate_pem_content\n-----END CERTIFICATE-----""",
+        """-----BEGIN CERTIFICATE-----\ncertificate_pem_content\n-----END CERTIFICATE-----""",
   );
 
   final qrData = zatcaManager.generateZatcaQrInit(

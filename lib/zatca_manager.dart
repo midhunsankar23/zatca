@@ -276,7 +276,7 @@ class ZatcaManager {
           '<xades:QualifyingProperties Target="signature" xmlns:xades="http://uri.etsi.org/01903/v1.3.2#">',
         );
     String replacable = """<ds:Object>
-                            ${defaultUBLExtensionsSignedPropertiesXMLString}
+                            $defaultUBLExtensionsSignedPropertiesXMLString
                             </ds:Object>""";
     xml = xml.replaceFirst('<ds:Object-1/>', replacable);
 

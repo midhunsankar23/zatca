@@ -90,8 +90,8 @@ ECPrivateKey _parseECPrivateKeyFromPem(String pem) {
   final asn1Parser = ASN1Parser(Uint8List.fromList(keyBytes));
   final sequence = asn1Parser.nextObject() as ASN1Sequence;
 
-  final privateKeyInt = (sequence.elements![1] as ASN1OctetString).valueBytes();
-  final privateKeyNum = BigInt.parse(hex.encode(privateKeyInt!), radix: 16);
+  final privateKeyInt = (sequence.elements[1] as ASN1OctetString).valueBytes();
+  final privateKeyNum = BigInt.parse(hex.encode(privateKeyInt), radix: 16);
 
   final curve =
       ECCurve_secp256r1(); // Matches the curve used in your key (NIST P-256)
