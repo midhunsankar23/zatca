@@ -902,7 +902,7 @@ String canonicalizeXml(String xmlString) {
       buffer.write('</${node.name}>');
       return buffer.toString();
     } else if (node is XmlText) {
-      return node.text;
+      return node.value;
     } else if (node is XmlProcessing) {
       // Skip XML declaration
       return '';

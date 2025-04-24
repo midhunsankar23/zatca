@@ -140,7 +140,6 @@ class ZatcaManager {
     );
 
     final xmlHash = generateHash(hashableXml);
-    final privateKey = parsePrivateKey(_privateKeyPem!);
 
     // Generate the ECDSA signature
     final signature = createInvoiceDigitalSignature(xmlHash, _privateKeyPem!);
