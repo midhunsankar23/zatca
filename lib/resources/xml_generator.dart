@@ -656,19 +656,7 @@ XmlDocument generateUBLSignExtensionsXml({
                             },
                           );
                           builder.element(
-                            'ds:Object',
-                            nest: () {
-                              builder.element(
-                                'xades:QualifyingProperties',
-                                nest:
-                                    ublSignatureSignedPropertiesXML.rootElement,
-                                attributes: {
-                                  'Target': 'signature',
-                                  'xmlns:xades':
-                                      'http://uri.etsi.org/01903/v1.3.2#',
-                                },
-                              );
-                            },
+                            'ds:Object-1',
                           );
                         },
                       );
@@ -785,49 +773,61 @@ XmlDocument defaultUBLExtensionsSignedProperties({
 }) {
   final builder = XmlBuilder();
   builder.element(
-    'xades:SignedProperties',
+    'xades:QualifyingProperties',
+    attributes: {
+      'Target': 'signature',
+      'xmlns:xades': 'http://uri.etsi.org/01903/v1.3.2#',
+    },
     nest: () {
-      builder.attribute('xmlns:xades', 'http://uri.etsi.org/01903/v1.3.2#');
-      builder.attribute('Id', 'xadesSignedProperties');
-
       builder.element(
-        'xades:SignedSignatureProperties',
+        'xades:SignedProperties',
         nest: () {
-          builder.element('xades:SigningTime', nest: signingTime);
+          builder.attribute('xmlns:xades', 'http://uri.etsi.org/01903/v1.3.2#');
+          builder.attribute('Id', 'xadesSignedProperties');
 
           builder.element(
-            'xades:SigningCertificate',
+            'xades:SignedSignatureProperties',
             nest: () {
+              builder.element('xades:SigningTime', nest: signingTime);
+
               builder.element(
-                'xades:Cert',
+                'xades:SigningCertificate',
                 nest: () {
                   builder.element(
-                    'xades:CertDigest',
+                    'xades:Cert',
                     nest: () {
                       builder.element(
-                        'ds:DigestMethod',
+                        'xades:CertDigest',
                         nest: () {
-                          builder.attribute(
-                            'Algorithm',
-                            'http://www.w3.org/2001/04/xmlenc#sha256',
+                          builder.element(
+                            'ds:DigestMethod',
+                            nest: () {
+                              builder.attribute(
+                                'Algorithm',
+                                'http://www.w3.org/2001/04/xmlenc#sha256',
+                              );
+                              builder.text('');
+                            },
                           );
-                          builder.text('');
+                          builder.element(
+                            'ds:DigestValue',
+                            nest: certificateHash,
+                          );
                         },
                       );
-                      builder.element('ds:DigestValue', nest: certificateHash);
-                    },
-                  );
 
-                  builder.element(
-                    'xades:IssuerSerial',
-                    nest: () {
                       builder.element(
-                        'ds:X509IssuerName',
-                        nest: certificateIssuer,
-                      );
-                      builder.element(
-                        'ds:X509SerialNumber',
-                        nest: certificateSerialNumber,
+                        'xades:IssuerSerial',
+                        nest: () {
+                          builder.element(
+                            'ds:X509IssuerName',
+                            nest: certificateIssuer,
+                          );
+                          builder.element(
+                            'ds:X509SerialNumber',
+                            nest: certificateSerialNumber,
+                          );
+                        },
                       );
                     },
                   );

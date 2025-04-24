@@ -257,7 +257,25 @@ class ZatcaManager {
       qrXml.children.map((node) => node.copy()).toList(),
     );
 
-    return xmlDocument.toXmlString(pretty: true, indent: '    ');
+    String xml= xmlDocument.toXmlString(pretty: true, indent: '    ');
+    String defaultUBLExtensionsSignedPropertiesXMLString=defaultUBLExtensionsSignedPropertiesXML.rootElement.toXmlString(pretty: true, indent: '    ');
+    defaultUBLExtensionsSignedPropertiesXMLString=defaultUBLExtensionsSignedPropertiesXMLString
+        .split('\n')
+        .map((e) {
+      return e.padLeft(e.length + 28);
+    }).join('\n');
+    defaultUBLExtensionsSignedPropertiesXMLString =
+        defaultUBLExtensionsSignedPropertiesXMLString.replaceFirst(
+          '                            <xades:QualifyingProperties Target="signature" xmlns:xades="http://uri.etsi.org/01903/v1.3.2#">',
+          '<xades:QualifyingProperties Target="signature" xmlns:xades="http://uri.etsi.org/01903/v1.3.2#">',
+        );
+     String replacable="""<ds:Object>
+                            ${defaultUBLExtensionsSignedPropertiesXMLString}
+                            </ds:Object>""";
+    xml=xml.replaceFirst('<ds:Object-1/>',replacable);
+
+    return xml;
+
   }
 }
 
