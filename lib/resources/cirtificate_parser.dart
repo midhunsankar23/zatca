@@ -5,6 +5,7 @@ import 'package:asn1lib/asn1lib.dart';
 import 'package:crypto/crypto.dart';
 import '../models/cirtificate_info.dart';
 
+/// Cleans the PEM certificate by removing header, footer, and line breaks.
 String cleanCertificatePem(String pem) {
   return pem
       .replaceAll("-----BEGIN CERTIFICATE-----", "")
@@ -13,29 +14,34 @@ String cleanCertificatePem(String pem) {
       .replaceAll("\r", ""); // Handle potential carriage returns
 }
 
+/// Extracts certificate information such as hash, issuer, serial number, public key, and signature.
 CertificateInfo getCertificateInfo(String pem) {
-  // Generate hash
+  /// Generate hash of the cleaned PEM content
   final pemContent = cleanCertificatePem(pem);
   final hash = sha256.convert(utf8.encode(pemContent)).toString();
   final hashBase64Encoded = base64.encode(utf8.encode(hash));
 
+  /// Decode the PEM content into bytes
   final bytes = _decodePem(pem);
   final asn1Parser = ASN1Parser(bytes);
   final topLevelSeq = asn1Parser.nextObject() as ASN1Sequence;
 
-  // tbsCertificate is the first element in the certificate sequence
+  /// Extract tbsCertificate (to-be-signed certificate) from the sequence
   final tbsCertificate = topLevelSeq.elements[0] as ASN1Sequence;
 
-  // Serial number is usually the second element in tbsCertificate
+  /// Extract serial number from tbsCertificate
   final serialNumberASN1 = tbsCertificate.elements[1] as ASN1Integer;
   final serialNumber = serialNumberASN1.valueAsBigInteger;
 
-  // Issuer is usually the fourth element in tbsCertificate
+  /// Extract issuer information from tbsCertificate
   final issuerSeq = tbsCertificate.elements[3] as ASN1Sequence;
   final issuer = _parseName(issuerSeq);
+
+  /// Extract signature from the top-level sequence
   final signature = topLevelSeq.elements[2] as ASN1BitString;
   final signatureBytes = signature.valueBytes().sublist(1);
 
+  /// Construct the public key in DER format
   final publicKeyDER = [
     ...[0x30, 0x56], // SEQUENCE header
     ...[0x30, 0x10], // OID for EC public key
@@ -45,6 +51,7 @@ CertificateInfo getCertificateInfo(String pem) {
     ..._extractPublicKey(tbsCertificate),
   ];
 
+  /// Return the parsed certificate information
   return CertificateInfo(
     hash: hashBase64Encoded,
     issuer: issuer,
@@ -54,12 +61,14 @@ CertificateInfo getCertificateInfo(String pem) {
   );
 }
 
+/// Extracts the public key bytes from the tbsCertificate.
 Uint8List _extractPublicKey(ASN1Sequence tbsCertificate) {
   final subjectPublicKeyInfo = tbsCertificate.elements[6] as ASN1Sequence;
   final publicKeyBitString = subjectPublicKeyInfo.elements[1] as ASN1BitString;
   return publicKeyBitString.contentBytes();
 }
 
+/// Decodes a PEM string into a Uint8List of bytes.
 Uint8List _decodePem(String pem) {
   final lines =
       pem.split('\n').where((line) => !line.startsWith('-----')).toList();
@@ -67,6 +76,7 @@ Uint8List _decodePem(String pem) {
   return base64Decode(base64Str);
 }
 
+/// Parses an ASN1 sequence to extract and format the issuer or subject name.
 String _parseName(ASN1Sequence seq) {
   final parts = <String>[];
   for (final rdnSet in seq.elements) {
@@ -79,23 +89,25 @@ String _parseName(ASN1Sequence seq) {
   return parts.reversed.join(', ');
 }
 
+/// Maps OID (Object Identifier) to a human-readable name.
 String _oidToName(String oid) {
   switch (oid) {
     case '2.5.4.6':
-      return 'C'; // Country
+      return 'C'; /// Country
     case '2.5.4.10':
-      return 'O'; // Organization
+      return 'O'; /// Organization
     case '2.5.4.11':
-      return 'OU'; // Organizational Unit
+      return 'OU'; /// Organizational Unit
     case '2.5.4.3':
-      return 'CN'; // Common Name
+      return 'CN'; /// Common Name
     case '0.9.2342.19200300.100.1.25':
-      return 'DC'; // Domain Component
+      return 'DC'; /// Domain Component
     default:
       return oid;
   }
 }
 
+/// Decodes an ASN1 object into a UTF-8 string.
 String _decodeASN1String(ASN1Object obj) {
   return utf8.decode(obj.valueBytes());
 }
