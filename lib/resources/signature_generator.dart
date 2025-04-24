@@ -107,10 +107,7 @@ ECPrivateKey _parseECPrivateKeyFromPem(String pem) {
   final privateKeyInt = (sequence.elements[1] as ASN1OctetString).valueBytes();
   final privateKeyNum = BigInt.parse(hex.encode(privateKeyInt), radix: 16);
 
-  final curve =
-      ECCurve_secp256r1(); // Matches the curve used in your key (NIST P-256)
   final domainParams = ECDomainParameters('secp256r1');
-  final Q = domainParams.G * privateKeyNum;
 
   return ECPrivateKey(privateKeyNum, domainParams);
 }
