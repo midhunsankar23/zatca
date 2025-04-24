@@ -93,15 +93,25 @@ String _parseName(ASN1Sequence seq) {
 String _oidToName(String oid) {
   switch (oid) {
     case '2.5.4.6':
-      return 'C'; /// Country
+      return 'C';
+
+    /// Country
     case '2.5.4.10':
-      return 'O'; /// Organization
+      return 'O';
+
+    /// Organization
     case '2.5.4.11':
-      return 'OU'; /// Organizational Unit
+      return 'OU';
+
+    /// Organizational Unit
     case '2.5.4.3':
-      return 'CN'; /// Common Name
+      return 'CN';
+
+    /// Common Name
     case '0.9.2342.19200300.100.1.25':
-      return 'DC'; /// Domain Component
+      return 'DC';
+
+    /// Domain Component
     default:
       return oid;
   }
