@@ -64,16 +64,16 @@ void main() {
 
     String invoiceHash = qrData.invoiceHash;
     String invoiceXmlString = qrData.xmlString;
-    String qrString = zatcaManager.getQrString(qrData);
+    String qr = zatcaManager.getQrString(qrData);
 
-    print("qr: $qrString");
+    print("qr: $qr");
     String ublXML = zatcaManager.generateUBLXml(
       invoiceHash: invoiceHash,
       signingTime:
           "${DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateTime.now().toUtc())}Z",
       digitalSignature: qrData.digitalSignature,
       invoiceXmlString: invoiceXmlString,
-      qrString: qrString,
+      qrString: qr,
     );
 
     print("XML: $ublXML");

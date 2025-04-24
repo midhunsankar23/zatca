@@ -69,7 +69,6 @@ void main() {
   /// Extract additional details like invoice hash and digital signature.
   String invoiceHash = qrData.invoiceHash;
   String invoiceXmlString = qrData.xmlString;
-  String qrString = zatcaManager.getQrString(qrData);
 
   /// Generate UBL XML using the extracted details.
   String ublXML = zatcaManager.generateUBLXml(
@@ -78,7 +77,7 @@ void main() {
         "${DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateTime.now().toUtc())}Z",
     digitalSignature: qrData.digitalSignature,
     invoiceXmlString: invoiceXmlString,
-    qrString: qrString,
+    qrString: qr,
   );
 
   /// Debug output to print the generated XML, QR, and UBL XML.
