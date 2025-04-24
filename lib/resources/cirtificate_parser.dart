@@ -5,9 +5,6 @@ import 'package:asn1lib/asn1lib.dart';
 import 'package:crypto/crypto.dart';
 import '../models/cirtificate_info.dart';
 
-
-
-
 String cleanCertificatePem(String pem) {
   return pem
       .replaceAll("-----BEGIN CERTIFICATE-----", "")
@@ -15,7 +12,6 @@ String cleanCertificatePem(String pem) {
       .replaceAll("\n", "")
       .replaceAll("\r", ""); // Handle potential carriage returns
 }
-
 
 CertificateInfo getCertificateInfo(String pem) {
   // Generate hash

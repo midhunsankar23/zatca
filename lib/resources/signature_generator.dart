@@ -6,8 +6,6 @@ import 'package:asn1lib/asn1lib.dart';
 import 'package:convert/convert.dart';
 import 'package:pointycastle/export.dart';
 
-
-
 /// Parses a Base64-encoded private key in PKCS#8 or SEC1 format.
 ECPrivateKey parsePrivateKey(String base64Key) {
   String cleanedBase64Key = base64Key

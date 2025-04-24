@@ -21,8 +21,10 @@ void main() {
         postalZone: "31952",
       ),
     ),
-    privateKeyPem: """-----BEGIN EC PRIVATE KEY-----\nprivate_key_pem_content\n-----END EC PRIVATE KEY-----""",
-    certificatePem: """-----BEGIN CERTIFICATE-----\pcertificate_pem_content\n-----END CERTIFICATE-----""",
+    privateKeyPem:
+        """-----BEGIN EC PRIVATE KEY-----\nprivate_key_pem_content\n-----END EC PRIVATE KEY-----""",
+    certificatePem:
+        """-----BEGIN CERTIFICATE-----\pcertificate_pem_content\n-----END CERTIFICATE-----""",
   );
 
   final qrData = zatcaManager.generateZatcaQrInit(

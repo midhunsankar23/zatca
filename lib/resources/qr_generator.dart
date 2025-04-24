@@ -51,4 +51,3 @@ String tlvToBase64(String tlv) {
 
   return base64Encode(Uint8List.fromList(bytes));
 }
-

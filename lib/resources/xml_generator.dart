@@ -655,9 +655,7 @@ XmlDocument generateUBLSignExtensionsXml({
                               );
                             },
                           );
-                          builder.element(
-                            'ds:Object-1',
-                          );
+                          builder.element('ds:Object-1');
                         },
                       );
                     },
