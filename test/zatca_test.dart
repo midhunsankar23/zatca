@@ -23,12 +23,10 @@ void main() {
           postalZone: "31952",
         ),
       ),
-      privateKeyPem:
-          """-----BEGIN EC PRIVATE KEY-----
+      privateKeyPem: """-----BEGIN EC PRIVATE KEY-----
 pemContent
 -----END EC PRIVATE KEY-----""",
-      certificatePem:
-          """-----BEGIN CERTIFICATE-----
+      certificatePem: """-----BEGIN CERTIFICATE-----
 pemContent
 -----END CERTIFICATE-----""",
     );
