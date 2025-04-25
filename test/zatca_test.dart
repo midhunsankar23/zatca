@@ -72,7 +72,7 @@ pemContent
     String ublXML = zatcaManager.generateUBLXml(
       invoiceHash: invoiceHash,
       signingTime:
-          "${DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateTime.now().toUtc())}Z",
+          "${DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateTime.now())}Z",
       digitalSignature: qrData.digitalSignature,
       invoiceXmlString: invoiceXmlString,
       qrString: qr,
