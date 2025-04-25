@@ -32,4 +32,4 @@ To use this package, add it to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  zatca: ^0.2.0
+  zatca: ^0.2.1
