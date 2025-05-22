@@ -4,14 +4,16 @@ import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'package:intl/intl.dart';
 import 'package:xml/xml.dart';
-import 'package:zatca/models/qr_data_model.dart';
-import 'package:zatca/resources/cirtificate_parser.dart';
+import 'package:zatca/models/qr_data.dart';
+import 'package:zatca/resources/cirtificate/certficate_util.dart';
 import 'package:zatca/resources/enums.dart';
 import 'package:zatca/resources/qr_generator.dart';
-import 'package:zatca/resources/signature_generator.dart';
-import 'package:zatca/resources/xml_generator.dart';
-import 'package:zatca/resources/xml_hashing.dart';
-import '../models/invoice_data_model.dart';
+import 'package:zatca/resources/signature/signature_util.dart';
+import 'package:zatca/resources/xml/xml_util.dart';
+import '../models/invoice.dart';
+import 'models/address.dart';
+import 'models/customer.dart';
+import 'models/supplier.dart';
 
 /// A singleton class that manages the generation of ZATCA-compliant invoices and QR codes.
 class ZatcaManager {
@@ -19,9 +21,10 @@ class ZatcaManager {
 
   /// The single instance of the `ZatcaManager` class.
   static ZatcaManager instance = ZatcaManager._();
-  Supplier? _supplier;
+
   String? _privateKeyPem;
   String? _certificatePem;
+  Supplier? _supplier;
   String? _sellerName;
   String? _sellerTRN;
 
@@ -35,18 +38,17 @@ class ZatcaManager {
   /// [issuedCertificateBase64] - The issued certificate from zatca compliance.  only required for generating UBL standard XML
 
   initializeZacta({
-    required Supplier supplier,
     required String privateKeyPem,
     required String certificatePem,
+    required Supplier supplier,
     required String sellerName,
     required String sellerTRN,
   }) {
-    _supplier = supplier;
     _privateKeyPem = privateKeyPem;
     _certificatePem = certificatePem;
     _sellerName = sellerName;
     _sellerTRN = sellerTRN;
-    _sellerTRN = sellerTRN;
+    _supplier = supplier;
   }
 
   /// /// Generates a ZATCA-compliant QR code and invoice data.
@@ -108,12 +110,11 @@ class ZatcaManager {
             companyID: ' ',
             registrationName: ' ',
             address: Address(
-              streetName: ' ',
-              buildingNumber: ' ',
-              citySubdivisionName: ' ',
-              cityName: ' ',
+              street: ' ',
+              building: ' ',
+              citySubdivision: ' ',
+              city: ' ',
               postalZone: ' ',
-              countryCode: ' ',
             ),
           ),
       invoiceLines: invoiceLines,
@@ -122,7 +123,7 @@ class ZatcaManager {
       previousInvoiceHash: previousInvoiceHash,
     );
 
-    final invoiceXml = generateZATCAXml(invoice);
+    final invoiceXml = XmlUtil.generateZATCAXml(invoice);
     final xmlString = invoiceXml.toXmlString(pretty: true, indent: '    ');
     String hashableXml = invoiceXml.rootElement.toXmlString(
       pretty: true,
@@ -139,11 +140,11 @@ class ZatcaManager {
       '\n    \n    <cac:AccountingSupplierParty>',
     );
 
-    final xmlHash = generateHash(hashableXml);
+    final xmlHash = XmlUtil.generateHash(hashableXml);
 
     // Generate the ECDSA signature
-    final signature = createInvoiceDigitalSignature(xmlHash, _privateKeyPem!);
-    final certificateInfo = getCertificateInfo(_certificatePem!);
+    final signature = SignatureUtil.createInvoiceDigitalSignature(xmlHash, _privateKeyPem!);
+    final certificateInfo = CertificateUtil.getCertificateInfo(_certificatePem!);
     final issueDateTime = DateTime.parse('$issueDate $issueTime');
 
     return ZatcaQr(
@@ -191,10 +192,10 @@ class ZatcaManager {
     required String invoiceXmlString,
     required String qrString,
   }) {
-    final cleanedCertificate = cleanCertificatePem(_certificatePem!);
-    final certificateInfo = getCertificateInfo(_certificatePem!);
+    final cleanedCertificate = CertificateUtil.cleanCertificatePem(_certificatePem!);
+    final certificateInfo = CertificateUtil.getCertificateInfo(_certificatePem!);
     final defaultUBLExtensionsSignedPropertiesForSigningXML =
-        defaultUBLExtensionsSignedPropertiesForSigning(
+    XmlUtil.defaultUBLExtensionsSignedPropertiesForSigning(
           signingTime: signingTime,
           certificateHash: certificateInfo.hash,
           certificateIssuer: certificateInfo.issuer,
@@ -230,13 +231,13 @@ class ZatcaManager {
     );
 
     final defaultUBLExtensionsSignedPropertiesXML =
-        defaultUBLExtensionsSignedProperties(
+    XmlUtil.defaultUBLExtensionsSignedProperties(
           signingTime: signingTime,
           certificateHash: certificateInfo.hash,
           certificateIssuer: certificateInfo.issuer,
           certificateSerialNumber: certificateInfo.serialNumber,
         );
-    final ublStandardXML = generateUBLSignExtensionsXml(
+    final ublStandardXML = XmlUtil.generateUBLSignExtensionsXml(
       invoiceHash: invoiceHash,
       signedPropertiesHash: signedPropertiesHashBase64,
       digitalSignature: digitalSignature,
@@ -250,7 +251,7 @@ class ZatcaManager {
       ublStandardXML.rootElement.copy(),
     );
 
-    final qrXml = generateQrAndSignatureXMl(qrString: qrString);
+    final qrXml = XmlUtil.generateQrAndSignatureXMl(qrString: qrString);
     xmlDocument.rootElement.children.insertAll(
       21,
       qrXml.children.map((node) => node.copy()).toList(),

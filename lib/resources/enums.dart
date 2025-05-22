@@ -19,3 +19,12 @@ enum InvoiceType {
 
 /// This enum represents the type of invoice relation.
 enum InvoiceRelationType { b2b, b2c }
+
+
+enum ZatcaEnvironment {
+  production("production"),
+  development("development");
+
+  final String value;
+  const ZatcaEnvironment(this.value);
+}

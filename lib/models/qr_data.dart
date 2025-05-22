@@ -1,4 +1,4 @@
-import 'invoice_data_model.dart';
+import 'invoice.dart';
 
 /// A class representing a ZATCA-compliant QR code and invoice data.
 class ZatcaQr {

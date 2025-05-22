@@ -1,3 +1,8 @@
+import 'package:zatca/models/supplier.dart';
+
+import 'customer.dart';
+import 'egs_unit.dart';
+
 /// Represents a ZATCA-compliant invoice.
 class ZatcaInvoice {
   /// The profile ID of the invoice.
@@ -116,137 +121,11 @@ class ZatcaInvoice {
   }
 }
 
-/// Represents a supplier in the invoice.
-class Supplier {
-  /// The company ID of the supplier.
-  final String companyID;
 
-  final String companyCRN;
 
-  /// The registration name of the supplier.
-  final String registrationName;
 
-  /// The address of the supplier.
-  final Address address;
 
-  /// Creates a new [Supplier] instance.
-  Supplier({
-    required this.companyID,
-    required this.companyCRN,
-    required this.registrationName,
-    required this.address,
-  });
 
-  /// Creates a [Supplier] instance from a [Map].
-  factory Supplier.fromMap(Map<String, dynamic> map) {
-    return Supplier(
-      companyID: map['companyID'] ?? '',
-      companyCRN: map['companyCRN'] ?? '',
-      registrationName: map['registrationName'] ?? '',
-      address: Address.fromMap(map['address']),
-    );
-  }
-
-  /// Converts the [Supplier] instance to a [Map].
-  Map<String, dynamic> toMap() {
-    return {
-      'companyID': companyID,
-      'registrationName': registrationName,
-      'address': address.toMap(),
-    };
-  }
-}
-
-/// Represents a customer in the invoice.
-class Customer {
-  /// The company ID of the customer.
-  final String companyID;
-
-  /// The registration name of the customer.
-  final String registrationName;
-
-  /// The address of the customer.
-  final Address address;
-
-  Customer({
-    required this.companyID,
-    required this.registrationName,
-    required this.address,
-  });
-
-  /// Creates a [Customer] instance from a [Map].
-  factory Customer.fromMap(Map<String, dynamic> map) {
-    return Customer(
-      companyID: map['companyID'] ?? '',
-      registrationName: map['registrationName'] ?? '',
-      address: Address.fromMap(map['address']),
-    );
-  }
-
-  /// Converts the [Customer] instance to a [Map].
-  Map<String, dynamic> toMap() {
-    return {
-      'companyID': companyID,
-      'registrationName': registrationName,
-      'address': address.toMap(),
-    };
-  }
-}
-
-/// Represents an address in the invoice.
-class Address {
-  /// The street name of the address.
-  final String streetName;
-
-  /// The building number of the address.
-  final String buildingNumber;
-
-  /// The city subdivision name of the address.
-  final String citySubdivisionName;
-
-  /// The city name of the address.
-  final String cityName;
-
-  /// The postal zone of the address.
-  final String postalZone;
-
-  /// The country code of the address.
-  final String countryCode;
-
-  /// Creates a new [Address] instance.
-  Address({
-    required this.streetName,
-    required this.buildingNumber,
-    required this.citySubdivisionName,
-    required this.cityName,
-    required this.postalZone,
-    this.countryCode = "SA",
-  });
-
-  /// Creates an [Address] instance from a [Map].
-  factory Address.fromMap(Map<String, dynamic> map) {
-    return Address(
-      streetName: map['streetName'] ?? '',
-      buildingNumber: map['buildingNumber'] ?? '',
-      citySubdivisionName: map['citySubdivisionName'] ?? '',
-      cityName: map['cityName'] ?? '',
-      postalZone: map['postalZone'] ?? '',
-      countryCode: map['countryCode'] ?? 'SA',
-    );
-  }
-
-  /// Converts the [Address] instance to a [Map].
-  Map<String, dynamic> toMap() {
-    return {
-      'streetName': streetName,
-      'buildingNumber': buildingNumber,
-      'citySubdivisionName': citySubdivisionName,
-      'cityName': cityName,
-      'postalZone': postalZone,
-      'countryCode': countryCode,
-    };
-  }
-}
 
 /// Represents an invoice line item in the invoice.
 class InvoiceLine {

@@ -18,6 +18,8 @@ dependencies:
   crypto: ^3.0.6
   intl: ^0.20.2
   convert: ^3.1.2
+  basic_utils: ^5.8.2
+  uuid: ^3.0.7
 
 dev_dependencies:
   flutter_test:
