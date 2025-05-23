@@ -63,8 +63,6 @@ void main() async {
     /// Issue a production certificate using the compliance certificate.
     // final productionCertificate = await certificateManager
     //     .issueProductionCertificate(complianceCertificate);
-
-
   } else {
     /// For non-desktop platforms, use hardcoded PEM strings for private key and compliance certificate.
     /// These should be replaced with actual PEM content.
