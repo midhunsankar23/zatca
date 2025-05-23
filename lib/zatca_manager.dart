@@ -143,8 +143,13 @@ class ZatcaManager {
     final xmlHash = XmlUtil.generateHash(hashableXml);
 
     // Generate the ECDSA signature
-    final signature = SignatureUtil.createInvoiceDigitalSignature(xmlHash, _privateKeyPem!);
-    final certificateInfo = CertificateUtil.getCertificateInfo(_certificatePem!);
+    final signature = SignatureUtil.createInvoiceDigitalSignature(
+      xmlHash,
+      _privateKeyPem!,
+    );
+    final certificateInfo = CertificateUtil.getCertificateInfo(
+      _certificatePem!,
+    );
     final issueDateTime = DateTime.parse('$issueDate $issueTime');
 
     return ZatcaQr(
@@ -192,10 +197,14 @@ class ZatcaManager {
     required String invoiceXmlString,
     required String qrString,
   }) {
-    final cleanedCertificate = CertificateUtil.cleanCertificatePem(_certificatePem!);
-    final certificateInfo = CertificateUtil.getCertificateInfo(_certificatePem!);
+    final cleanedCertificate = CertificateUtil.cleanCertificatePem(
+      _certificatePem!,
+    );
+    final certificateInfo = CertificateUtil.getCertificateInfo(
+      _certificatePem!,
+    );
     final defaultUBLExtensionsSignedPropertiesForSigningXML =
-    XmlUtil.defaultUBLExtensionsSignedPropertiesForSigning(
+        XmlUtil.defaultUBLExtensionsSignedPropertiesForSigning(
           signingTime: signingTime,
           certificateHash: certificateInfo.hash,
           certificateIssuer: certificateInfo.issuer,
@@ -231,7 +240,7 @@ class ZatcaManager {
     );
 
     final defaultUBLExtensionsSignedPropertiesXML =
-    XmlUtil.defaultUBLExtensionsSignedProperties(
+        XmlUtil.defaultUBLExtensionsSignedProperties(
           signingTime: signingTime,
           certificateHash: certificateInfo.hash,
           certificateIssuer: certificateInfo.issuer,

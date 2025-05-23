@@ -68,7 +68,7 @@ class CSRConfigProps {
 
   CSRConfigProps({
     this.privateKeyPass,
-    this.production=false,
+    this.production = false,
     required this.egsModel,
     required this.egsSerialNumber,
     required this.solutionName,
@@ -83,26 +83,42 @@ class CSRConfigProps {
   String toTemplate() {
     String populatedTemplate = template;
     populatedTemplate = populatedTemplate.replaceAll(
-        "SET_PRIVATE_KEY_PASS", privateKeyPass ?? "SET_PRIVATE_KEY_PASS");
+      "SET_PRIVATE_KEY_PASS",
+      privateKeyPass ?? "SET_PRIVATE_KEY_PASS",
+    );
     populatedTemplate = populatedTemplate.replaceAll(
-        "SET_PRODUCTION_VALUE", this.production?"ZATCA-Code-Signing":"PREZATCA-Code-Signing");
+      "SET_PRODUCTION_VALUE",
+      this.production ? "ZATCA-Code-Signing" : "PREZATCA-Code-Signing",
+    );
     populatedTemplate = populatedTemplate.replaceAll(
-        "SET_EGS_SERIAL_NUMBER",
-        "1-$solutionName|2-$egsModel|3-$egsSerialNumber");
+      "SET_EGS_SERIAL_NUMBER",
+      "1-$solutionName|2-$egsModel|3-$egsSerialNumber",
+    );
     populatedTemplate = populatedTemplate.replaceAll(
-        "SET_VAT_REGISTRATION_NUMBER", vatNumber);
+      "SET_VAT_REGISTRATION_NUMBER",
+      vatNumber,
+    );
     populatedTemplate = populatedTemplate.replaceAll(
-        "SET_BRANCH_LOCATION", branchLocation);
+      "SET_BRANCH_LOCATION",
+      branchLocation,
+    );
     populatedTemplate = populatedTemplate.replaceAll(
-        "SET_BRANCH_INDUSTRY", branchIndustry);
+      "SET_BRANCH_INDUSTRY",
+      branchIndustry,
+    );
     populatedTemplate = populatedTemplate.replaceAll(
-        "SET_COMMON_NAME", taxpayerProvidedId);
+      "SET_COMMON_NAME",
+      taxpayerProvidedId,
+    );
     populatedTemplate = populatedTemplate.replaceAll(
-        "SET_BRANCH_NAME", branchName);
+      "SET_BRANCH_NAME",
+      branchName,
+    );
     populatedTemplate = populatedTemplate.replaceAll(
-        "SET_TAXPAYER_NAME", taxpayerName);
+      "SET_TAXPAYER_NAME",
+      taxpayerName,
+    );
 
     return populatedTemplate;
   }
 }
-

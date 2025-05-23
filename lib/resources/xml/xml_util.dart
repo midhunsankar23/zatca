@@ -5,9 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:xml/xml.dart';
 import 'package:zatca/models/invoice.dart';
 
-
-class XmlUtil{
-
+class XmlUtil {
   ///     Generate a ZATCA-compliant XML string for the invoice data.
   static XmlDocument generateZATCAXml(ZatcaInvoice data) {
     final builder = XmlBuilder();
@@ -392,7 +390,7 @@ class XmlUtil{
                 'cac:TaxTotal',
                 nest: () {
                   double taxAmount =
-                  (line.lineExtensionAmount * line.taxPercent / 100);
+                      (line.lineExtensionAmount * line.taxPercent / 100);
                   builder.element(
                     'cbc:TaxAmount',
                     nest: () {
@@ -440,7 +438,8 @@ class XmlUtil{
                     nest: () {
                       builder.attribute('currencyID', 'SAR');
                       builder.text(
-                          line.lineExtensionAmount.toStringAsFixed(14));
+                        line.lineExtensionAmount.toStringAsFixed(14),
+                      );
                     },
                   );
                 },
@@ -504,7 +503,7 @@ class XmlUtil{
                         builder.element(
                           'sbc:ReferencedSignatureID',
                           nest:
-                          'urn:oasis:names:specification:ubl:signature:Invoice',
+                              'urn:oasis:names:specification:ubl:signature:Invoice',
                         );
                         builder.element(
                           'ds:Signature',
@@ -541,7 +540,9 @@ class XmlUtil{
                                   'ds:Reference',
                                   nest: () {
                                     builder.attribute(
-                                        'Id', 'invoiceSignedData');
+                                      'Id',
+                                      'invoiceSignedData',
+                                    );
                                     builder.attribute('URI', '');
                                     builder.element(
                                       'ds:Transforms',
@@ -556,7 +557,7 @@ class XmlUtil{
                                             builder.element(
                                               'ds:XPath',
                                               nest:
-                                              'not(//ancestor-or-self::ext:UBLExtensions)',
+                                                  'not(//ancestor-or-self::ext:UBLExtensions)',
                                             );
                                           },
                                         );
@@ -570,7 +571,7 @@ class XmlUtil{
                                             builder.element(
                                               'ds:XPath',
                                               nest:
-                                              'not(//ancestor-or-self::cac:Signature)',
+                                                  'not(//ancestor-or-self::cac:Signature)',
                                             );
                                           },
                                         );
@@ -584,7 +585,7 @@ class XmlUtil{
                                             builder.element(
                                               'ds:XPath',
                                               nest:
-                                              'not(//ancestor-or-self::cac:AdditionalDocumentReference[cbc:ID=\'QR\'])',
+                                                  'not(//ancestor-or-self::cac:AdditionalDocumentReference[cbc:ID=\'QR\'])',
                                             );
                                           },
                                         );
@@ -681,7 +682,7 @@ class XmlUtil{
   }
 
   /// Generates the default  xades:SignedProperties XML template.
- static XmlDocument defaultUBLExtensionsSignedPropertiesForSigning({
+  static XmlDocument defaultUBLExtensionsSignedPropertiesForSigning({
     required String signingTime,
     required String certificateHash,
     required String certificateIssuer,
@@ -789,7 +790,9 @@ class XmlUtil{
           'xades:SignedProperties',
           nest: () {
             builder.attribute(
-                'xmlns:xades', 'http://uri.etsi.org/01903/v1.3.2#');
+              'xmlns:xades',
+              'http://uri.etsi.org/01903/v1.3.2#',
+            );
             builder.attribute('Id', 'xadesSignedProperties');
 
             builder.element(
@@ -850,7 +853,7 @@ class XmlUtil{
     return builder.buildDocument();
   }
 
- static XmlDocument generateQrAndSignatureXMl({required String qrString}) {
+  static XmlDocument generateQrAndSignatureXMl({required String qrString}) {
     final builder = XmlBuilder();
     builder.element(
       'cac:AdditionalDocumentReference',
@@ -885,15 +888,15 @@ class XmlUtil{
     return builder.buildDocument();
   }
 
- static  String canonicalizeXml(String xmlString) {
+  static String canonicalizeXml(String xmlString) {
     final document = XmlDocument.parse(xmlString);
 
     // Recursively sort attributes and format the nodes
     String normalizeNode(XmlNode node) {
       if (node is XmlElement) {
         final sortedAttributes =
-        node.attributes.toList()
-          ..sort((a, b) => a.name.toString().compareTo(b.name.toString()));
+            node.attributes.toList()
+              ..sort((a, b) => a.name.toString().compareTo(b.name.toString()));
 
         final buffer = StringBuffer();
         buffer.write('<${node.name}');

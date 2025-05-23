@@ -5,6 +5,8 @@ The ZATCA package provides tools for generating and managing e-invoices complian
 For more information about ZATCA e-invoicing regulations, visit the [official ZATCA website](https://zatca.gov.sa/en/E-Invoicing/SystemsDevelopers/Pages/default.aspx).
 ![ZATCA Fatoora Logo](https://zatca.gov.sa/ar/E-Invoicing/PublishingImages/header_logo.svg)
 
+For more details, check out our Medium story: [Simplifying ZATCA E-Invoicing in Flutter with the ZATCA Package](https://medium.com/@sbrsubuvga/simplifying-zatca-e-invoicing-in-flutter-with-the-zatca-package-9d181243c2a0).
+
 ---
 
 <a href="https://github.com/sponsors/sbrsubuvga" target="_blank">

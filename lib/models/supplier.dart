@@ -1,5 +1,4 @@
 import 'address.dart';
-import 'invoice.dart';
 
 /// Represents a supplier in the invoice.
 class Supplier {

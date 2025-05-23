@@ -121,12 +121,6 @@ class ZatcaInvoice {
   }
 }
 
-
-
-
-
-
-
 /// Represents an invoice line item in the invoice.
 class InvoiceLine {
   final String id;

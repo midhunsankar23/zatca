@@ -7,12 +7,14 @@ import 'package:zatca/models/customer.dart';
 import 'package:zatca/models/egs_unit.dart';
 import 'package:zatca/models/invoice.dart';
 import 'package:zatca/models/supplier.dart';
-import 'package:zatca/resources/cirtificate/certificate_manager.dart';
+import 'package:zatca/certificate_manager.dart';
 import 'package:zatca/resources/enums.dart';
 import 'package:zatca/zatca_manager.dart';
 
-void main() async{
-  final egsUnitInfo=EGSUnitInfo(
+void main() async {
+  /// Initialize the EGSUnitInfo object with the required details.
+  /// This object contains information about the EGS unit, such as its UUID, model, CRN number, taxpayer name, VAT number, branch name, industry, and location.
+  final egsUnitInfo = EGSUnitInfo(
     uuid: "6f4d20e0-6bfe-4a80-9389-7dabe6620f14",
     taxpayerProvidedId: 'EGS2',
     model: 'IOS',
@@ -31,12 +33,16 @@ void main() async{
     ),
   );
 
+  /// Declare variables for private key and compliance certificate PEM strings.
+  /// These will be used to store the generated private key and compliance certificate in PEM format.
+  /// In a real-world scenario, these should be securely stored and managed.
+  /// The private key is used for signing the compliance certificate, and the compliance certificate is used for generating the production certificate.
   late String privateKeyPem;
   late String complianceCertificatePem;
   // late String productionCertificate;
 
-  bool isDeskTop=Platform.isWindows || Platform.isLinux || Platform.isMacOS;
-  if(isDeskTop) {
+  bool isDeskTop = Platform.isWindows || Platform.isLinux || Platform.isMacOS;
+  if (isDeskTop) {
     /// Initialize the CertificateManager singleton instance.
     final certificateManager = CertificateManager.instance;
     certificateManager.env = ZatcaEnvironment.development;
@@ -50,27 +56,36 @@ void main() async{
     final csr = await certificateManager.generateCSR(privateKeyPem, csrPop);
 
     /// Issue a compliance certificate using the CSR.
-    final complianceCertificate =
-    await certificateManager.issueComplianceCertificate(csr, '123345');
+    final complianceCertificate = await certificateManager
+        .issueComplianceCertificate(csr, '123345');
     complianceCertificatePem = complianceCertificate.complianceCertificatePem;
 
     /// Issue a production certificate using the compliance certificate.
-    final productionCertificate =
-    await certificateManager.issueProductionCertificate(complianceCertificate);
-  }
-  else{
+    final productionCertificate = await certificateManager
+        .issueProductionCertificate(complianceCertificate);
+  } else {
     /// For non-desktop platforms, use hardcoded PEM strings for private key and compliance certificate.
     /// These should be replaced with actual PEM content.
     /// In a real-world scenario, you would fetch these securely from a server or a key management system.
-    privateKeyPem = """-----BEGIN EC PRIVATE KEY-----\nprivate_key_pem_content\n-----END EC PRIVATE KEY-----""";
-    complianceCertificatePem = """-----BEGIN CERTIFICATE-----\ncertificate_pem_content\n-----END CERTIFICATE-----""";
+    privateKeyPem =
+        """-----BEGIN EC PRIVATE KEY-----\nprivate_key_pem_content\n-----END EC PRIVATE KEY-----""";
+    complianceCertificatePem =
+        """-----BEGIN CERTIFICATE-----\ncertificate_pem_content\n-----END CERTIFICATE-----""";
   }
 
-  initZATCAAndGenerateQr(egsUnitInfo: egsUnitInfo,privateKeyPem: privateKeyPem,certificatePem: complianceCertificatePem);
+  /// Initialize the ZATCA manager and generate the QR code using the EGS unit info, private key, and compliance certificate.
+  initZATCAAndGenerateQr(
+    egsUnitInfo: egsUnitInfo,
+    privateKeyPem: privateKeyPem,
+    certificatePem: complianceCertificatePem,
+  );
 }
 
-
-initZATCAAndGenerateQr({ required EGSUnitInfo egsUnitInfo,required String privateKeyPem,required String certificatePem}){
+initZATCAAndGenerateQr({
+  required EGSUnitInfo egsUnitInfo,
+  required String privateKeyPem,
+  required String certificatePem,
+}) {
   /// Initialize the ZatcaManager singleton instance with seller and supplier details.
   final zatcaManager = ZatcaManager.instance;
   zatcaManager.initializeZacta(
@@ -82,8 +97,8 @@ initZATCAAndGenerateQr({ required EGSUnitInfo egsUnitInfo,required String privat
       registrationName: egsUnitInfo.taxpayerName,
       location: egsUnitInfo.location,
     ),
-    privateKeyPem:privateKeyPem,
-    certificatePem:certificatePem,
+    privateKeyPem: privateKeyPem,
+    certificatePem: certificatePem,
   );
 
   /// Generate QR data for the invoice using the ZatcaManager.
@@ -109,11 +124,11 @@ initZATCAAndGenerateQr({ required EGSUnitInfo egsUnitInfo,required String privat
       companyID: '300000000000003',
       registrationName: 'S7S',
       address: Address(
-          street: '__',
-          building: '00',
-          citySubdivision: 'ssss',
-          city: 'jeddah',
-          postalZone: '00000'
+        street: '__',
+        building: '00',
+        citySubdivision: 'ssss',
+        city: 'jeddah',
+        postalZone: '00000',
       ),
     ),
     previousInvoiceHash: "zDnQnE05P6rFMqF1ai21V5hIRlUq/EXvrpsaoPkWRVI=",
@@ -132,7 +147,7 @@ initZATCAAndGenerateQr({ required EGSUnitInfo egsUnitInfo,required String privat
   String ublXML = zatcaManager.generateUBLXml(
     invoiceHash: invoiceHash,
     signingTime:
-    "${DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateTime.now())}Z",
+        "${DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateTime.now())}Z",
     digitalSignature: qrData.digitalSignature,
     invoiceXmlString: invoiceXmlString,
     qrString: qr,

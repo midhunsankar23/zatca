@@ -20,7 +20,7 @@ enum InvoiceType {
 /// This enum represents the type of invoice relation.
 enum InvoiceRelationType { b2b, b2c }
 
-
+/// This enum represents the type of environment.
 enum ZatcaEnvironment {
   production("production"),
   development("development");

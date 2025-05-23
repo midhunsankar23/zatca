@@ -1,5 +1,4 @@
 import 'address.dart';
-import 'invoice.dart';
 
 /// Represents a customer in the invoice.
 class Customer {

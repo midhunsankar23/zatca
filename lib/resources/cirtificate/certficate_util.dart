@@ -5,9 +5,7 @@ import 'package:asn1lib/asn1lib.dart';
 import 'package:crypto/crypto.dart';
 import '../../models/cirtificate_info.dart';
 
-
 class CertificateUtil {
-
   /// Cleans the PEM certificate by removing header, footer, and line breaks.
   static String cleanCertificatePem(String pem) {
     return pem
@@ -67,15 +65,15 @@ class CertificateUtil {
   /// Extracts the public key bytes from the tbsCertificate.
   static Uint8List _extractPublicKey(ASN1Sequence tbsCertificate) {
     final subjectPublicKeyInfo = tbsCertificate.elements[6] as ASN1Sequence;
-    final publicKeyBitString = subjectPublicKeyInfo
-        .elements[1] as ASN1BitString;
+    final publicKeyBitString =
+        subjectPublicKeyInfo.elements[1] as ASN1BitString;
     return publicKeyBitString.contentBytes();
   }
 
   /// Decodes a PEM string into a Uint8List of bytes.
   static Uint8List _decodePem(String pem) {
     final lines =
-    pem.split('\n').where((line) => !line.startsWith('-----')).toList();
+        pem.split('\n').where((line) => !line.startsWith('-----')).toList();
     final base64Str = lines.join('');
     return base64Decode(base64Str);
   }
@@ -99,23 +97,23 @@ class CertificateUtil {
       case '2.5.4.6':
         return 'C';
 
-    /// Country
+      /// Country
       case '2.5.4.10':
         return 'O';
 
-    /// Organization
+      /// Organization
       case '2.5.4.11':
         return 'OU';
 
-    /// Organizational Unit
+      /// Organizational Unit
       case '2.5.4.3':
         return 'CN';
 
-    /// Common Name
+      /// Common Name
       case '0.9.2342.19200300.100.1.25':
         return 'DC';
 
-    /// Domain Component
+      /// Domain Component
       default:
         return oid;
     }
@@ -125,5 +123,4 @@ class CertificateUtil {
   static String _decodeASN1String(ASN1Object obj) {
     return utf8.decode(obj.valueBytes());
   }
-
 }

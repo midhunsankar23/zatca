@@ -1,4 +1,3 @@
-
 class Address {
   final String city;
   final String citySubdivision;
@@ -41,7 +40,6 @@ class Address {
   }
 }
 
-
 class Location extends Address {
   final String plotIdentification;
 
@@ -51,12 +49,12 @@ class Location extends Address {
     required super.street,
     required super.building,
     required super.postalZone,
-    super.countryCode="SA",
+    super.countryCode = "SA",
     required this.plotIdentification,
   });
 
   get branchLocation {
-    return '${building??""} ${street??""}, ${city??''}';
+    return '${building ?? ""} ${street ?? ""}, ${city ?? ''}';
   }
 
   /// Creates an [Address] instance from a [Map].
@@ -69,7 +67,7 @@ class Location extends Address {
       city: map['city'] ?? '',
       postalZone: map['postalZone'] ?? '',
       countryCode: map['countryCode'] ?? 'SA',
-      plotIdentification: map['plotIdentification'] ?? ''
+      plotIdentification: map['plotIdentification'] ?? '',
     );
   }
 
@@ -86,46 +84,3 @@ class Location extends Address {
     };
   }
 }
-
-// /// Represents an address in the invoice.
-// class Address extends Location {
-//   /// The country code of the address.
-//   final String countryCode;
-//   /// Creates a new [Address] instance.
-//   Address({
-//     required super.city,
-//     required super.citySubdivision,
-//     required super.street,
-//     required super.plotIdentification,
-//     required super.building,
-//     required super.postalZone,
-//     this.countryCode = "SA",
-//   });
-//
-//   /// Creates an [Address] instance from a [Map].
-//   factory Address.fromMap(Map<String, dynamic> map) {
-//     return Address(
-//       street: map['street'] ?? '',
-//       building: map['building'] ?? '',
-//       citySubdivision: map['citySubdivision'] ?? '',
-//       city: map['city'] ?? '',
-//       postalZone: map['postalZone'] ?? '',
-//       plotIdentification: map['plotIdentification'] ?? '',
-//       countryCode: map['countryCode'] ?? 'SA',
-//     );
-//   }
-//
-//   /// Converts the [Address] instance to a [Map].
-//   Map<String, dynamic> toMap() {
-//     return {
-//       'street': street,
-//       'building': building,
-//       'citySubdivision': citySubdivision,
-//       'city': city,
-//       'postalZone': postalZone,
-//       'plotIdentification': plotIdentification,
-//       'countryCode': countryCode,
-//     };
-//   }
-// }
-

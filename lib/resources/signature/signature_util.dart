@@ -6,14 +6,13 @@ import 'package:asn1lib/asn1lib.dart';
 import 'package:convert/convert.dart';
 import 'package:pointycastle/export.dart';
 
-
 class SignatureUtil {
   /// Parses a Base64-encoded private key in PKCS#8 or SEC1 format and returns an ECPrivateKey object.
   ///
   /// [base64Key] - The Base64-encoded private key string.
   ///
   /// Throws [ArgumentError] if the private key format is invalid.
- static ECPrivateKey parsePrivateKey(String base64Key) {
+  static ECPrivateKey parsePrivateKey(String base64Key) {
     String cleanedBase64Key = base64Key
         .replaceAll('-----BEGIN EC PRIVATE KEY-----', '')
         .replaceAll('-----END EC PRIVATE KEY-----', '')
@@ -34,14 +33,14 @@ class SignatureUtil {
       final privateKeyParser = ASN1Parser(privateKeyOctets);
       final pkSeq = privateKeyParser.nextObject() as ASN1Sequence;
 
-      final privateKeyInt = (pkSeq.elements[1] as ASN1Integer)
-          .valueAsBigInteger;
+      final privateKeyInt =
+          (pkSeq.elements[1] as ASN1Integer).valueAsBigInteger;
       final curve = ECCurve_secp256r1();
       return ECPrivateKey(privateKeyInt, curve);
     } else if (topLevelSeq.elements.length == 4) {
       /// SEC1 format
-      final privateKeyBytes = (topLevelSeq.elements[1] as ASN1OctetString)
-          .octets;
+      final privateKeyBytes =
+          (topLevelSeq.elements[1] as ASN1OctetString).octets;
       final privateKeyInt = BigInt.parse(
         privateKeyBytes.map((e) => e.toRadixString(16).padLeft(2, '0')).join(),
         radix: 16,
@@ -59,8 +58,10 @@ class SignatureUtil {
   /// [privateKeyPem] - The PEM-encoded EC private key.
   ///
   /// Returns the Base64-encoded digital signature.
- static String createInvoiceDigitalSignature(String invoiceHashBase64,
-      String privateKeyPem,) {
+  static String createInvoiceDigitalSignature(
+    String invoiceHashBase64,
+    String privateKeyPem,
+  ) {
     final invoiceHashBytes = base64.decode(invoiceHashBase64);
 
     // Parse the EC private key from PEM format
@@ -77,13 +78,14 @@ class SignatureUtil {
     );
 
     ECSignature sig =
-    signer.generateSignature(Uint8List.fromList(invoiceHashBytes))
-    as ECSignature;
+        signer.generateSignature(Uint8List.fromList(invoiceHashBytes))
+            as ECSignature;
 
     // ASN.1 encode (DER format)
     final asn1Seq =
-    ASN1Sequence()
-      ..add(ASN1Integer(sig.r))..add(ASN1Integer(sig.s));
+        ASN1Sequence()
+          ..add(ASN1Integer(sig.r))
+          ..add(ASN1Integer(sig.s));
     final derEncoded = asn1Seq.encodedBytes;
 
     return base64.encode(derEncoded);
@@ -94,7 +96,7 @@ class SignatureUtil {
   /// [pem] - The PEM-encoded EC private key.
   ///
   /// Returns an [ECPrivateKey] object.
- static ECPrivateKey _parseECPrivateKeyFromPem(String pem) {
+  static ECPrivateKey _parseECPrivateKeyFromPem(String pem) {
     final lines = pem
         .replaceAll('-----BEGIN EC PRIVATE KEY-----', '')
         .replaceAll('-----END EC PRIVATE KEY-----', '')
@@ -105,8 +107,8 @@ class SignatureUtil {
     final asn1Parser = ASN1Parser(Uint8List.fromList(keyBytes));
     final sequence = asn1Parser.nextObject() as ASN1Sequence;
 
-    final privateKeyInt = (sequence.elements[1] as ASN1OctetString)
-        .valueBytes();
+    final privateKeyInt =
+        (sequence.elements[1] as ASN1OctetString).valueBytes();
     final privateKeyNum = BigInt.parse(hex.encode(privateKeyInt), radix: 16);
 
     final domainParams = ECDomainParameters('secp256r1');

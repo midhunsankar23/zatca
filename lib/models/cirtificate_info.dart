@@ -1,3 +1,4 @@
+/// This class represents the information of a certificate.
 class CertificateInfo {
   final String hash;
   final String issuer;

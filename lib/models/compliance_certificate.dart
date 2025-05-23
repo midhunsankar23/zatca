@@ -1,5 +1,3 @@
-
-
 class ZatcaCertificate {
   final String complianceCertificatePem;
   final String complianceApiSecret;

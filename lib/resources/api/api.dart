@@ -1,21 +1,26 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:zatca/resources/cirtificate/certificate_manager.dart';
+import 'package:zatca/certificate_manager.dart';
 
 import '../enums.dart';
 
 class API {
+  /// The environment for the API (sandbox(development), simulation, or production).
   final ZatcaEnvironment env;
 
   API(this.env);
 
+  /// The base URL for the API endpoints.
   static const settings = {
     "API_VERSION": "V2",
-    "SANDBOX_BASEURL": "https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal",
-    "SIMULATION_BASEURL": "https://gw-fatoora.zatca.gov.sa/e-invoicing/simulation",
+    "SANDBOX_BASEURL":
+        "https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal",
+    "SIMULATION_BASEURL":
+        "https://gw-fatoora.zatca.gov.sa/e-invoicing/simulation",
     "PRODUCTION_BASEURL": "https://gw-fatoora.zatca.gov.sa/e-invoicing/core",
   };
 
+  /// The base URL for the API endpoints based on the environment.
   String getBaseUrl() {
     if (env.value == "production") {
       return settings["PRODUCTION_BASEURL"]!;
@@ -26,21 +31,25 @@ class API {
     }
   }
 
+  /// Generates the authentication headers for the API requests.
   Map<String, String> getAuthHeaders(String? certificate, String? secret) {
     if (certificate != null && secret != null) {
-      final basic = base64Encode(utf8.encode(
-          '${base64Encode(utf8.encode(certificate))}:$secret'));
+      final basic = base64Encode(
+        utf8.encode('${base64Encode(utf8.encode(certificate))}:$secret'),
+      );
       return {"Authorization": "Basic $basic"};
     }
     return {};
   }
 
+  /// Creates an instance of the ComplianceAPI class.
   ComplianceAPI compliance({String? certificate, String? secret}) {
     final authHeaders = getAuthHeaders(certificate, secret);
     final baseUrl = getBaseUrl();
     return ComplianceAPI(authHeaders, baseUrl);
   }
 
+  /// Creates an instance of the ProductionAPI class.
   ProductionAPI production(String? certificate, String? secret) {
     final authHeaders = getAuthHeaders(certificate, secret);
     final baseUrl = getBaseUrl();
@@ -49,11 +58,15 @@ class API {
 }
 
 class ComplianceAPI {
+  /// The authentication headers for the API requests.
   final Map<String, String> authHeaders;
+
+  /// The base URL for the API endpoints.
   final String baseUrl;
 
   ComplianceAPI(this.authHeaders, this.baseUrl);
 
+  /// Issues a compliance certificate using the provided CSR and OTP.
   Future<Map<String, dynamic>> issueCertificate(String csr, String otp) async {
     final headers = {
       "Accept-Version": API.settings["API_VERSION"]!,
@@ -61,7 +74,6 @@ class ComplianceAPI {
       'Content-Type': 'application/json',
       ...authHeaders,
     };
-
 
     try {
       final response = await http.post(
@@ -86,15 +98,18 @@ ${utf8.decode(base64Decode(data["binarySecurityToken"]))}
         "api_secret": data["secret"],
         "request_id": data["requestID"],
       };
-    }
-    catch (e) {
+    } catch (e) {
       print("An error occurred: $e");
       rethrow;
     }
   }
 
+  /// Reports an invoice using the provided signed XML string, invoice hash, and EGS UUID.
   Future<dynamic> checkInvoiceCompliance(
-      String signedXmlString, String invoiceHash, String egsUuid) async {
+    String signedXmlString,
+    String invoiceHash,
+    String egsUuid,
+  ) async {
     final headers = {
       "Accept-Version": API.settings["API_VERSION"]!,
       "Accept-Language": "en",
@@ -120,18 +135,23 @@ ${utf8.decode(base64Decode(data["binarySecurityToken"]))}
 }
 
 class ProductionAPI {
+  /// The authentication headers for the API requests.
   final Map<String, String> authHeaders;
+
+  /// The base URL for the API endpoints.
   final String baseUrl;
 
   ProductionAPI(this.authHeaders, this.baseUrl);
 
-  Future<Map<String, dynamic>> issueCertificate(String complianceRequestId) async {
+  /// Issues a production certificate using the provided compliance request ID.
+  Future<Map<String, dynamic>> issueCertificate(
+    String complianceRequestId,
+  ) async {
     final headers = {
       "Accept-Version": API.settings["API_VERSION"]!,
       'Content-Type': 'application/json',
       ...authHeaders,
     };
-
 
     final response = await http.post(
       Uri.parse('$baseUrl/production/csids'),
@@ -156,8 +176,12 @@ ${utf8.decode(base64Decode(data["binarySecurityToken"]))}
     };
   }
 
+  /// Reports an invoice using the provided signed XML string, invoice hash, and EGS UUID.
   Future<dynamic> reportInvoice(
-      String signedXmlString, String invoiceHash, String egsUuid) async {
+    String signedXmlString,
+    String invoiceHash,
+    String egsUuid,
+  ) async {
     final headers = {
       "Accept-Version": API.settings["API_VERSION"]!,
       "Accept-Language": "en",
@@ -182,8 +206,12 @@ ${utf8.decode(base64Decode(data["binarySecurityToken"]))}
     return jsonDecode(response.body);
   }
 
+  /// Reports an invoice using the provided signed XML string, invoice hash, and EGS UUID.
   Future<dynamic> clearanceInvoice(
-      String signedXmlString, String invoiceHash, String egsUuid) async {
+    String signedXmlString,
+    String invoiceHash,
+    String egsUuid,
+  ) async {
     final headers = {
       "Accept-Version": API.settings["API_VERSION"]!,
       "Accept-Language": "en",
