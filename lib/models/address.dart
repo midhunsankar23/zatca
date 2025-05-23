@@ -54,7 +54,7 @@ class Location extends Address {
   });
 
   get branchLocation {
-    return '${building ?? ""} ${street ?? ""}, ${city ?? ''}';
+    return '$building $street, $city';
   }
 
   /// Creates an [Address] instance from a [Map].
@@ -72,6 +72,7 @@ class Location extends Address {
   }
 
   /// Converts the [Address] instance to a [Map].
+  @override
   Map<String, dynamic> toMap() {
     return {
       'street': street,

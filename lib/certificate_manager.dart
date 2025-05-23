@@ -23,7 +23,7 @@ class CertificateManager {
       final keyPair = CryptoUtils.generateEcKeyPair(curve: 'secp256k1');
 
       final privateKey = keyPair.privateKey as ECPrivateKey;
-      final publicKey = keyPair.publicKey as ECPublicKey;
+      // final publicKey = keyPair.publicKey as ECPublicKey;
 
       final privatePem = CryptoUtils.encodeEcPrivateKeyToPem(privateKey);
       return {'privateKeyPem': privatePem};

@@ -47,8 +47,8 @@ void main() {
       csr,
       '123345',
     );
-    final productionCertificate = await certificateManager
-        .issueProductionCertificate(complianceCertificate);
+    // final productionCertificate = await certificateManager
+    //     .issueProductionCertificate(complianceCertificate);
   });
   test('adds one to input values', () async {
     final zatcaManager = ZatcaManager.instance;
@@ -112,6 +112,6 @@ void main() {
       qrString: qr,
     );
 
-    // print("XML: $ublXML");
+    print("XML: $ublXML");
   });
 }

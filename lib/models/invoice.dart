@@ -1,7 +1,6 @@
 import 'package:zatca/models/supplier.dart';
 
 import 'customer.dart';
-import 'egs_unit.dart';
 
 /// Represents a ZATCA-compliant invoice.
 class ZatcaInvoice {

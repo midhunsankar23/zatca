@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:zatca/certificate_manager.dart';
 
 import '../enums.dart';
 
