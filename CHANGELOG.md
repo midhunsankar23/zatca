@@ -1,4 +1,4 @@
-## 0.2.2
+## 0.2.3
 
 * Added new feature: `CertificateManager` to generate certificates.
     Generating key pairs.
