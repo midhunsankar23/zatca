@@ -1,6 +1,6 @@
 name: zatca
 description: "A Flutter package for generating ZATCA (Saudi Arabia's Zakat, Tax and Customs Authority) compliant invoice XML and QR codes."
-version: 0.2.3
+version: 0.2.4
 homepage: https://github.com/sbrsubuvga/zatca.git
 repository: https://github.com/sbrsubuvga/zatca.git
 issue_tracker: https://github.com/sbrsubuvga/zatca/issues
@@ -19,7 +19,7 @@ dependencies:
   intl: ^0.20.2
   convert: ^3.1.2
   basic_utils: ^5.8.2
-  uuid: ^3.0.7
+  uuid: ^4.5.1
   http: ^1.4.0
 
 dev_dependencies:

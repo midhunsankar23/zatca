@@ -1,6 +1,3 @@
-## 0.2.3
+## 0.2.4
 
-* Added new feature: `CertificateManager` to generate certificates.
-    Generating key pairs.
-    Creating Certificate Signing Requests (CSRs).
-    Issuing compliance and production certificates.
+* Updated dependencies to the latest package versions for improved functionality and compatibility.
