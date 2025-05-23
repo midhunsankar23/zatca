@@ -25,6 +25,7 @@ For more details, check out our Medium story: [Simplifying ZATCA E-Invoicing in 
 - ✅ Sign invoices with private keys and certificates.
 - ✅ Easy integration with Flutter and Dart projects.
 - ✅ Generate ZATCA-compliant UBL standard XML for reporting purposes.
+- ✅ Generate and manage certificates for signing invoices.
 
 ---
 
@@ -34,4 +35,4 @@ To use this package, add it to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  zatca: ^0.2.1
+  zatca: ^0.2.2
