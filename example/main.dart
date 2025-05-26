@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:zatca/models/address.dart';
 import 'package:zatca/models/customer.dart';
 import 'package:zatca/models/egs_unit.dart';
+import 'package:zatca/models/invo.dart';
 import 'package:zatca/models/invoice.dart';
 import 'package:zatca/models/supplier.dart';
 import 'package:zatca/certificate_manager.dart';
@@ -101,39 +102,42 @@ initZATCAAndGenerateQr({
     certificatePem: certificatePem,
   );
 
-  /// Generate QR data for the invoice using the ZatcaManager.
-  final qrData = zatcaManager.generateZatcaQrInit(
-    invoiceLines: [
-      InvoiceLine(
-        id: '1',
-        quantity: '1',
-        unitCode: 'PCE',
-        lineExtensionAmount: 10.00,
-        itemName: 'Item 1',
-        taxPercent: 15,
+  final invoice = SimplifiedInvoice(
+      invoiceNumber: "EGS1-886431145-101",
+      uuid: egsUnitInfo.uuid,
+      issueDate:  "2024-02-29",
+      issueTime: "11:40:40",
+      actualDeliveryDate:  "2024-02-29",
+      currencyCode: 'SAR',
+      taxCurrencyCode: 'SAR',
+      customer:Customer(
+        companyID: '300000000000003',
+        registrationName: 'S7S',
+        address: Address(
+          street: '__',
+          building: '00',
+          citySubdivision: 'ssss',
+          city: 'jeddah',
+          postalZone: '00000',
+        ),
       ),
-    ],
-    invoiceType: InvoiceType.standardInvoicesAndSimplifiedInvoices,
-    issueDate: "2025-04-08",
-    issueTime: "03:41:08",
-    invoiceUUid: "8e6000cf-1a98-4174-b3e7-b5d5954bc10d",
-    invoiceNumber: "INV0001",
-    totalVat: 1.50,
-    totalWithVat: 11.50,
-    customer: Customer(
-      companyID: '300000000000003',
-      registrationName: 'S7S',
-      address: Address(
-        street: '__',
-        building: '00',
-        citySubdivision: 'ssss',
-        city: 'jeddah',
-        postalZone: '00000',
-      ),
-    ),
-    previousInvoiceHash: "zDnQnE05P6rFMqF1ai21V5hIRlUq/EXvrpsaoPkWRVI=",
-    invoiceRelationType: InvoiceRelationType.b2c,
+      invoiceLines: [
+        InvoiceLine(
+          id: '1',
+          quantity: '1',
+          unitCode: 'PCE',
+          lineExtensionAmount: 10,
+          itemName: 'TEST NAME',
+          taxPercent: 15,
+        ),
+      ],
+      taxAmount: 1.50,
+      totalAmount: 11.50,
+      previousInvoiceHash: "zDnQnE05P6rFMqF1ai21V5hIRlUq/EXvrpsaoPkWRVI="
   );
+
+  /// Generate QR data for the invoice using the ZatcaManager.
+  final qrData = zatcaManager.generateZatcaQrInit(invoice: invoice);
 
   /// Extract XML and QR string from the generated QR data.
   String xml = qrData.xmlString;

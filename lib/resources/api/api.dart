@@ -104,14 +104,15 @@ ${utf8.decode(base64Decode(data["binarySecurityToken"]))}
   }
 
   /// Reports an invoice using the provided signed XML string, invoice hash, and EGS UUID.
-  Future<dynamic> checkInvoiceCompliance(
-    String signedXmlString,
-    String invoiceHash,
-    String egsUuid,
-  ) async {
+  Future<dynamic> checkInvoiceCompliance({
+    required String signedXmlString,
+    required String invoiceHash,
+    required String egsUuid
+  }) async {
     final headers = {
       "Accept-Version": API.settings["API_VERSION"]!,
       "Accept-Language": "en",
+      'Content-Type': 'application/json',
       ...authHeaders,
     };
 
@@ -126,6 +127,7 @@ ${utf8.decode(base64Decode(data["binarySecurityToken"]))}
     );
 
     if (response.statusCode != 200 && response.statusCode != 202) {
+      print("Response: ${response.statusCode}, Body: ${response.body}");
       throw Exception("Error in compliance check.");
     }
 

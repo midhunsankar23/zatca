@@ -42,7 +42,7 @@ class EGSUnitInfo {
     required this.location,
   });
 
-  toCsrProps(String solutionName) {
+  CSRConfigProps toCsrProps(String solutionName) {
     return CSRConfigProps(
       egsModel: model,
       egsSerialNumber: uuid,
@@ -53,6 +53,7 @@ class EGSUnitInfo {
       branchName: branchName,
       taxpayerName: taxpayerName,
       taxpayerProvidedId: taxpayerProvidedId,
+      production: false
     );
   }
 }

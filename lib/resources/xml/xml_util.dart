@@ -3,11 +3,14 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:intl/intl.dart';
 import 'package:xml/xml.dart';
-import 'package:zatca/models/invoice.dart';
+import 'package:zatca/models/invo.dart';
+import 'package:zatca/models/supplier.dart';
 
 class XmlUtil {
   ///     Generate a ZATCA-compliant XML string for the invoice data.
-  static XmlDocument generateZATCAXml(ZatcaInvoice data) {
+  static XmlDocument generateZATCAXml(BaseInvoice invoice,Supplier supplier) {
+
+
     final builder = XmlBuilder();
     final formatter = NumberFormat("#.##");
     builder.processing('xml', 'version="1.0" encoding="UTF-8"');
@@ -30,18 +33,21 @@ class XmlUtil {
           'xmlns:ext',
           'urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2',
         );
-        builder.element('cbc:ProfileID', nest: data.profileID);
-        builder.element('cbc:ID', nest: data.id);
-        builder.element('cbc:UUID', nest: data.uuid);
-        builder.element('cbc:IssueDate', nest: data.issueDate);
-        builder.element('cbc:IssueTime', nest: data.issueTime);
+        builder.element('cbc:ProfileID', nest: invoice.profileID);
+        builder.element('cbc:ID', nest: invoice.invoiceNumber);
+        builder.element('cbc:UUID', nest: invoice.uuid);
+        builder.element('cbc:IssueDate', nest: invoice.issueDate);
+        builder.element('cbc:IssueTime', nest: invoice.issueTime);
+
+
         builder.element(
           'cbc:InvoiceTypeCode',
           nest: () {
-            builder.attribute('name', data.invoiceTypeName);
-            builder.text(data.invoiceTypeCode);
+            builder.attribute('name', invoice.invoiceType.invoiceRelationType.value);
+            builder.text(invoice.invoiceType.code);
           },
         );
+
         // builder.element(
         //   'cbc:Note',
         //   nest: () {
@@ -49,8 +55,30 @@ class XmlUtil {
         //     builder.text(data.note);
         //   },
         // );
-        builder.element('cbc:DocumentCurrencyCode', nest: data.currencyCode);
-        builder.element('cbc:TaxCurrencyCode', nest: data.taxCurrencyCode);
+        builder.element('cbc:DocumentCurrencyCode', nest: invoice.currencyCode);
+        builder.element('cbc:TaxCurrencyCode', nest: invoice.taxCurrencyCode);
+
+
+       if(invoice is DBInvoice ) {
+         builder.element(
+           'cac:BillingReference',
+           nest: () {
+             builder.element(
+               'cac:InvoiceDocumentReference',
+               nest: () {
+                 builder.element(
+                   'cbc:ID',
+                   nest: () {
+                     builder.text(
+                         invoice.cancellation.canceledSerialInvoiceNumber);
+                   },
+                 );
+               },
+             );
+           },
+         );
+       }
+
 
         builder.element(
           'cac:AdditionalDocumentReference',
@@ -68,7 +96,7 @@ class XmlUtil {
               nest: () {
                 builder.element(
                   'cbc:EmbeddedDocumentBinaryObject',
-                  nest: data.previousInvoiceHash,
+                  nest: invoice.previousInvoiceHash,
                   attributes: {'mimeCode': 'text/plain'},
                 );
               },
@@ -90,7 +118,7 @@ class XmlUtil {
                       'cbc:ID',
                       nest: () {
                         builder.attribute('schemeID', 'CRN');
-                        builder.text(data.supplier.companyCRN);
+                        builder.text(supplier.companyCRN);
                       },
                     );
                   },
@@ -100,34 +128,34 @@ class XmlUtil {
                   nest: () {
                     builder.element(
                       'cbc:StreetName',
-                      nest: data.supplier.location.street,
+                      nest: supplier.location.street,
                     );
                     builder.element(
                       'cbc:BuildingNumber',
-                      nest: data.supplier.location.building,
+                      nest: supplier.location.building,
                     );
                     builder.element(
                       'cbc:PlotIdentification',
-                      nest: data.supplier.location.plotIdentification,
+                      nest: supplier.location.plotIdentification,
                     );
                     builder.element(
                       'cbc:CitySubdivisionName',
-                      nest: data.supplier.location.citySubdivision,
+                      nest: supplier.location.citySubdivision,
                     );
                     builder.element(
                       'cbc:CityName',
-                      nest: data.supplier.location.city,
+                      nest: supplier.location.city,
                     );
                     builder.element(
                       'cbc:PostalZone',
-                      nest: data.supplier.location.postalZone,
+                      nest: supplier.location.postalZone,
                     );
                     builder.element(
                       'cac:Country',
                       nest: () {
                         builder.element(
                           'cbc:IdentificationCode',
-                          nest: data.supplier.location.countryCode,
+                          nest: supplier.location.countryCode,
                         );
                       },
                     );
@@ -138,7 +166,7 @@ class XmlUtil {
                   nest: () {
                     builder.element(
                       'cbc:CompanyID',
-                      nest: data.supplier.companyID,
+                      nest: supplier.companyID,
                     );
                     builder.element(
                       'cac:TaxScheme',
@@ -153,7 +181,7 @@ class XmlUtil {
                   nest: () {
                     builder.element(
                       'cbc:RegistrationName',
-                      nest: data.supplier.registrationName,
+                      nest: supplier.registrationName,
                     );
                   },
                 );
@@ -186,30 +214,30 @@ class XmlUtil {
                   nest: () {
                     builder.element(
                       'cbc:StreetName',
-                      nest: data.customer.address.street,
+                      nest: invoice.customer!.address.street,
                     );
                     builder.element(
                       'cbc:BuildingNumber',
-                      nest: data.customer.address.building,
+                      nest: invoice.customer!.address.building,
                     );
                     builder.element(
                       'cbc:CitySubdivisionName',
-                      nest: data.customer.address.citySubdivision,
+                      nest: invoice.customer!.address.citySubdivision,
                     );
                     builder.element(
                       'cbc:CityName',
-                      nest: data.customer.address.city,
+                      nest: invoice.customer!.address.city,
                     );
                     builder.element(
                       'cbc:PostalZone',
-                      nest: data.customer.address.postalZone,
+                      nest: invoice.customer!.address.postalZone,
                     );
                     builder.element(
                       'cac:Country',
                       nest: () {
                         builder.element(
                           'cbc:IdentificationCode',
-                          nest: data.customer.address.countryCode,
+                          nest: invoice.customer!.address.countryCode,
                         );
                       },
                     );
@@ -220,7 +248,7 @@ class XmlUtil {
                   nest: () {
                     builder.element(
                       'cbc:CompanyID',
-                      nest: data.customer.companyID,
+                      nest: invoice.customer!.companyID,
                     );
                     builder.element(
                       'cac:TaxScheme',
@@ -235,7 +263,7 @@ class XmlUtil {
                   nest: () {
                     builder.element(
                       'cbc:RegistrationName',
-                      nest: data.customer.registrationName,
+                      nest: invoice.customer!.registrationName,
                     );
                   },
                 );
@@ -243,12 +271,25 @@ class XmlUtil {
             );
           },
         );
-        builder.element(
-          'cac:Delivery',
-          nest: () {
-            builder.element('cbc:ActualDeliveryDate', nest: data.issueDate);
-          },
-        );
+
+        if(invoice is Invoice) {
+          builder.element(
+            'cac:Delivery',
+            nest: () {
+              builder.element(
+                  'cbc:ActualDeliveryDate', nest: invoice.actualDeliveryDate);
+            },
+          );
+        }
+        if(invoice is DBInvoice){
+          builder.element(
+            'cac:PaymentMeans',
+            nest: () {
+              builder.element('cbc:PaymentMeansCode', nest: invoice.cancellation.paymentMethod.value);
+              builder.element('cbc:InstructionNote', nest: invoice.cancellation.reason);
+            },
+          );
+        }
 
         // Totals
         builder.element(
@@ -258,7 +299,7 @@ class XmlUtil {
               'cbc:TaxAmount',
               nest: () {
                 builder.attribute('currencyID', 'SAR');
-                builder.text(data.taxAmount.toStringAsFixed(2));
+                builder.text(invoice.taxAmount.toStringAsFixed(2));
               },
             );
             builder.element(
@@ -269,7 +310,7 @@ class XmlUtil {
                   nest: () {
                     builder.attribute('currencyID', 'SAR');
                     builder.text(
-                      formatter.format(data.totalAmount - data.taxAmount),
+                      formatter.format(invoice.totalAmount - invoice.taxAmount),
                     );
                   },
                 );
@@ -277,7 +318,7 @@ class XmlUtil {
                   'cbc:TaxAmount',
                   nest: () {
                     builder.attribute('currencyID', 'SAR');
-                    builder.text(formatter.format(data.taxAmount));
+                    builder.text(formatter.format(invoice.taxAmount));
                   },
                 );
                 builder.element(
@@ -318,7 +359,7 @@ class XmlUtil {
               'cbc:TaxAmount',
               nest: () {
                 builder.attribute('currencyID', 'SAR');
-                builder.text(data.taxAmount.toStringAsFixed(2));
+                builder.text(invoice.taxAmount.toStringAsFixed(2));
               },
             );
           },
@@ -327,7 +368,7 @@ class XmlUtil {
         builder.element(
           'cac:LegalMonetaryTotal',
           nest: () {
-            double taxableAmount = data.totalAmount - data.taxAmount;
+            double taxableAmount = invoice.totalAmount - invoice.taxAmount;
             builder.element(
               'cbc:LineExtensionAmount',
               nest: () {
@@ -346,7 +387,7 @@ class XmlUtil {
               'cbc:TaxInclusiveAmount',
               nest: () {
                 builder.attribute('currencyID', 'SAR');
-                builder.text(data.totalAmount.toStringAsFixed(2));
+                builder.text(invoice.totalAmount.toStringAsFixed(2));
               },
             );
             builder.element(
@@ -360,14 +401,14 @@ class XmlUtil {
               'cbc:PayableAmount',
               nest: () {
                 builder.attribute('currencyID', 'SAR');
-                builder.text(data.totalAmount.toStringAsFixed(2));
+                builder.text(invoice.totalAmount.toStringAsFixed(2));
               },
             );
           },
         );
 
         // Invoice Lines
-        for (var line in data.invoiceLines) {
+        for (var line in invoice.invoiceLines) {
           builder.element(
             'cac:InvoiceLine',
             nest: () {
@@ -447,6 +488,7 @@ class XmlUtil {
             },
           );
         }
+
       },
     );
 

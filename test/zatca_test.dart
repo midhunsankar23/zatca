@@ -4,6 +4,7 @@ import 'package:zatca/models/address.dart';
 import 'package:zatca/models/compliance_certificate.dart';
 import 'package:zatca/models/customer.dart';
 import 'package:zatca/models/egs_unit.dart';
+import 'package:zatca/models/invo.dart';
 import 'package:zatca/models/invoice.dart';
 import 'package:zatca/models/supplier.dart';
 import 'package:zatca/certificate_manager.dart';
@@ -15,7 +16,7 @@ void main() {
   late EGSUnitInfo egsUnitInfo;
   late String privateKeyPem;
   late ZatcaCertificate complianceCertificate;
-  test('adds one to input values', () async {
+  test('Certificate generate', () async {
     egsUnitInfo = EGSUnitInfo(
       uuid: "6f4d20e0-6bfe-4a80-9389-7dabe6620f14",
       taxpayerProvidedId: 'EGS2',
@@ -50,7 +51,7 @@ void main() {
     // final productionCertificate = await certificateManager
     //     .issueProductionCertificate(complianceCertificate);
   });
-  test('adds one to input values', () async {
+  test('Initialize zatca', () async {
     final zatcaManager = ZatcaManager.instance;
     zatcaManager.initializeZacta(
       sellerName: egsUnitInfo.taxpayerName,
@@ -64,16 +65,20 @@ void main() {
       privateKeyPem: privateKeyPem,
       certificatePem: complianceCertificate.complianceCertificatePem,
     );
+  });
 
-    final qrData = zatcaManager.generateZatcaQrInit(
-      invoiceType: InvoiceType.standardInvoicesAndSimplifiedInvoices,
-      issueDate: "2024-02-29",
-      issueTime: "11:40:40",
-      invoiceUUid: egsUnitInfo.uuid,
+  test('Sign Simplified Invoice', () async {
+    final zatcaManager = ZatcaManager.instance;
+
+    final invoice = SimplifiedInvoice(
       invoiceNumber: "EGS1-886431145-101",
-      totalVat: 1.50,
-      totalWithVat: 11.50,
-      customer: Customer(
+      uuid: egsUnitInfo.uuid,
+      issueDate:  "2025-05-26",
+      issueTime: "11:40:40",
+      actualDeliveryDate: "2025-05-26",
+      currencyCode: 'SAR',
+      taxCurrencyCode: 'SAR',
+      customer:Customer(
         companyID: '300000000000003',
         registrationName: 'S7S',
         address: Address(
@@ -84,8 +89,6 @@ void main() {
           postalZone: '00000',
         ),
       ),
-      previousInvoiceHash: "zDnQnE05P6rFMqF1ai21V5hIRlUq/EXvrpsaoPkWRVI=",
-      invoiceRelationType: InvoiceRelationType.b2c,
       invoiceLines: [
         InvoiceLine(
           id: '1',
@@ -96,13 +99,18 @@ void main() {
           taxPercent: 15,
         ),
       ],
+      taxAmount: 1.50,
+      totalAmount: 11.50,
+      previousInvoiceHash: "zDnQnE05P6rFMqF1ai21V5hIRlUq/EXvrpsaoPkWRVI="
     );
+
+    final qrData = zatcaManager.generateZatcaQrInit(invoice: invoice);
 
     String invoiceHash = qrData.invoiceHash;
     String invoiceXmlString = qrData.xmlString;
     String qr = zatcaManager.getQrString(qrData);
 
-    print("qr: $qr");
+    // print("qr: $qr");
     String ublXML = zatcaManager.generateUBLXml(
       invoiceHash: invoiceHash,
       signingTime:
@@ -111,7 +119,186 @@ void main() {
       invoiceXmlString: invoiceXmlString,
       qrString: qr,
     );
-
-    print("XML: $ublXML");
+    final certificateManager= CertificateManager.instance;
+    await certificateManager.checkInvoiceCompliance(complianceCertificate: complianceCertificate,invoiceHash: invoiceHash,ublXml: ublXML,uuid:egsUnitInfo.uuid );
+    // print("XML: $ublXML");
   });
+
+
+  test('Sign Simplified Credit Note', () async {
+    final zatcaManager = ZatcaManager.instance;
+
+    final invoice = SimplifiedCreditNoteInvoice(
+        invoiceNumber: "EGS1-886431145-102",
+        uuid: egsUnitInfo.uuid,
+        issueDate:  "2025-05-26",
+        issueTime: "11:40:40",
+        currencyCode: 'SAR',
+        taxCurrencyCode: 'SAR',
+        customer:Customer(
+          companyID: '300000000000003',
+          registrationName: 'S7S',
+          address: Address(
+            street: '__',
+            building: '00',
+            citySubdivision: 'ssss',
+            city: 'jeddah',
+            postalZone: '00000',
+          ),
+        ),
+        invoiceLines: [
+          InvoiceLine(
+            id: '1',
+            quantity: '1',
+            unitCode: 'PCE',
+            lineExtensionAmount: 10,
+            itemName: 'TEST NAME',
+            taxPercent: 15,
+          ),
+        ],
+        taxAmount: 1.50,
+        totalAmount: 11.50,
+        previousInvoiceHash: "zDnQnE05P6rFMqF1ai21V5hIRlUq/EXvrpsaoPkWRVI=",
+        cancellation: InvoiceCancellation(
+            reason: "Customer requested cancellation",
+            canceledSerialInvoiceNumber: 'EGS1-886431145-101',
+            paymentMethod: ZATCAPaymentMethods.CASH
+        )
+    );
+
+    final qrData = zatcaManager.generateZatcaQrInit(invoice: invoice);
+
+    String invoiceHash = qrData.invoiceHash;
+    String invoiceXmlString = qrData.xmlString;
+    String qr = zatcaManager.getQrString(qrData);
+
+    // print("qr: $qr");
+    String ublXML = zatcaManager.generateUBLXml(
+      invoiceHash: invoiceHash,
+      signingTime:
+      "${DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateTime.now())}Z",
+      digitalSignature: qrData.digitalSignature,
+      invoiceXmlString: invoiceXmlString,
+      qrString: qr,
+    );
+    final certificateManager= CertificateManager.instance;
+    await certificateManager.checkInvoiceCompliance(complianceCertificate: complianceCertificate,invoiceHash: invoiceHash,ublXml: ublXML,uuid:egsUnitInfo.uuid );
+    // print("XML: $ublXML");
+  });
+
+
+  test('Sign Standard Invoice', () async {
+    final zatcaManager = ZatcaManager.instance;
+
+    final invoice = StandardInvoice(
+      invoiceNumber: "EGS1-886431145-104",
+      uuid: egsUnitInfo.uuid,
+      issueDate:  "2024-02-29",
+      issueTime: "11:40:40",
+      actualDeliveryDate:  "2024-02-29",
+      currencyCode: 'SAR',
+      taxCurrencyCode: 'SAR',
+      customer:Customer(
+        companyID: '300000000000003',
+        registrationName: 'S7S',
+        address: Address(
+          street: '__',
+          building: '00',
+          citySubdivision: 'ssss',
+          city: 'jeddah',
+          postalZone: '00000',
+        ),
+      ),
+      invoiceLines: [
+        InvoiceLine(
+          id: '1',
+          quantity: '1',
+          unitCode: 'PCE',
+          lineExtensionAmount: 10,
+          itemName: 'TEST NAME',
+          taxPercent: 15,
+        ),
+      ],
+      taxAmount: 1.50,
+      totalAmount: 11.50,
+      previousInvoiceHash: "zDnQnE05P6rFMqF1ai21V5hIRlUq/EXvrpsaoPkWRVI=",
+
+    );
+
+    final qrData = zatcaManager.generateZatcaQrInit(invoice: invoice);
+
+    String invoiceHash = qrData.invoiceHash;
+    String invoiceXmlString = qrData.xmlString;
+    String qr = zatcaManager.getQrString(qrData);
+    String ublXML = zatcaManager.generateUBLXml(
+      invoiceHash: invoiceHash,
+      signingTime:
+          "${DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateTime.now())}Z",
+      digitalSignature: qrData.digitalSignature,
+      invoiceXmlString: invoiceXmlString,
+      qrString: qr,
+    );
+    final certificateManager= CertificateManager.instance;
+    await certificateManager.checkInvoiceCompliance(complianceCertificate: complianceCertificate,invoiceHash: invoiceHash,ublXml: ublXML,uuid:egsUnitInfo.uuid );
+  });
+
+  test('Sign Standard Credit Note', () async {
+    final zatcaManager = ZatcaManager.instance;
+
+    final invoice = StandardCreditNoteInvoice(
+      invoiceNumber: "EGS1-886431145-105",
+      uuid: egsUnitInfo.uuid,
+      issueDate:  "2024-02-29",
+      issueTime: "11:40:40",
+      currencyCode: 'SAR',
+      taxCurrencyCode: 'SAR',
+      customer:Customer(
+        companyID: '300000000000003',
+        registrationName: 'S7S',
+        address: Address(
+          street: '__',
+          building: '00',
+          citySubdivision: 'ssss',
+          city: 'jeddah',
+          postalZone: '00000',
+        ),
+      ),
+      invoiceLines: [
+        InvoiceLine(
+          id: '1',
+          quantity: '1',
+          unitCode: 'PCE',
+          lineExtensionAmount: 10,
+          itemName: 'TEST NAME',
+          taxPercent: 15,
+        ),
+      ],
+      taxAmount: 1.50,
+      totalAmount: 11.50,
+      previousInvoiceHash: "zDnQnE05P6rFMqF1ai21V5hIRlUq/EXvrpsaoPkWRVI=",
+        cancellation: InvoiceCancellation(
+            reason: "Customer requested cancellation",
+            canceledSerialInvoiceNumber: 'EGS1-886431145-104',
+            paymentMethod: ZATCAPaymentMethods.CASH
+        )
+
+    );
+
+    final qrData = zatcaManager.generateZatcaQrInit(invoice: invoice);
+
+    String invoiceHash = qrData.invoiceHash;
+    String invoiceXmlString = qrData.xmlString;
+    String qr = zatcaManager.getQrString(qrData);
+    String ublXML = zatcaManager.generateUBLXml(
+      invoiceHash: invoiceHash,
+      signingTime:
+          "${DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateTime.now())}Z",
+      digitalSignature: qrData.digitalSignature,
+      invoiceXmlString: invoiceXmlString,
+      qrString: qr,
+    );
+    final certificateManager= CertificateManager.instance;
+    await certificateManager.checkInvoiceCompliance(complianceCertificate: complianceCertificate,invoiceHash: invoiceHash,ublXml: ublXML,uuid:egsUnitInfo.uuid );
+  });
+
 }

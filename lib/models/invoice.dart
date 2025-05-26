@@ -1,14 +1,14 @@
 import 'package:zatca/models/supplier.dart';
+import 'package:zatca/resources/enums.dart';
 
 import 'customer.dart';
 
 /// Represents a ZATCA-compliant invoice.
-class ZatcaInvoice {
-  /// The profile ID of the invoice.
-  final String profileID;
+class Invoice {
+
 
   /// The unique identifier of the invoice.
-  final String id;
+  final String invoiceNumber;
 
   /// The universally unique identifier (UUID) of the invoice.
   final String uuid;
@@ -20,13 +20,7 @@ class ZatcaInvoice {
   final String issueTime;
 
   /// The type code of the invoice.
-  final String invoiceTypeCode;
-
-  /// The name of the invoice type.
-  final String invoiceTypeName;
-
-  /// Additional notes or comments about the invoice.
-  final String note;
+  final InvoiceType invoiceType;
 
   /// The currency code used in the invoice.
   final String currencyCode;
@@ -34,11 +28,8 @@ class ZatcaInvoice {
   /// The tax currency code used in the invoice.
   final String taxCurrencyCode;
 
-  /// The supplier information.
-  final Supplier supplier;
-
   /// The customer information.
-  final Customer customer;
+  final Customer? customer;
 
   /// The list of invoice line items.
   final List<InvoiceLine> invoiceLines;
@@ -52,45 +43,118 @@ class ZatcaInvoice {
   /// The hash of the previous invoice, if applicable.
   final String previousInvoiceHash;
 
-  /// Creates a new [ZatcaInvoice] instance.
-  ZatcaInvoice({
-    required this.profileID,
-    required this.id,
+  final InvoiceCancellation? cancellation;
+
+
+  /// The issue date of the invoice in ISO 8601 format.
+  final String? actualDeliveryDate;
+
+  /// Creates a new [Invoice] instance.
+  Invoice({
+    required this.invoiceNumber,
     required this.uuid,
     required this.issueDate,
     required this.issueTime,
-    required this.invoiceTypeCode,
-    required this.invoiceTypeName,
-    required this.note,
-    required this.currencyCode,
-    required this.taxCurrencyCode,
-    required this.supplier,
-    required this.customer,
+    required this.invoiceType,
+    this.currencyCode='SAR',
+    this.taxCurrencyCode='SAR',
+    this.customer,
     required this.invoiceLines,
     required this.taxAmount,
     required this.totalAmount,
     required this.previousInvoiceHash,
+    this.cancellation,
+    this.actualDeliveryDate,
   });
 
-  /// Creates a [ZatcaInvoice] instance from a [Map].
-  factory ZatcaInvoice.fromMap(Map<String, dynamic> map) {
-    return ZatcaInvoice(
-      profileID: map['profileID'] ?? '',
-      id: map['id'] ?? '',
+  /// Creates a [Invoice] instance from a [Map].
+  factory Invoice.fromMap(Map<String, dynamic> map) {
+    return Invoice(
+      invoiceNumber: map['id'] ?? '',
       uuid: map['uuid'] ?? '',
       issueDate: map['issueDate'] ?? '',
       issueTime: map['issueTime'] ?? '',
-      invoiceTypeCode: map['invoiceTypeCode'] ?? '',
-      invoiceTypeName: map['invoiceTypeName'] ?? '',
-      note: map['note'] ?? '',
+      invoiceType: InvoiceType.values[map['invoiceType']],
       currencyCode: map['currencyCode'] ?? '',
       taxCurrencyCode: map['taxCurrencyCode'] ?? '',
-      supplier: Supplier.fromMap(map['supplier']),
       customer: Customer.fromMap(map['customer']),
       invoiceLines:
           (map['invoiceLines'] as List<dynamic>)
               .map((line) => InvoiceLine.fromMap(line))
               .toList(),
+      taxAmount: map['taxAmount'] ?? '',
+      totalAmount: map['totalAmount'] ?? '',
+      previousInvoiceHash: map['previousInvoiceHash'] ?? '' ,
+    );
+  }
+
+  /// Converts the [Invoice] instance to a [Map].
+  Map<String, dynamic> toMap() {
+    return {
+      'id': invoiceNumber,
+      'uuid': uuid,
+      'issueDate': issueDate,
+      'issueTime': issueTime,
+      'invoiceType': invoiceType.index,
+      'currencyCode': currencyCode,
+      'taxCurrencyCode': taxCurrencyCode,
+      'customer': customer?.toMap(),
+      'invoiceLines': invoiceLines.map((line) => line.toMap()).toList(),
+      'taxAmount': taxAmount,
+      'totalAmount': totalAmount,
+      'previousInvoiceHash': previousInvoiceHash,
+    };
+  }
+}
+
+
+/// Represents a ZATCA-compliant invoice.
+class ZatcaInvoice extends Invoice{
+
+  /// The profile ID of the invoice.
+  final String profileID;
+
+  /// The supplier information.
+  final Supplier supplier;
+
+
+  /// Creates a new [ZatcaInvoice] instance.
+  ZatcaInvoice({
+    this.profileID='reporting:1.0',
+    required super.invoiceNumber,
+    required super.uuid,
+    required super.issueDate,
+    required super.issueTime,
+    required super.invoiceType,
+    super.currencyCode='SAR',
+    super.taxCurrencyCode='SAR',
+    required this.supplier,
+    required Customer customer,
+    required super.invoiceLines,
+    required super.taxAmount,
+    required super.totalAmount,
+    required super.previousInvoiceHash,
+    cancellation,
+    actualDeliveryDate,
+  }):super(customer: customer,cancellation: cancellation,actualDeliveryDate: actualDeliveryDate);
+
+  /// Creates a [ZatcaInvoice] instance from a [Map].
+  factory ZatcaInvoice.fromMap(Map<String, dynamic> map) {
+    return ZatcaInvoice(
+      profileID: map['profileID'] ?? '',
+      invoiceNumber: map['id'] ?? '',
+      uuid: map['uuid'] ?? '',
+      issueDate: map['issueDate'] ?? '',
+      issueTime: map['issueTime'] ?? '',
+      invoiceType: InvoiceType.values[map['invoiceType']],
+      currencyCode: map['currencyCode'] ?? '',
+      taxCurrencyCode: map['taxCurrencyCode'] ?? '',
+      supplier: Supplier.fromMap(map['supplier']),
+      customer: Customer.fromMap(map['customer']),
+      invoiceLines:
+      (map['invoiceLines'] as List<dynamic>)
+          .map((line) => InvoiceLine.fromMap(line))
+          .toList(),
       taxAmount: map['taxAmount'] ?? '',
       totalAmount: map['totalAmount'] ?? '',
       previousInvoiceHash: map['previousInvoiceHash'] ?? '',
@@ -101,17 +165,15 @@ class ZatcaInvoice {
   Map<String, dynamic> toMap() {
     return {
       'profileID': profileID,
-      'id': id,
+      'id': invoiceNumber,
       'uuid': uuid,
       'issueDate': issueDate,
       'issueTime': issueTime,
-      'invoiceTypeCode': invoiceTypeCode,
-      'invoiceTypeName': invoiceTypeName,
-      'note': note,
+      'invoiceType': invoiceType,
       'currencyCode': currencyCode,
       'taxCurrencyCode': taxCurrencyCode,
       'supplier': supplier.toMap(),
-      'customer': customer.toMap(),
+      'customer': customer?.toMap(),
       'invoiceLines': invoiceLines.map((line) => line.toMap()).toList(),
       'taxAmount': taxAmount,
       'totalAmount': totalAmount,
@@ -119,6 +181,8 @@ class ZatcaInvoice {
     };
   }
 }
+
+
 
 /// Represents an invoice line item in the invoice.
 class InvoiceLine {
@@ -160,6 +224,43 @@ class InvoiceLine {
       'lineExtensionAmount': lineExtensionAmount,
       'itemName': itemName,
       'taxPercent': taxPercent,
+    };
+  }
+}
+
+/// Represents the cancellation details of an invoice.
+class InvoiceCancellation {
+  /// The reason for the cancellation.
+  final String reason;
+
+  /// The canceled serial invoice number.
+  final String canceledSerialInvoiceNumber;
+
+  /// The payment method used.
+  final ZATCAPaymentMethods paymentMethod;
+
+  /// Creates a new [InvoiceCancellation] instance.
+  InvoiceCancellation({
+    required this.reason,
+    required this.canceledSerialInvoiceNumber,
+    required this.paymentMethod,
+  });
+
+  /// Creates an [InvoiceCancellation] instance from a [Map].
+  factory InvoiceCancellation.fromMap(Map<String, dynamic> map) {
+    return InvoiceCancellation(
+      reason: map['reason'] ?? '',
+      canceledSerialInvoiceNumber: map['canceled_serial_invoice_number'] ?? '',
+      paymentMethod: ZATCAPaymentMethods.values[map['payment_method']],
+    );
+  }
+
+  /// Converts the [InvoiceCancellation] instance to a [Map].
+  Map<String, dynamic> toMap() {
+    return {
+      'reason': reason,
+      'canceled_serial_invoice_number': canceledSerialInvoiceNumber,
+      'payment_method': paymentMethod.index,
     };
   }
 }

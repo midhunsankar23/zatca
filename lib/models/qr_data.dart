@@ -1,4 +1,4 @@
-import 'invoice.dart';
+import 'package:zatca/models/invo.dart';
 
 /// A class representing a ZATCA-compliant QR code and invoice data.
 class ZatcaQr {
@@ -24,7 +24,7 @@ class ZatcaQr {
   final String certificateSignature;
 
   /// The invoice data
-  final ZatcaInvoice invoiceData;
+  final BaseInvoice invoiceData;
 
   /// The XML string representation of the invoice
   final String xmlString;
@@ -51,7 +51,7 @@ class ZatcaQr {
       digitalSignature: json['digitalSignature'] ?? '',
       publicKey: json['publicKey'] ?? '',
       certificateSignature: json['certificateSignature'] ?? '',
-      invoiceData: ZatcaInvoice.fromMap(json['invoiceData']),
+      invoiceData: BaseInvoice.fromJson(json['invoiceData']),
       xmlString: json['xmlString'] ?? '',
     );
   }
@@ -66,7 +66,7 @@ class ZatcaQr {
       'digitalSignature': digitalSignature,
       'publicKey': publicKey,
       'certificateSignature': certificateSignature,
-      'invoiceData': invoiceData.toMap(),
+      'invoiceData': invoiceData.toJson(),
       'xmlString': xmlString,
     };
   }
