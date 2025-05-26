@@ -53,7 +53,7 @@ class EGSUnitInfo {
       branchName: branchName,
       taxpayerName: taxpayerName,
       taxpayerProvidedId: taxpayerProvidedId,
-      production: false
+      production: false,
     );
   }
 }

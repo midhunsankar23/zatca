@@ -5,9 +5,12 @@ enum InvoiceType {
   standardCreditNote("Standard Credit Note", "381", InvoiceRelationType.b2b),
   standardDebitNote("Standard Debit Note", "383", InvoiceRelationType.b2b),
   simplifiedInvoice("Simplified Invoice", "388", InvoiceRelationType.b2c),
-  simplifiedCreditNote("Simplified Credit Note", "381", InvoiceRelationType.b2c),
+  simplifiedCreditNote(
+    "Simplified Credit Note",
+    "381",
+    InvoiceRelationType.b2c,
+  ),
   simplifiedDebitNote("Simplified Debit Note", "383", InvoiceRelationType.b2c);
-
 
   /// enum string value.
   final String name;
@@ -15,13 +18,14 @@ enum InvoiceType {
   final InvoiceRelationType invoiceRelationType;
 
   /// Constructor for [InvoiceType] enum.
-  const InvoiceType(this.name, this.code,this.invoiceRelationType);
+  const InvoiceType(this.name, this.code, this.invoiceRelationType);
 }
 
 /// This enum represents the type of invoice relation.
 enum InvoiceRelationType {
   b2b('0100000'),
   b2c('0200000');
+
   final String value;
   const InvoiceRelationType(this.value);
 }

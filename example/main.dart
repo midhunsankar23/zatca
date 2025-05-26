@@ -103,37 +103,37 @@ initZATCAAndGenerateQr({
   );
 
   final invoice = SimplifiedInvoice(
-      invoiceNumber: "EGS1-886431145-101",
-      uuid: egsUnitInfo.uuid,
-      issueDate:  "2024-02-29",
-      issueTime: "11:40:40",
-      actualDeliveryDate:  "2024-02-29",
-      currencyCode: 'SAR',
-      taxCurrencyCode: 'SAR',
-      customer:Customer(
-        companyID: '300000000000003',
-        registrationName: 'S7S',
-        address: Address(
-          street: '__',
-          building: '00',
-          citySubdivision: 'ssss',
-          city: 'jeddah',
-          postalZone: '00000',
-        ),
+    invoiceNumber: "EGS1-886431145-101",
+    uuid: egsUnitInfo.uuid,
+    issueDate: "2024-02-29",
+    issueTime: "11:40:40",
+    actualDeliveryDate: "2024-02-29",
+    currencyCode: 'SAR',
+    taxCurrencyCode: 'SAR',
+    customer: Customer(
+      companyID: '300000000000003',
+      registrationName: 'S7S',
+      address: Address(
+        street: '__',
+        building: '00',
+        citySubdivision: 'ssss',
+        city: 'jeddah',
+        postalZone: '00000',
       ),
-      invoiceLines: [
-        InvoiceLine(
-          id: '1',
-          quantity: '1',
-          unitCode: 'PCE',
-          lineExtensionAmount: 10,
-          itemName: 'TEST NAME',
-          taxPercent: 15,
-        ),
-      ],
-      taxAmount: 1.50,
-      totalAmount: 11.50,
-      previousInvoiceHash: "zDnQnE05P6rFMqF1ai21V5hIRlUq/EXvrpsaoPkWRVI="
+    ),
+    invoiceLines: [
+      InvoiceLine(
+        id: '1',
+        quantity: '1',
+        unitCode: 'PCE',
+        lineExtensionAmount: 10,
+        itemName: 'TEST NAME',
+        taxPercent: 15,
+      ),
+    ],
+    taxAmount: 1.50,
+    totalAmount: 11.50,
+    previousInvoiceHash: "zDnQnE05P6rFMqF1ai21V5hIRlUq/EXvrpsaoPkWRVI=",
   );
 
   /// Generate QR data for the invoice using the ZatcaManager.

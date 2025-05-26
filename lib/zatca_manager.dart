@@ -63,9 +63,7 @@ class ZatcaManager {
   ///   /// [previousInvoiceHash] - The hash of the previous invoice.
 
   ///   /// Returns a `ZatcaQr` object containing the QR code and invoice data.
-  ZatcaQr generateZatcaQrInit({
-    required BaseInvoice invoice,
-  }) {
+  ZatcaQr generateZatcaQrInit({required BaseInvoice invoice}) {
     if (_supplier == null ||
         _privateKeyPem == null ||
         _certificatePem == null ||
@@ -75,8 +73,6 @@ class ZatcaManager {
         'Supplier, private key, certificate, seller name, and seller TRN must be initialized before generating the QR code.',
       );
     }
-
-
 
     // if (invoice.invoiceType.invoiceRelationType == InvoiceRelationType.b2b && invoice.customer == null) {
     //   throw Exception(
@@ -113,7 +109,7 @@ class ZatcaManager {
     //
     // );
 
-    final invoiceXml = XmlUtil.generateZATCAXml(invoice,_supplier!);
+    final invoiceXml = XmlUtil.generateZATCAXml(invoice, _supplier!);
     final xmlString = invoiceXml.toXmlString(pretty: true, indent: '    ');
     String hashableXml = invoiceXml.rootElement.toXmlString(
       pretty: true,
@@ -140,7 +136,9 @@ class ZatcaManager {
     final certificateInfo = CertificateUtil.getCertificateInfo(
       _certificatePem!,
     );
-    final issueDateTime = DateTime.parse('${invoice.issueDate} ${invoice.issueTime}');
+    final issueDateTime = DateTime.parse(
+      '${invoice.issueDate} ${invoice.issueTime}',
+    );
 
     return ZatcaQr(
       sellerName: _sellerName!,
@@ -252,10 +250,9 @@ class ZatcaManager {
 
     final qrXml = XmlUtil.generateQrAndSignatureXMl(qrString: qrString);
 
-
-
     final supplierPartyIndex = xmlDocument.rootElement.children.indexWhere(
-          (node) => node is XmlElement && node.name.local == 'AccountingSupplierParty',
+      (node) =>
+          node is XmlElement && node.name.local == 'AccountingSupplierParty',
     );
     xmlDocument.rootElement.children.insertAll(
       supplierPartyIndex,

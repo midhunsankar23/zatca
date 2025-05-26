@@ -3,10 +3,9 @@ import 'customer.dart';
 import 'invoice.dart';
 
 class BaseInvoice {
-
   final InvoiceType invoiceType;
 
-  final String profileID='reporting:1.0';
+  final String profileID = 'reporting:1.0';
 
   /// The unique identifier of the invoice.
   final String invoiceNumber;
@@ -41,7 +40,6 @@ class BaseInvoice {
   /// The hash of the previous invoice, if applicable.
   final String previousInvoiceHash;
 
-
   BaseInvoice({
     required this.invoiceNumber,
     required this.uuid,
@@ -65,10 +63,12 @@ class BaseInvoice {
       issueTime: json['issueTime'],
       currencyCode: json['currencyCode'],
       taxCurrencyCode: json['taxCurrencyCode'],
-      customer: json['customer'] != null ? Customer.fromMap(json['customer']) : null,
-      invoiceLines: (json['invoiceLines'] as List)
-          .map((item) => InvoiceLine.fromMap(item))
-          .toList(),
+      customer:
+          json['customer'] != null ? Customer.fromMap(json['customer']) : null,
+      invoiceLines:
+          (json['invoiceLines'] as List)
+              .map((item) => InvoiceLine.fromMap(item))
+              .toList(),
       taxAmount: json['taxAmount'].toDouble(),
       totalAmount: json['totalAmount'].toDouble(),
       previousInvoiceHash: json['previousInvoiceHash'],
@@ -93,7 +93,6 @@ class BaseInvoice {
     };
   }
 }
-
 
 class Invoice extends BaseInvoice {
   /// The actual delivery date of the invoice in ISO 8601 format.
@@ -124,9 +123,10 @@ class Invoice extends BaseInvoice {
       currencyCode: json['currencyCode'],
       taxCurrencyCode: json['taxCurrencyCode'],
       customer: Customer.fromMap(json['customer']),
-      invoiceLines: (json['invoiceLines'] as List)
-          .map((item) => InvoiceLine.fromMap(item))
-          .toList(),
+      invoiceLines:
+          (json['invoiceLines'] as List)
+              .map((item) => InvoiceLine.fromMap(item))
+              .toList(),
       taxAmount: json['taxAmount'].toDouble(),
       totalAmount: json['totalAmount'].toDouble(),
       previousInvoiceHash: json['previousInvoiceHash'],
@@ -157,7 +157,7 @@ class SimplifiedInvoice extends Invoice {
     required super.totalAmount,
     required super.previousInvoiceHash,
     required super.actualDeliveryDate,
-  }):super(invoiceType: InvoiceType.simplifiedInvoice);
+  }) : super(invoiceType: InvoiceType.simplifiedInvoice);
 
   factory SimplifiedInvoice.fromJson(Map<String, dynamic> json) {
     return SimplifiedInvoice(
@@ -167,10 +167,12 @@ class SimplifiedInvoice extends Invoice {
       issueTime: json['issueTime'],
       currencyCode: json['currencyCode'],
       taxCurrencyCode: json['taxCurrencyCode'],
-      customer: json['customer'] != null ? Customer.fromMap(json['customer']) : null,
-      invoiceLines: (json['invoiceLines'] as List)
-          .map((item) => InvoiceLine.fromMap(item))
-          .toList(),
+      customer:
+          json['customer'] != null ? Customer.fromMap(json['customer']) : null,
+      invoiceLines:
+          (json['invoiceLines'] as List)
+              .map((item) => InvoiceLine.fromMap(item))
+              .toList(),
       taxAmount: json['taxAmount'].toDouble(),
       totalAmount: json['totalAmount'].toDouble(),
       previousInvoiceHash: json['previousInvoiceHash'],
@@ -185,6 +187,7 @@ class SimplifiedInvoice extends Invoice {
     return json;
   }
 }
+
 class StandardInvoice extends Invoice {
   StandardInvoice({
     required super.invoiceNumber,
@@ -199,7 +202,7 @@ class StandardInvoice extends Invoice {
     required super.totalAmount,
     required super.previousInvoiceHash,
     required super.actualDeliveryDate,
-  }):super(invoiceType: InvoiceType.standardInvoice);
+  }) : super(invoiceType: InvoiceType.standardInvoice);
 
   factory StandardInvoice.fromJson(Map<String, dynamic> json) {
     return StandardInvoice(
@@ -209,10 +212,12 @@ class StandardInvoice extends Invoice {
       issueTime: json['issueTime'],
       currencyCode: json['currencyCode'],
       taxCurrencyCode: json['taxCurrencyCode'],
-      customer: json['customer'] != null ? Customer.fromMap(json['customer']) : null,
-      invoiceLines: (json['invoiceLines'] as List)
-          .map((item) => InvoiceLine.fromMap(item))
-          .toList(),
+      customer:
+          json['customer'] != null ? Customer.fromMap(json['customer']) : null,
+      invoiceLines:
+          (json['invoiceLines'] as List)
+              .map((item) => InvoiceLine.fromMap(item))
+              .toList(),
       taxAmount: json['taxAmount'].toDouble(),
       totalAmount: json['totalAmount'].toDouble(),
       previousInvoiceHash: json['previousInvoiceHash'],
@@ -246,7 +251,7 @@ class DBInvoice extends BaseInvoice {
     required super.previousInvoiceHash,
     required super.invoiceType,
     required this.cancellation,
-  }):super(customer: customer);
+  }) : super(customer: customer);
 
   factory DBInvoice.fromJson(Map<String, dynamic> json) {
     return DBInvoice(
@@ -257,9 +262,10 @@ class DBInvoice extends BaseInvoice {
       currencyCode: json['currencyCode'],
       taxCurrencyCode: json['taxCurrencyCode'],
       customer: Customer.fromMap(json['customer']),
-      invoiceLines: (json['invoiceLines'] as List)
-          .map((item) => InvoiceLine.fromMap(item))
-          .toList(),
+      invoiceLines:
+          (json['invoiceLines'] as List)
+              .map((item) => InvoiceLine.fromMap(item))
+              .toList(),
       taxAmount: json['taxAmount'].toDouble(),
       totalAmount: json['totalAmount'].toDouble(),
       previousInvoiceHash: json['previousInvoiceHash'],
@@ -277,7 +283,6 @@ class DBInvoice extends BaseInvoice {
 }
 
 class SimplifiedCreditNoteInvoice extends DBInvoice {
-
   SimplifiedCreditNoteInvoice({
     required super.invoiceNumber,
     required super.uuid,
@@ -291,7 +296,7 @@ class SimplifiedCreditNoteInvoice extends DBInvoice {
     required super.totalAmount,
     required super.previousInvoiceHash,
     required super.cancellation,
-  }):super(invoiceType: InvoiceType.simplifiedCreditNote);
+  }) : super(invoiceType: InvoiceType.simplifiedCreditNote);
 
   factory SimplifiedCreditNoteInvoice.fromJson(Map<String, dynamic> json) {
     return SimplifiedCreditNoteInvoice(
@@ -302,9 +307,10 @@ class SimplifiedCreditNoteInvoice extends DBInvoice {
       currencyCode: json['currencyCode'],
       taxCurrencyCode: json['taxCurrencyCode'],
       customer: Customer.fromMap(json['customer']),
-      invoiceLines: (json['invoiceLines'] as List)
-          .map((item) => InvoiceLine.fromMap(item))
-          .toList(),
+      invoiceLines:
+          (json['invoiceLines'] as List)
+              .map((item) => InvoiceLine.fromMap(item))
+              .toList(),
       taxAmount: json['taxAmount'].toDouble(),
       totalAmount: json['totalAmount'].toDouble(),
       previousInvoiceHash: json['previousInvoiceHash'],
@@ -319,6 +325,7 @@ class SimplifiedCreditNoteInvoice extends DBInvoice {
     return json;
   }
 }
+
 class StandardCreditNoteInvoice extends DBInvoice {
   StandardCreditNoteInvoice({
     required super.invoiceNumber,
@@ -333,7 +340,7 @@ class StandardCreditNoteInvoice extends DBInvoice {
     required super.totalAmount,
     required super.previousInvoiceHash,
     required super.cancellation,
-  }):super(invoiceType: InvoiceType.standardCreditNote);
+  }) : super(invoiceType: InvoiceType.standardCreditNote);
 
   factory StandardCreditNoteInvoice.fromJson(Map<String, dynamic> json) {
     return StandardCreditNoteInvoice(
@@ -344,9 +351,10 @@ class StandardCreditNoteInvoice extends DBInvoice {
       currencyCode: json['currencyCode'],
       taxCurrencyCode: json['taxCurrencyCode'],
       customer: Customer.fromMap(json['customer']),
-      invoiceLines: (json['invoiceLines'] as List)
-          .map((item) => InvoiceLine.fromMap(item))
-          .toList(),
+      invoiceLines:
+          (json['invoiceLines'] as List)
+              .map((item) => InvoiceLine.fromMap(item))
+              .toList(),
       taxAmount: json['taxAmount'].toDouble(),
       totalAmount: json['totalAmount'].toDouble(),
       previousInvoiceHash: json['previousInvoiceHash'],
@@ -376,7 +384,7 @@ class SimplifiedDebitNoteInvoice extends DBInvoice {
     required super.totalAmount,
     required super.previousInvoiceHash,
     required super.cancellation,
-  }):super(invoiceType: InvoiceType.simplifiedDebitNote);
+  }) : super(invoiceType: InvoiceType.simplifiedDebitNote);
 
   factory SimplifiedDebitNoteInvoice.fromJson(Map<String, dynamic> json) {
     return SimplifiedDebitNoteInvoice(
@@ -387,9 +395,10 @@ class SimplifiedDebitNoteInvoice extends DBInvoice {
       currencyCode: json['currencyCode'],
       taxCurrencyCode: json['taxCurrencyCode'],
       customer: Customer.fromMap(json['customer']),
-      invoiceLines: (json['invoiceLines'] as List)
-          .map((item) => InvoiceLine.fromMap(item))
-          .toList(),
+      invoiceLines:
+          (json['invoiceLines'] as List)
+              .map((item) => InvoiceLine.fromMap(item))
+              .toList(),
       taxAmount: json['taxAmount'].toDouble(),
       totalAmount: json['totalAmount'].toDouble(),
       previousInvoiceHash: json['previousInvoiceHash'],
@@ -404,6 +413,7 @@ class SimplifiedDebitNoteInvoice extends DBInvoice {
     return json;
   }
 }
+
 class StandardDebitNoteInvoice extends DBInvoice {
   StandardDebitNoteInvoice({
     required super.invoiceNumber,
@@ -418,7 +428,7 @@ class StandardDebitNoteInvoice extends DBInvoice {
     required super.totalAmount,
     required super.previousInvoiceHash,
     required super.cancellation,
-  }):super(invoiceType: InvoiceType.standardDebitNote);
+  }) : super(invoiceType: InvoiceType.standardDebitNote);
 
   factory StandardDebitNoteInvoice.fromJson(Map<String, dynamic> json) {
     return StandardDebitNoteInvoice(
@@ -428,10 +438,11 @@ class StandardDebitNoteInvoice extends DBInvoice {
       issueTime: json['issueTime'],
       currencyCode: json['currencyCode'],
       taxCurrencyCode: json['taxCurrencyCode'],
-      customer:  Customer.fromMap(json['customer']) ,
-      invoiceLines: (json['invoiceLines'] as List)
-          .map((item) => InvoiceLine.fromMap(item))
-          .toList(),
+      customer: Customer.fromMap(json['customer']),
+      invoiceLines:
+          (json['invoiceLines'] as List)
+              .map((item) => InvoiceLine.fromMap(item))
+              .toList(),
       taxAmount: json['taxAmount'].toDouble(),
       totalAmount: json['totalAmount'].toDouble(),
       previousInvoiceHash: json['previousInvoiceHash'],
@@ -446,4 +457,3 @@ class StandardDebitNoteInvoice extends DBInvoice {
     return json;
   }
 }
-

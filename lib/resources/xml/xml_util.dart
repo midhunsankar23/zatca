@@ -8,9 +8,7 @@ import 'package:zatca/models/supplier.dart';
 
 class XmlUtil {
   ///     Generate a ZATCA-compliant XML string for the invoice data.
-  static XmlDocument generateZATCAXml(BaseInvoice invoice,Supplier supplier) {
-
-
+  static XmlDocument generateZATCAXml(BaseInvoice invoice, Supplier supplier) {
     final builder = XmlBuilder();
     final formatter = NumberFormat("#.##");
     builder.processing('xml', 'version="1.0" encoding="UTF-8"');
@@ -39,11 +37,13 @@ class XmlUtil {
         builder.element('cbc:IssueDate', nest: invoice.issueDate);
         builder.element('cbc:IssueTime', nest: invoice.issueTime);
 
-
         builder.element(
           'cbc:InvoiceTypeCode',
           nest: () {
-            builder.attribute('name', invoice.invoiceType.invoiceRelationType.value);
+            builder.attribute(
+              'name',
+              invoice.invoiceType.invoiceRelationType.value,
+            );
             builder.text(invoice.invoiceType.code);
           },
         );
@@ -58,27 +58,26 @@ class XmlUtil {
         builder.element('cbc:DocumentCurrencyCode', nest: invoice.currencyCode);
         builder.element('cbc:TaxCurrencyCode', nest: invoice.taxCurrencyCode);
 
-
-       if(invoice is DBInvoice ) {
-         builder.element(
-           'cac:BillingReference',
-           nest: () {
-             builder.element(
-               'cac:InvoiceDocumentReference',
-               nest: () {
-                 builder.element(
-                   'cbc:ID',
-                   nest: () {
-                     builder.text(
-                         invoice.cancellation.canceledSerialInvoiceNumber);
-                   },
-                 );
-               },
-             );
-           },
-         );
-       }
-
+        if (invoice is DBInvoice) {
+          builder.element(
+            'cac:BillingReference',
+            nest: () {
+              builder.element(
+                'cac:InvoiceDocumentReference',
+                nest: () {
+                  builder.element(
+                    'cbc:ID',
+                    nest: () {
+                      builder.text(
+                        invoice.cancellation.canceledSerialInvoiceNumber,
+                      );
+                    },
+                  );
+                },
+              );
+            },
+          );
+        }
 
         builder.element(
           'cac:AdditionalDocumentReference',
@@ -164,10 +163,7 @@ class XmlUtil {
                 builder.element(
                   'cac:PartyTaxScheme',
                   nest: () {
-                    builder.element(
-                      'cbc:CompanyID',
-                      nest: supplier.companyID,
-                    );
+                    builder.element('cbc:CompanyID', nest: supplier.companyID);
                     builder.element(
                       'cac:TaxScheme',
                       nest: () {
@@ -272,21 +268,29 @@ class XmlUtil {
           },
         );
 
-        if(invoice is Invoice) {
+        if (invoice is Invoice) {
           builder.element(
             'cac:Delivery',
             nest: () {
               builder.element(
-                  'cbc:ActualDeliveryDate', nest: invoice.actualDeliveryDate);
+                'cbc:ActualDeliveryDate',
+                nest: invoice.actualDeliveryDate,
+              );
             },
           );
         }
-        if(invoice is DBInvoice){
+        if (invoice is DBInvoice) {
           builder.element(
             'cac:PaymentMeans',
             nest: () {
-              builder.element('cbc:PaymentMeansCode', nest: invoice.cancellation.paymentMethod.value);
-              builder.element('cbc:InstructionNote', nest: invoice.cancellation.reason);
+              builder.element(
+                'cbc:PaymentMeansCode',
+                nest: invoice.cancellation.paymentMethod.value,
+              );
+              builder.element(
+                'cbc:InstructionNote',
+                nest: invoice.cancellation.reason,
+              );
             },
           );
         }
@@ -488,7 +492,6 @@ class XmlUtil {
             },
           );
         }
-
       },
     );
 

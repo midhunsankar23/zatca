@@ -128,15 +128,26 @@ class CertificateManager {
     return ZatcaCertificate.fromJson(response);
   }
 
-  checkInvoiceCompliance({required ZatcaCertificate complianceCertificate, required String ublXml, required String invoiceHash, required String uuid})async{
+  checkInvoiceCompliance({
+    required ZatcaCertificate complianceCertificate,
+    required String ublXml,
+    required String invoiceHash,
+    required String uuid,
+  }) async {
     final api = API(env);
     final String cleanPem = CertificateUtil.cleanCertificatePem(
       complianceCertificate.complianceCertificatePem,
     );
     final Map<String, dynamic> response = await api
-        .compliance(certificate:cleanPem,secret: complianceCertificate.complianceApiSecret)
-        .checkInvoiceCompliance(signedXmlString: ublXml,invoiceHash: invoiceHash,egsUuid: uuid);
+        .compliance(
+          certificate: cleanPem,
+          secret: complianceCertificate.complianceApiSecret,
+        )
+        .checkInvoiceCompliance(
+          signedXmlString: ublXml,
+          invoiceHash: invoiceHash,
+          egsUuid: uuid,
+        );
     print(response);
   }
-
 }

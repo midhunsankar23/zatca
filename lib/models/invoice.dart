@@ -5,8 +5,6 @@ import 'customer.dart';
 
 /// Represents a ZATCA-compliant invoice.
 class Invoice {
-
-
   /// The unique identifier of the invoice.
   final String invoiceNumber;
 
@@ -45,7 +43,6 @@ class Invoice {
 
   final InvoiceCancellation? cancellation;
 
-
   /// The issue date of the invoice in ISO 8601 format.
   final String? actualDeliveryDate;
 
@@ -56,8 +53,8 @@ class Invoice {
     required this.issueDate,
     required this.issueTime,
     required this.invoiceType,
-    this.currencyCode='SAR',
-    this.taxCurrencyCode='SAR',
+    this.currencyCode = 'SAR',
+    this.taxCurrencyCode = 'SAR',
     this.customer,
     required this.invoiceLines,
     required this.taxAmount,
@@ -84,7 +81,7 @@ class Invoice {
               .toList(),
       taxAmount: map['taxAmount'] ?? '',
       totalAmount: map['totalAmount'] ?? '',
-      previousInvoiceHash: map['previousInvoiceHash'] ?? '' ,
+      previousInvoiceHash: map['previousInvoiceHash'] ?? '',
     );
   }
 
@@ -107,27 +104,24 @@ class Invoice {
   }
 }
 
-
 /// Represents a ZATCA-compliant invoice.
-class ZatcaInvoice extends Invoice{
-
+class ZatcaInvoice extends Invoice {
   /// The profile ID of the invoice.
   final String profileID;
 
   /// The supplier information.
   final Supplier supplier;
 
-
   /// Creates a new [ZatcaInvoice] instance.
   ZatcaInvoice({
-    this.profileID='reporting:1.0',
+    this.profileID = 'reporting:1.0',
     required super.invoiceNumber,
     required super.uuid,
     required super.issueDate,
     required super.issueTime,
     required super.invoiceType,
-    super.currencyCode='SAR',
-    super.taxCurrencyCode='SAR',
+    super.currencyCode = 'SAR',
+    super.taxCurrencyCode = 'SAR',
     required this.supplier,
     required Customer customer,
     required super.invoiceLines,
@@ -136,7 +130,11 @@ class ZatcaInvoice extends Invoice{
     required super.previousInvoiceHash,
     cancellation,
     actualDeliveryDate,
-  }):super(customer: customer,cancellation: cancellation,actualDeliveryDate: actualDeliveryDate);
+  }) : super(
+         customer: customer,
+         cancellation: cancellation,
+         actualDeliveryDate: actualDeliveryDate,
+       );
 
   /// Creates a [ZatcaInvoice] instance from a [Map].
   factory ZatcaInvoice.fromMap(Map<String, dynamic> map) {
@@ -152,9 +150,9 @@ class ZatcaInvoice extends Invoice{
       supplier: Supplier.fromMap(map['supplier']),
       customer: Customer.fromMap(map['customer']),
       invoiceLines:
-      (map['invoiceLines'] as List<dynamic>)
-          .map((line) => InvoiceLine.fromMap(line))
-          .toList(),
+          (map['invoiceLines'] as List<dynamic>)
+              .map((line) => InvoiceLine.fromMap(line))
+              .toList(),
       taxAmount: map['taxAmount'] ?? '',
       totalAmount: map['totalAmount'] ?? '',
       previousInvoiceHash: map['previousInvoiceHash'] ?? '',
@@ -181,8 +179,6 @@ class ZatcaInvoice extends Invoice{
     };
   }
 }
-
-
 
 /// Represents an invoice line item in the invoice.
 class InvoiceLine {

@@ -107,7 +107,7 @@ ${utf8.decode(base64Decode(data["binarySecurityToken"]))}
   Future<dynamic> checkInvoiceCompliance({
     required String signedXmlString,
     required String invoiceHash,
-    required String egsUuid
+    required String egsUuid,
   }) async {
     final headers = {
       "Accept-Version": API.settings["API_VERSION"]!,
