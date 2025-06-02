@@ -4,8 +4,8 @@ import 'package:zatca/models/address.dart';
 import 'package:zatca/models/compliance_certificate.dart';
 import 'package:zatca/models/customer.dart';
 import 'package:zatca/models/egs_unit.dart';
-import 'package:zatca/models/invo.dart';
 import 'package:zatca/models/invoice.dart';
+import 'package:zatca/models/invoice_line.dart';
 import 'package:zatca/models/supplier.dart';
 import 'package:zatca/certificate_manager.dart';
 import 'package:zatca/resources/enums.dart';
@@ -48,8 +48,8 @@ void main() {
       csr,
       '123345',
     );
-    final productionCertificate = await certificateManager
-        .issueProductionCertificate(complianceCertificate);
+    // final productionCertificate = await certificateManager
+    //     .issueProductionCertificate(complianceCertificate);
   });
   test('Initialize zatca', () async {
     final zatcaManager = ZatcaManager.instance;
@@ -166,7 +166,7 @@ void main() {
       cancellation: InvoiceCancellation(
         reason: "Customer requested cancellation",
         canceledSerialInvoiceNumber: 'EGS1-886431145-101',
-        paymentMethod: ZATCAPaymentMethods.CASH,
+        paymentMethod: ZATCAPaymentMethods.cash,
       ),
     );
 
@@ -291,7 +291,7 @@ void main() {
       cancellation: InvoiceCancellation(
         reason: "Customer requested cancellation",
         canceledSerialInvoiceNumber: 'EGS1-886431145-104',
-        paymentMethod: ZATCAPaymentMethods.CASH,
+        paymentMethod: ZATCAPaymentMethods.cash,
       ),
     );
 

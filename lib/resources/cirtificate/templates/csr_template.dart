@@ -88,7 +88,7 @@ class CSRConfigProps {
     );
     populatedTemplate = populatedTemplate.replaceAll(
       "SET_PRODUCTION_VALUE",
-      this.production ? "ZATCA-Code-Signing" : "PREZATCA-Code-Signing",
+      production ? "ZATCA-Code-Signing" : "PREZATCA-Code-Signing",
     );
     populatedTemplate = populatedTemplate.replaceAll(
       "SET_EGS_SERIAL_NUMBER",

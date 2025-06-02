@@ -41,10 +41,10 @@ enum ZatcaEnvironment {
 
 /// This enum represents the ZATCA payment methods.
 enum ZATCAPaymentMethods {
-  CASH("10"),
-  CREDIT("30"),
-  BANK_ACCOUNT("42"),
-  BANK_CARD("48");
+  cash("10"),
+  credit("30"),
+  bankAccount("42"),
+  bankCard("48");
 
   final String value;
   const ZATCAPaymentMethods(this.value);

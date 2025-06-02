@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:intl/intl.dart';
 import 'package:xml/xml.dart';
-import 'package:zatca/models/invo.dart';
+import 'package:zatca/models/invoice.dart';
 import 'package:zatca/models/supplier.dart';
 
 class XmlUtil {

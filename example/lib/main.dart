@@ -1,14 +1,13 @@
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:zatca/models/address.dart';
 import 'package:zatca/models/customer.dart';
 import 'package:zatca/models/egs_unit.dart';
-import 'package:zatca/models/invo.dart';
 import 'package:zatca/models/invoice.dart';
+import 'package:zatca/models/invoice_line.dart';
 import 'package:zatca/models/qr_data.dart';
 import 'package:zatca/models/supplier.dart';
 import 'package:zatca/certificate_manager.dart';

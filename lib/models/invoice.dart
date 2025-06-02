@@ -1,10 +1,12 @@
-import 'package:zatca/models/supplier.dart';
-import 'package:zatca/resources/enums.dart';
-
+import '../resources/enums.dart';
 import 'customer.dart';
+import 'invoice_line.dart';
 
-/// Represents a ZATCA-compliant invoice.
-class Invoice {
+class BaseInvoice {
+  final InvoiceType invoiceType;
+
+  final String profileID = 'reporting:1.0';
+
   /// The unique identifier of the invoice.
   final String invoiceNumber;
 
@@ -16,9 +18,6 @@ class Invoice {
 
   /// The issue time of the invoice in ISO 8601 format.
   final String issueTime;
-
-  /// The type code of the invoice.
-  final InvoiceType invoiceType;
 
   /// The currency code used in the invoice.
   final String currencyCode;
@@ -41,222 +40,420 @@ class Invoice {
   /// The hash of the previous invoice, if applicable.
   final String previousInvoiceHash;
 
-  final InvoiceCancellation? cancellation;
-
-  /// The issue date of the invoice in ISO 8601 format.
-  final String? actualDeliveryDate;
-
-  /// Creates a new [Invoice] instance.
-  Invoice({
+  BaseInvoice({
     required this.invoiceNumber,
     required this.uuid,
     required this.issueDate,
     required this.issueTime,
-    required this.invoiceType,
-    this.currencyCode = 'SAR',
-    this.taxCurrencyCode = 'SAR',
+    required this.currencyCode,
+    required this.taxCurrencyCode,
     this.customer,
     required this.invoiceLines,
     required this.taxAmount,
     required this.totalAmount,
     required this.previousInvoiceHash,
-    this.cancellation,
-    this.actualDeliveryDate,
+    required this.invoiceType,
   });
 
-  /// Creates a [Invoice] instance from a [Map].
-  factory Invoice.fromMap(Map<String, dynamic> map) {
-    return Invoice(
-      invoiceNumber: map['id'] ?? '',
-      uuid: map['uuid'] ?? '',
-      issueDate: map['issueDate'] ?? '',
-      issueTime: map['issueTime'] ?? '',
-      invoiceType: InvoiceType.values[map['invoiceType']],
-      currencyCode: map['currencyCode'] ?? '',
-      taxCurrencyCode: map['taxCurrencyCode'] ?? '',
-      customer: Customer.fromMap(map['customer']),
+  factory BaseInvoice.fromJson(Map<String, dynamic> json) {
+    return BaseInvoice(
+      invoiceNumber: json['invoiceNumber'],
+      uuid: json['uuid'],
+      issueDate: json['issueDate'],
+      issueTime: json['issueTime'],
+      currencyCode: json['currencyCode'],
+      taxCurrencyCode: json['taxCurrencyCode'],
+      customer:
+          json['customer'] != null ? Customer.fromMap(json['customer']) : null,
       invoiceLines:
-          (map['invoiceLines'] as List<dynamic>)
-              .map((line) => InvoiceLine.fromMap(line))
+          (json['invoiceLines'] as List)
+              .map((item) => InvoiceLine.fromMap(item))
               .toList(),
-      taxAmount: map['taxAmount'] ?? '',
-      totalAmount: map['totalAmount'] ?? '',
-      previousInvoiceHash: map['previousInvoiceHash'] ?? '',
+      taxAmount: json['taxAmount'].toDouble(),
+      totalAmount: json['totalAmount'].toDouble(),
+      previousInvoiceHash: json['previousInvoiceHash'],
+      invoiceType: InvoiceType.values[json['invoiceType']],
     );
   }
 
-  /// Converts the [Invoice] instance to a [Map].
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     return {
-      'id': invoiceNumber,
+      'invoiceNumber': invoiceNumber,
       'uuid': uuid,
       'issueDate': issueDate,
       'issueTime': issueTime,
-      'invoiceType': invoiceType.index,
       'currencyCode': currencyCode,
       'taxCurrencyCode': taxCurrencyCode,
       'customer': customer?.toMap(),
-      'invoiceLines': invoiceLines.map((line) => line.toMap()).toList(),
+      'invoiceLines': invoiceLines.map((item) => item.toMap()).toList(),
       'taxAmount': taxAmount,
       'totalAmount': totalAmount,
       'previousInvoiceHash': previousInvoiceHash,
+      'invoiceType': invoiceType,
     };
   }
 }
 
-/// Represents a ZATCA-compliant invoice.
-class ZatcaInvoice extends Invoice {
-  /// The profile ID of the invoice.
-  final String profileID;
+class Invoice extends BaseInvoice {
+  /// The actual delivery date of the invoice in ISO 8601 format.
+  final String actualDeliveryDate;
 
-  /// The supplier information.
-  final Supplier supplier;
-
-  /// Creates a new [ZatcaInvoice] instance.
-  ZatcaInvoice({
-    this.profileID = 'reporting:1.0',
+  Invoice({
     required super.invoiceNumber,
     required super.uuid,
     required super.issueDate,
     required super.issueTime,
+    required super.currencyCode,
+    required super.taxCurrencyCode,
+    super.customer,
+    required super.invoiceLines,
+    required super.taxAmount,
+    required super.totalAmount,
+    required super.previousInvoiceHash,
     required super.invoiceType,
-    super.currencyCode = 'SAR',
-    super.taxCurrencyCode = 'SAR',
-    required this.supplier,
+    required this.actualDeliveryDate,
+  });
+
+  factory Invoice.fromJson(Map<String, dynamic> json) {
+    return Invoice(
+      invoiceNumber: json['invoiceNumber'],
+      uuid: json['uuid'],
+      issueDate: json['issueDate'],
+      issueTime: json['issueTime'],
+      currencyCode: json['currencyCode'],
+      taxCurrencyCode: json['taxCurrencyCode'],
+      customer: Customer.fromMap(json['customer']),
+      invoiceLines:
+          (json['invoiceLines'] as List)
+              .map((item) => InvoiceLine.fromMap(item))
+              .toList(),
+      taxAmount: json['taxAmount'].toDouble(),
+      totalAmount: json['totalAmount'].toDouble(),
+      previousInvoiceHash: json['previousInvoiceHash'],
+      invoiceType: InvoiceType.values[json['invoiceType']],
+      actualDeliveryDate: json['actualDeliveryDate'],
+    );
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    final json = super.toJson();
+    json['actualDeliveryDate'] = actualDeliveryDate;
+    return json;
+  }
+}
+
+class SimplifiedInvoice extends Invoice {
+  SimplifiedInvoice({
+    required super.invoiceNumber,
+    required super.uuid,
+    required super.issueDate,
+    required super.issueTime,
+    required super.currencyCode,
+    required super.taxCurrencyCode,
+    super.customer,
+    required super.invoiceLines,
+    required super.taxAmount,
+    required super.totalAmount,
+    required super.previousInvoiceHash,
+    required super.actualDeliveryDate,
+  }) : super(invoiceType: InvoiceType.simplifiedInvoice);
+
+  factory SimplifiedInvoice.fromJson(Map<String, dynamic> json) {
+    return SimplifiedInvoice(
+      invoiceNumber: json['invoiceNumber'],
+      uuid: json['uuid'],
+      issueDate: json['issueDate'],
+      issueTime: json['issueTime'],
+      currencyCode: json['currencyCode'],
+      taxCurrencyCode: json['taxCurrencyCode'],
+      customer:
+          json['customer'] != null ? Customer.fromMap(json['customer']) : null,
+      invoiceLines:
+          (json['invoiceLines'] as List)
+              .map((item) => InvoiceLine.fromMap(item))
+              .toList(),
+      taxAmount: json['taxAmount'].toDouble(),
+      totalAmount: json['totalAmount'].toDouble(),
+      previousInvoiceHash: json['previousInvoiceHash'],
+      actualDeliveryDate: json['actualDeliveryDate'],
+    );
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    final json = super.toJson();
+    json['actualDeliveryDate'] = actualDeliveryDate;
+    return json;
+  }
+}
+
+class StandardInvoice extends Invoice {
+  StandardInvoice({
+    required super.invoiceNumber,
+    required super.uuid,
+    required super.issueDate,
+    required super.issueTime,
+    required super.currencyCode,
+    required super.taxCurrencyCode,
+    super.customer,
+    required super.invoiceLines,
+    required super.taxAmount,
+    required super.totalAmount,
+    required super.previousInvoiceHash,
+    required super.actualDeliveryDate,
+  }) : super(invoiceType: InvoiceType.standardInvoice);
+
+  factory StandardInvoice.fromJson(Map<String, dynamic> json) {
+    return StandardInvoice(
+      invoiceNumber: json['invoiceNumber'],
+      uuid: json['uuid'],
+      issueDate: json['issueDate'],
+      issueTime: json['issueTime'],
+      currencyCode: json['currencyCode'],
+      taxCurrencyCode: json['taxCurrencyCode'],
+      customer:
+          json['customer'] != null ? Customer.fromMap(json['customer']) : null,
+      invoiceLines:
+          (json['invoiceLines'] as List)
+              .map((item) => InvoiceLine.fromMap(item))
+              .toList(),
+      taxAmount: json['taxAmount'].toDouble(),
+      totalAmount: json['totalAmount'].toDouble(),
+      previousInvoiceHash: json['previousInvoiceHash'],
+      actualDeliveryDate: json['actualDeliveryDate'],
+    );
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    final json = super.toJson();
+    json['actualDeliveryDate'] = actualDeliveryDate;
+    return json;
+  }
+}
+
+class DBInvoice extends BaseInvoice {
+  /// The cancellation details of the invoice.
+  final InvoiceCancellation cancellation;
+
+  DBInvoice({
+    required super.invoiceNumber,
+    required super.uuid,
+    required super.issueDate,
+    required super.issueTime,
+    required super.currencyCode,
+    required super.taxCurrencyCode,
     required Customer customer,
     required super.invoiceLines,
     required super.taxAmount,
     required super.totalAmount,
     required super.previousInvoiceHash,
-    cancellation,
-    actualDeliveryDate,
-  }) : super(
-         customer: customer,
-         cancellation: cancellation,
-         actualDeliveryDate: actualDeliveryDate,
-       );
+    required super.invoiceType,
+    required this.cancellation,
+  }) : super(customer: customer);
 
-  /// Creates a [ZatcaInvoice] instance from a [Map].
-  factory ZatcaInvoice.fromMap(Map<String, dynamic> map) {
-    return ZatcaInvoice(
-      profileID: map['profileID'] ?? '',
-      invoiceNumber: map['id'] ?? '',
-      uuid: map['uuid'] ?? '',
-      issueDate: map['issueDate'] ?? '',
-      issueTime: map['issueTime'] ?? '',
-      invoiceType: InvoiceType.values[map['invoiceType']],
-      currencyCode: map['currencyCode'] ?? '',
-      taxCurrencyCode: map['taxCurrencyCode'] ?? '',
-      supplier: Supplier.fromMap(map['supplier']),
-      customer: Customer.fromMap(map['customer']),
+  factory DBInvoice.fromJson(Map<String, dynamic> json) {
+    return DBInvoice(
+      invoiceNumber: json['invoiceNumber'],
+      uuid: json['uuid'],
+      issueDate: json['issueDate'],
+      issueTime: json['issueTime'],
+      currencyCode: json['currencyCode'],
+      taxCurrencyCode: json['taxCurrencyCode'],
+      customer: Customer.fromMap(json['customer']),
       invoiceLines:
-          (map['invoiceLines'] as List<dynamic>)
-              .map((line) => InvoiceLine.fromMap(line))
+          (json['invoiceLines'] as List)
+              .map((item) => InvoiceLine.fromMap(item))
               .toList(),
-      taxAmount: map['taxAmount'] ?? '',
-      totalAmount: map['totalAmount'] ?? '',
-      previousInvoiceHash: map['previousInvoiceHash'] ?? '',
+      taxAmount: json['taxAmount'].toDouble(),
+      totalAmount: json['totalAmount'].toDouble(),
+      previousInvoiceHash: json['previousInvoiceHash'],
+      invoiceType: InvoiceType.values[json['invoiceType']],
+      cancellation: InvoiceCancellation.fromMap(json['cancellation']),
     );
   }
 
-  /// Converts the [ZatcaInvoice] instance to a [Map].
-  Map<String, dynamic> toMap() {
-    return {
-      'profileID': profileID,
-      'id': invoiceNumber,
-      'uuid': uuid,
-      'issueDate': issueDate,
-      'issueTime': issueTime,
-      'invoiceType': invoiceType,
-      'currencyCode': currencyCode,
-      'taxCurrencyCode': taxCurrencyCode,
-      'supplier': supplier.toMap(),
-      'customer': customer?.toMap(),
-      'invoiceLines': invoiceLines.map((line) => line.toMap()).toList(),
-      'taxAmount': taxAmount,
-      'totalAmount': totalAmount,
-      'previousInvoiceHash': previousInvoiceHash,
-    };
+  @override
+  Map<String, dynamic> toJson() {
+    final json = super.toJson();
+    json['cancellation'] = cancellation.toMap();
+    return json;
   }
 }
 
-/// Represents an invoice line item in the invoice.
-class InvoiceLine {
-  final String id;
-  final String quantity;
-  final String unitCode;
-  final double lineExtensionAmount;
-  final String itemName;
-  final double taxPercent;
+class SimplifiedCreditNoteInvoice extends DBInvoice {
+  SimplifiedCreditNoteInvoice({
+    required super.invoiceNumber,
+    required super.uuid,
+    required super.issueDate,
+    required super.issueTime,
+    required super.currencyCode,
+    required super.taxCurrencyCode,
+    required super.customer,
+    required super.invoiceLines,
+    required super.taxAmount,
+    required super.totalAmount,
+    required super.previousInvoiceHash,
+    required super.cancellation,
+  }) : super(invoiceType: InvoiceType.simplifiedCreditNote);
 
-  /// Creates a new [InvoiceLine] instance.
-  InvoiceLine({
-    required this.id,
-    required this.quantity,
-    required this.unitCode,
-    required this.lineExtensionAmount,
-    required this.itemName,
-    required this.taxPercent,
-  });
-
-  /// Creates an [InvoiceLine] instance from a [Map].
-  factory InvoiceLine.fromMap(Map<String, dynamic> map) {
-    return InvoiceLine(
-      id: map['id'] ?? '',
-      quantity: map['quantity'] ?? '',
-      unitCode: map['unitCode'] ?? '',
-      lineExtensionAmount: map['lineExtensionAmount'] ?? '',
-      itemName: map['itemName'] ?? '',
-      taxPercent: map['taxPercent'] ?? '',
+  factory SimplifiedCreditNoteInvoice.fromJson(Map<String, dynamic> json) {
+    return SimplifiedCreditNoteInvoice(
+      invoiceNumber: json['invoiceNumber'],
+      uuid: json['uuid'],
+      issueDate: json['issueDate'],
+      issueTime: json['issueTime'],
+      currencyCode: json['currencyCode'],
+      taxCurrencyCode: json['taxCurrencyCode'],
+      customer: Customer.fromMap(json['customer']),
+      invoiceLines:
+          (json['invoiceLines'] as List)
+              .map((item) => InvoiceLine.fromMap(item))
+              .toList(),
+      taxAmount: json['taxAmount'].toDouble(),
+      totalAmount: json['totalAmount'].toDouble(),
+      previousInvoiceHash: json['previousInvoiceHash'],
+      cancellation: InvoiceCancellation.fromMap(json['cancellation']),
     );
   }
 
-  /// Converts the [InvoiceLine] instance to a [Map].
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'quantity': quantity,
-      'unitCode': unitCode,
-      'lineExtensionAmount': lineExtensionAmount,
-      'itemName': itemName,
-      'taxPercent': taxPercent,
-    };
+  @override
+  Map<String, dynamic> toJson() {
+    final json = super.toJson();
+    json['cancellation'] = cancellation.toMap();
+    return json;
   }
 }
 
-/// Represents the cancellation details of an invoice.
-class InvoiceCancellation {
-  /// The reason for the cancellation.
-  final String reason;
+class StandardCreditNoteInvoice extends DBInvoice {
+  StandardCreditNoteInvoice({
+    required super.invoiceNumber,
+    required super.uuid,
+    required super.issueDate,
+    required super.issueTime,
+    required super.currencyCode,
+    required super.taxCurrencyCode,
+    required super.customer,
+    required super.invoiceLines,
+    required super.taxAmount,
+    required super.totalAmount,
+    required super.previousInvoiceHash,
+    required super.cancellation,
+  }) : super(invoiceType: InvoiceType.standardCreditNote);
 
-  /// The canceled serial invoice number.
-  final String canceledSerialInvoiceNumber;
-
-  /// The payment method used.
-  final ZATCAPaymentMethods paymentMethod;
-
-  /// Creates a new [InvoiceCancellation] instance.
-  InvoiceCancellation({
-    required this.reason,
-    required this.canceledSerialInvoiceNumber,
-    required this.paymentMethod,
-  });
-
-  /// Creates an [InvoiceCancellation] instance from a [Map].
-  factory InvoiceCancellation.fromMap(Map<String, dynamic> map) {
-    return InvoiceCancellation(
-      reason: map['reason'] ?? '',
-      canceledSerialInvoiceNumber: map['canceled_serial_invoice_number'] ?? '',
-      paymentMethod: ZATCAPaymentMethods.values[map['payment_method']],
+  factory StandardCreditNoteInvoice.fromJson(Map<String, dynamic> json) {
+    return StandardCreditNoteInvoice(
+      invoiceNumber: json['invoiceNumber'],
+      uuid: json['uuid'],
+      issueDate: json['issueDate'],
+      issueTime: json['issueTime'],
+      currencyCode: json['currencyCode'],
+      taxCurrencyCode: json['taxCurrencyCode'],
+      customer: Customer.fromMap(json['customer']),
+      invoiceLines:
+          (json['invoiceLines'] as List)
+              .map((item) => InvoiceLine.fromMap(item))
+              .toList(),
+      taxAmount: json['taxAmount'].toDouble(),
+      totalAmount: json['totalAmount'].toDouble(),
+      previousInvoiceHash: json['previousInvoiceHash'],
+      cancellation: InvoiceCancellation.fromMap(json['cancellation']),
     );
   }
 
-  /// Converts the [InvoiceCancellation] instance to a [Map].
-  Map<String, dynamic> toMap() {
-    return {
-      'reason': reason,
-      'canceled_serial_invoice_number': canceledSerialInvoiceNumber,
-      'payment_method': paymentMethod.index,
-    };
+  @override
+  Map<String, dynamic> toJson() {
+    final json = super.toJson();
+    json['cancellation'] = cancellation.toMap();
+    return json;
+  }
+}
+
+class SimplifiedDebitNoteInvoice extends DBInvoice {
+  SimplifiedDebitNoteInvoice({
+    required super.invoiceNumber,
+    required super.uuid,
+    required super.issueDate,
+    required super.issueTime,
+    required super.currencyCode,
+    required super.taxCurrencyCode,
+    required super.customer,
+    required super.invoiceLines,
+    required super.taxAmount,
+    required super.totalAmount,
+    required super.previousInvoiceHash,
+    required super.cancellation,
+  }) : super(invoiceType: InvoiceType.simplifiedDebitNote);
+
+  factory SimplifiedDebitNoteInvoice.fromJson(Map<String, dynamic> json) {
+    return SimplifiedDebitNoteInvoice(
+      invoiceNumber: json['invoiceNumber'],
+      uuid: json['uuid'],
+      issueDate: json['issueDate'],
+      issueTime: json['issueTime'],
+      currencyCode: json['currencyCode'],
+      taxCurrencyCode: json['taxCurrencyCode'],
+      customer: Customer.fromMap(json['customer']),
+      invoiceLines:
+          (json['invoiceLines'] as List)
+              .map((item) => InvoiceLine.fromMap(item))
+              .toList(),
+      taxAmount: json['taxAmount'].toDouble(),
+      totalAmount: json['totalAmount'].toDouble(),
+      previousInvoiceHash: json['previousInvoiceHash'],
+      cancellation: InvoiceCancellation.fromMap(json['cancellation']),
+    );
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    final json = super.toJson();
+    json['cancellation'] = cancellation.toMap();
+    return json;
+  }
+}
+
+class StandardDebitNoteInvoice extends DBInvoice {
+  StandardDebitNoteInvoice({
+    required super.invoiceNumber,
+    required super.uuid,
+    required super.issueDate,
+    required super.issueTime,
+    required super.currencyCode,
+    required super.taxCurrencyCode,
+    required super.customer,
+    required super.invoiceLines,
+    required super.taxAmount,
+    required super.totalAmount,
+    required super.previousInvoiceHash,
+    required super.cancellation,
+  }) : super(invoiceType: InvoiceType.standardDebitNote);
+
+  factory StandardDebitNoteInvoice.fromJson(Map<String, dynamic> json) {
+    return StandardDebitNoteInvoice(
+      invoiceNumber: json['invoiceNumber'],
+      uuid: json['uuid'],
+      issueDate: json['issueDate'],
+      issueTime: json['issueTime'],
+      currencyCode: json['currencyCode'],
+      taxCurrencyCode: json['taxCurrencyCode'],
+      customer: Customer.fromMap(json['customer']),
+      invoiceLines:
+          (json['invoiceLines'] as List)
+              .map((item) => InvoiceLine.fromMap(item))
+              .toList(),
+      taxAmount: json['taxAmount'].toDouble(),
+      totalAmount: json['totalAmount'].toDouble(),
+      previousInvoiceHash: json['previousInvoiceHash'],
+      cancellation: InvoiceCancellation.fromMap(json['cancellation']),
+    );
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    final json = super.toJson();
+    json['cancellation'] = cancellation.toMap();
+    return json;
   }
 }

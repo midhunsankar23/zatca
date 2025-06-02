@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:basic_utils/basic_utils.dart';
 import 'dart:convert';
-import 'package:uuid/uuid.dart';
 import 'package:zatca/resources/api/api.dart';
 import 'package:zatca/resources/cirtificate/templates/csr_template.dart';
 import 'package:path_provider/path_provider.dart';
@@ -57,7 +56,7 @@ class CertificateManager {
     // final privateKeyFile = '$dbPath/${Uuid().v4()}.pem';
     // final csrConfigFile = '$dbPath/${Uuid().v4()}.cnf';
 
-    print("privateKeyPem-${privateKeyPem}-");
+    print("privateKeyPem-$privateKeyPem-");
     print("csrProps-${csrProps.toTemplate()}-");
     final appDocDir = await getApplicationDocumentsDirectory();
 

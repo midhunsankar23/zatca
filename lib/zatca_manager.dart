@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'package:intl/intl.dart';
 import 'package:xml/xml.dart';
-import 'package:zatca/models/invo.dart';
+import 'package:zatca/models/invoice.dart';
 import 'package:zatca/models/qr_data.dart';
 import 'package:zatca/resources/cirtificate/certficate_util.dart';
 import 'package:zatca/resources/qr_generator.dart';

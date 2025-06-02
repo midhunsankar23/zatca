@@ -1,3 +1,7 @@
 ## 0.2.4
 
 * Updated dependencies to the latest package versions for improved functionality and compatibility.
+
+## 0.3.0
+
+* Resolved an issue with certificate generation.

@@ -116,26 +116,6 @@ class SignatureUtil {
     return ECPrivateKey(privateKeyNum, domainParams);
   }
 
-  static ECPrivateKey _parseRSAPrivateKeyFromPem(String pem) {
-    final lines = pem
-        .replaceAll('-----BEGIN EC PRIVATE KEY-----', '')
-        .replaceAll('-----END EC PRIVATE KEY-----', '')
-        .replaceAll('\n', '')
-        .replaceAll('\r', '');
-    final keyBytes = base64.decode(lines);
-
-
-    final asn1Parser = ASN1Parser(Uint8List.fromList(keyBytes));
-    final sequence = asn1Parser.nextObject() as ASN1Sequence;
-
-    final privateKeyInt =
-    (sequence.elements[1] as ASN1OctetString).valueBytes();
-    final privateKeyNum = BigInt.parse(hex.encode(privateKeyInt), radix: 16);
-
-    final domainParams = ECDomainParameters('secp256r1');
-
-    return ECPrivateKey(privateKeyNum, domainParams);
-  }
 
 
 
