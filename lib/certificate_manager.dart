@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:uuid/uuid.dart';
 import 'package:zatca/resources/api/api.dart';
 import 'package:zatca/resources/cirtificate/templates/csr_template.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'resources/enums.dart';
 import 'resources/cirtificate/certficate_util.dart';
@@ -51,10 +52,25 @@ class CertificateManager {
     String privateKeyPem,
     CSRConfigProps csrProps,
   ) async {
-    final privateKeyFile =
-        '${Platform.environment['TEMP_FOLDER'] ?? "/tmp/"}${Uuid().v4()}.pem';
-    final csrConfigFile =
-        '${Platform.environment['TEMP_FOLDER'] ?? "/tmp/"}${Uuid().v4()}.cnf';
+    // Directory supDir = await getApplicationSupportDirectory();
+    // String dbPath = supDir.path;
+    // final privateKeyFile = '$dbPath/${Uuid().v4()}.pem';
+    // final csrConfigFile = '$dbPath/${Uuid().v4()}.cnf';
+
+    print("privateKeyPem-${privateKeyPem}-");
+    print("csrProps-${csrProps.toTemplate()}-");
+    final appDocDir = await getApplicationDocumentsDirectory();
+
+    final privateKeyFile = '${appDocDir.path}/private_key.pem';
+    final csrConfigFile = '${appDocDir.path}/csr_config.cnf';
+
+
+    // final privateKeyFile =
+    //     '${Platform.environment['TEMP_FOLDER'] ?? "/tmp/"}${Uuid().v4()}.pem';
+    // final csrConfigFile =
+    //     '${Platform.environment['TEMP_FOLDER'] ?? "/tmp/"}${Uuid().v4()}.cnf';
+
+    print(privateKeyFile);
     try {
       File(privateKeyFile).writeAsStringSync(privateKeyPem);
       File(csrConfigFile).writeAsStringSync(csrProps.toTemplate());
@@ -76,6 +92,11 @@ class CertificateManager {
 
       /// Check for errors
       if (errorOutput.isNotEmpty) {
+        if (errorOutput.contains('Operation not permitted')) {
+          throw Exception(
+            'Permission denied: Unable to execute OpenSSL. Please ensure the application has the necessary permissions to execute external processes.',
+          );
+        }
         throw Exception('OpenSSL error: $errorOutput');
       }
 
@@ -95,9 +116,17 @@ class CertificateManager {
 
       return csr;
     } catch (e) {
+      print("Error during CSR generation: $e");
+
       // Perform cleanup in case of an error
-      File(privateKeyFile).deleteSync();
-      File(csrConfigFile).deleteSync();
+      if (File(privateKeyFile).existsSync()) {
+        File(privateKeyFile).deleteSync();
+      }
+      if (File(csrConfigFile).existsSync()) {
+        File(csrConfigFile).deleteSync();
+      }
+
+      // Rethrow the exception for further handling
       rethrow;
     }
   }

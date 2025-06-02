@@ -48,8 +48,8 @@ void main() {
       csr,
       '123345',
     );
-    // final productionCertificate = await certificateManager
-    //     .issueProductionCertificate(complianceCertificate);
+    final productionCertificate = await certificateManager
+        .issueProductionCertificate(complianceCertificate);
   });
   test('Initialize zatca', () async {
     final zatcaManager = ZatcaManager.instance;
@@ -126,7 +126,7 @@ void main() {
       ublXml: ublXML,
       uuid: egsUnitInfo.uuid,
     );
-    // print("XML: $ublXML");
+    print("XML: $ublXML");
   });
 
   test('Sign Simplified Credit Note', () async {
