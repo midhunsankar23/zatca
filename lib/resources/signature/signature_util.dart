@@ -116,12 +116,6 @@ class SignatureUtil {
     return ECPrivateKey(privateKeyNum, domainParams);
   }
 
-
-
-
-
-
-
   /// Generates a secure random number generator using FortunaRandom.
   ///
   /// Returns a [SecureRandom] instance seeded with a cryptographically secure random value.

@@ -1,4 +1,3 @@
-
 import '../resources/enums.dart';
 
 /// Represents an invoice line item in the invoice.

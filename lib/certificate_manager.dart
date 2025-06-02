@@ -63,7 +63,6 @@ class CertificateManager {
     final privateKeyFile = '${appDocDir.path}/private_key.pem';
     final csrConfigFile = '${appDocDir.path}/csr_config.cnf';
 
-
     // final privateKeyFile =
     //     '${Platform.environment['TEMP_FOLDER'] ?? "/tmp/"}${Uuid().v4()}.pem';
     // final csrConfigFile =
