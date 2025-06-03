@@ -44,8 +44,12 @@ void main() {
     final keyPair = certificateManager.generateKeyPair();
     privateKeyPem = keyPair['privateKeyPem'];
     final csrPop = egsUnitInfo.toCsrProps("solution_name");
-    final path=Platform.environment['TEMP_FOLDER'] ?? "/tmp/";
-    final csr = await certificateManager.generateCSR(privateKeyPem, csrPop,path);
+    final path = Platform.environment['TEMP_FOLDER'] ?? "/tmp/";
+    final csr = await certificateManager.generateCSR(
+      privateKeyPem,
+      csrPop,
+      path,
+    );
 
     complianceCertificate = await certificateManager.issueComplianceCertificate(
       csr,

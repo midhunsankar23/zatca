@@ -31,13 +31,17 @@ class CertificateManager {
   }
 
   /// Generates a CSR (Certificate Signing Request) using the provided private key and CSR configuration properties.
-  Future<String> generateCSR(String privateKeyPem, CSRConfigProps csrProps,String path) {
+  Future<String> generateCSR(
+    String privateKeyPem,
+    CSRConfigProps csrProps,
+    String path,
+  ) {
     /// Check if the platform is desktop (Windows, Linux, or macOS)
     bool isDeskTop = Platform.isWindows || Platform.isLinux || Platform.isMacOS;
 
     /// If the platform is desktop, generate the CSR using OpenSSL
     if (isDeskTop) {
-      return generateCSRInDeskTop(privateKeyPem, csrProps,path);
+      return generateCSRInDeskTop(privateKeyPem, csrProps, path);
     } else {
       /// If the platform is not desktop, throw an exception
       throw Exception(
@@ -50,7 +54,7 @@ class CertificateManager {
   Future<String> generateCSRInDeskTop(
     String privateKeyPem,
     CSRConfigProps csrProps,
-    String path
+    String path,
   ) async {
     // Directory supDir = await getApplicationSupportDirectory();
     // String dbPath = supDir.path;

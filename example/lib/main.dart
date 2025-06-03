@@ -77,7 +77,6 @@ class _HomeState extends State<Home> {
     return Scaffold(
       body: ListView(
         children: [
-
           const SizedBox(height: 40),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -233,7 +232,11 @@ class _HomeState extends State<Home> {
       ///
       final appDocDir = await getApplicationDocumentsDirectory();
       final csrPop = egsUnitInfo.toCsrProps("solution_name");
-      final csr = await certificateManager.generateCSR(privateKeyPem, csrPop,appDocDir.path);
+      final csr = await certificateManager.generateCSR(
+        privateKeyPem,
+        csrPop,
+        appDocDir.path,
+      );
 
       /// Issue a compliance certificate using the CSR.
       final complianceCertificate = await certificateManager
