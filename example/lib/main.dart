@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:zatca/models/address.dart';
 import 'package:zatca/models/customer.dart';
@@ -76,6 +77,8 @@ class _HomeState extends State<Home> {
     return Scaffold(
       body: ListView(
         children: [
+
+          const SizedBox(height: 40),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -116,7 +119,7 @@ class _HomeState extends State<Home> {
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 40),
               ElevatedButton(
                 onPressed: () {
                   generateCertificate();
@@ -124,38 +127,38 @@ class _HomeState extends State<Home> {
                 child: const Text("Generate Certificate"),
               ),
 
+              const SizedBox(height: 10),
               if (privateKeyPem.isNotEmpty)
                 Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(Icons.check_circle, color: Colors.green),
                         SizedBox(width: 5),
-                        Expanded(
-                          child: Text(
-                            'Private Key PEM: $privateKeyPem',
-                            style: Theme.of(context).textTheme.bodyMedium,
-                          ),
+                        Text(
+                          'Private Key Generated',
+                          style: Theme.of(context).textTheme.bodyMedium,
                         ),
                       ],
                     ),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(Icons.check_circle, color: Colors.green),
                         SizedBox(width: 5),
-                        Expanded(
-                          child: Text(
-                            'Compliance Certificate PEM: $complianceCertificatePem]',
-                            style: Theme.of(context).textTheme.bodyMedium,
-                          ),
+                        Text(
+                          'Compliance Certificate Generated',
+                          style: Theme.of(context).textTheme.bodyMedium,
                         ),
                       ],
                     ),
                   ],
                 ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 40),
               ElevatedButton(
                 onPressed: () {
                   initZATCAAndGenerateQr();
@@ -163,6 +166,7 @@ class _HomeState extends State<Home> {
                 child: const Text("init ZATCA And GenerateQr"),
               ),
 
+              const SizedBox(height: 10),
               if (qrData != null && qr.isNotEmpty)
                 Column(
                   children: [
@@ -174,13 +178,15 @@ class _HomeState extends State<Home> {
                   ],
                 ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 40),
               ElevatedButton(
                 onPressed: () {
                   generateReportingXml();
                 },
                 child: const Text("Generate Reporting XML"),
               ),
+
+              const SizedBox(height: 10),
               if (ublXML.isNotEmpty)
                 Column(
                   children: [
@@ -224,8 +230,10 @@ class _HomeState extends State<Home> {
       });
 
       /// Generate a CSR (Certificate Signing Request) using the EGS unit info and private key.
+      ///
+      final appDocDir = await getApplicationDocumentsDirectory();
       final csrPop = egsUnitInfo.toCsrProps("solution_name");
-      final csr = await certificateManager.generateCSR(privateKeyPem, csrPop);
+      final csr = await certificateManager.generateCSR(privateKeyPem, csrPop,appDocDir.path);
 
       /// Issue a compliance certificate using the CSR.
       final complianceCertificate = await certificateManager

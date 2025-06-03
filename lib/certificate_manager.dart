@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'package:basic_utils/basic_utils.dart';
+import 'package:uuid/uuid.dart';
 import 'dart:convert';
 import 'package:zatca/resources/api/api.dart';
 import 'package:zatca/resources/cirtificate/templates/csr_template.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'resources/enums.dart';
 import 'resources/cirtificate/certficate_util.dart';
@@ -31,13 +31,13 @@ class CertificateManager {
   }
 
   /// Generates a CSR (Certificate Signing Request) using the provided private key and CSR configuration properties.
-  Future<String> generateCSR(String privateKeyPem, CSRConfigProps csrProps) {
+  Future<String> generateCSR(String privateKeyPem, CSRConfigProps csrProps,String path) {
     /// Check if the platform is desktop (Windows, Linux, or macOS)
     bool isDeskTop = Platform.isWindows || Platform.isLinux || Platform.isMacOS;
 
     /// If the platform is desktop, generate the CSR using OpenSSL
     if (isDeskTop) {
-      return generateCSRInDeskTop(privateKeyPem, csrProps);
+      return generateCSRInDeskTop(privateKeyPem, csrProps,path);
     } else {
       /// If the platform is not desktop, throw an exception
       throw Exception(
@@ -50,6 +50,7 @@ class CertificateManager {
   Future<String> generateCSRInDeskTop(
     String privateKeyPem,
     CSRConfigProps csrProps,
+    String path
   ) async {
     // Directory supDir = await getApplicationSupportDirectory();
     // String dbPath = supDir.path;
@@ -58,10 +59,9 @@ class CertificateManager {
 
     print("privateKeyPem-$privateKeyPem-");
     print("csrProps-${csrProps.toTemplate()}-");
-    final appDocDir = await getApplicationDocumentsDirectory();
 
-    final privateKeyFile = '${appDocDir.path}/private_key.pem';
-    final csrConfigFile = '${appDocDir.path}/csr_config.cnf';
+    final privateKeyFile = '$path/${Uuid().v4()}.pem';
+    final csrConfigFile = '$path/${Uuid().v4()}.cnf';
 
     // final privateKeyFile =
     //     '${Platform.environment['TEMP_FOLDER'] ?? "/tmp/"}${Uuid().v4()}.pem';

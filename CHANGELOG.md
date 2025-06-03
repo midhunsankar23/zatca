@@ -5,3 +5,7 @@
 ## 0.3.0
 
 * Resolved an issue with certificate generation.
+
+## 0.3.2
+
+* Adding a custom path for the certificate.

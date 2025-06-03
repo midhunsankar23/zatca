@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 import 'package:zatca/models/address.dart';
@@ -42,7 +44,8 @@ void main() {
     final keyPair = certificateManager.generateKeyPair();
     privateKeyPem = keyPair['privateKeyPem'];
     final csrPop = egsUnitInfo.toCsrProps("solution_name");
-    final csr = await certificateManager.generateCSR(privateKeyPem, csrPop);
+    final path=Platform.environment['TEMP_FOLDER'] ?? "/tmp/";
+    final csr = await certificateManager.generateCSR(privateKeyPem, csrPop,path);
 
     complianceCertificate = await certificateManager.issueComplianceCertificate(
       csr,
