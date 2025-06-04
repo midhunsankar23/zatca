@@ -78,20 +78,16 @@ class CertificateManager {
       File(privateKeyFile).writeAsStringSync(privateKeyPem);
       File(csrConfigFile).writeAsStringSync(csrProps.toTemplate());
 
-
       final opensslCheckProcess = await Process.run('openssl', ['version']);
       if (opensslCheckProcess.exitCode == 0) {
         print('OpenSSL is installed: ${opensslCheckProcess.stdout}');
       } else {
-        if(Platform.isWindows) {
+        if (Platform.isWindows) {
           await _installAndSetupOpenSSLInWindows();
-        }
-        else{
-
+        } else {
           throw Exception('Error: no CSR found in OpenSSL output.');
         }
       }
-
 
       /// Execute the OpenSSL command
       final process = await Process.start('openssl', [
@@ -149,43 +145,42 @@ class CertificateManager {
     }
   }
 
-
   Future<void> _installAndSetupOpenSSLInWindows() async {
     try {
-    // Step 1: Download OpenSSL installer
-      final downloadUrl = 'https://slproweb.com/download/Win64OpenSSL-3_1_2.msi';
-      final installerPath = 'C:\\Users\\${Platform.environment['USERNAME']}\\Downloads\\OpenSSLInstaller.msi';
+      // Step 1: Download OpenSSL installer
+      final downloadUrl =
+          'https://slproweb.com/download/Win64OpenSSL-3_1_2.msi';
+      final installerPath =
+          'C:\\Users\\${Platform.environment['USERNAME']}\\Downloads\\OpenSSLInstaller.msi';
 
       print('Downloading OpenSSL installer...');
-      final downloadProcess = await Process.start(
-        'powershell',
-        [
-          '-Command',
-          'Invoke-WebRequest',
-          '-Uri',
-          downloadUrl,
-          '-OutFile',
-          installerPath,
-        ],
-      );
+      final downloadProcess = await Process.start('powershell', [
+        '-Command',
+        'Invoke-WebRequest',
+        '-Uri',
+        downloadUrl,
+        '-OutFile',
+        installerPath,
+      ]);
       await downloadProcess.exitCode;
 
-// Step 2: Install OpenSSL silently
+      // Step 2: Install OpenSSL silently
       print('Installing OpenSSL...');
-      final installProcess = await Process.start(
-        'msiexec',
-        ['/i', installerPath, '/quiet', '/norestart'],
-      );
+      final installProcess = await Process.start('msiexec', [
+        '/i',
+        installerPath,
+        '/quiet',
+        '/norestart',
+      ]);
       await installProcess.exitCode;
 
-// Step 3: Add OpenSSL to PATH
+      // Step 3: Add OpenSSL to PATH
       final openSslBinPath = 'C:\\Program Files\\OpenSSL-Win64\\bin';
       print('Adding OpenSSL to PATH...');
-      final pathUpdateProcess = await Process.start(
-        'setx',
-        ['PATH', '%PATH%;$openSslBinPath'],
-        runInShell: true,
-      );
+      final pathUpdateProcess = await Process.start('setx', [
+        'PATH',
+        '%PATH%;$openSslBinPath',
+      ], runInShell: true);
       await pathUpdateProcess.exitCode;
 
       print('OpenSSL installation and setup completed successfully.');
@@ -193,7 +188,6 @@ class CertificateManager {
       print('Error during OpenSSL installation: $e');
     }
   }
-
 
   /// Issues a compliance certificate using the provided CSR and OTP.
   Future<ZatcaCertificate> issueComplianceCertificate(
