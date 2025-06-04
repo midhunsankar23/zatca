@@ -14,6 +14,6 @@
 
 * Bug fixed: OpenSSL certificate generation now supported on Linux, Windows, and macOS.
 
-## 0.4.0+1
+## 0.4.0+2
 
 * Updated documentation for better clarity and consistency.
