@@ -86,6 +86,10 @@ class CertificateManager {
         if(Platform.isWindows) {
           await _installAndSetupOpenSSLInWindows();
         }
+        else{
+
+          throw Exception('Error: no CSR found in OpenSSL output.');
+        }
       }
 
 
