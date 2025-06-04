@@ -35,9 +35,9 @@ To use this package, add it to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  zatca: ^0.3.9+3
+  zatca: ^0.3.9+4
 ```
 
 ## Example App Screenshot
 
-<img alt="Example App Screenshot" src="https://github.com/sbrsubuvga/zatca/blob/main/assets/example_app.png" width="821" height="798" />
+<img alt="Example App Screenshot" src="https://raw.githubusercontent.com/sbrsubuvga/zatca/refs/heads/main/assets/example_app.png" width="821" height="798" />
