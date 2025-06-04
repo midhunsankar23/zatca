@@ -35,16 +35,17 @@ To use this package, add it to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  zatca: ^0.4.0
+  zatca: ^0.4.0+1
 ```
 
 ## Enabling App Sandbox for macOS
 
 To disable the App Sandbox entitlement for macOS, ensure the following lines in your `.entitlements` file are commented:
 
+```entitlements
 <!-- <key>com.apple.security.app-sandbox</key>
 <true/> -->
-
+```
 
 ## Example App Screenshot
 
