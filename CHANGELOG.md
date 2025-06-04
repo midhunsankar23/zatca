@@ -9,3 +9,7 @@
 ## 0.3.2
 
 * Adding a custom path for the certificate.
+
+## 0.4.0
+
+* Bug fixed: OpenSSL certificate generation now supported on Linux, Windows, and macOS.
