@@ -38,6 +38,14 @@ dependencies:
   zatca: ^0.3.9+4
 ```
 
+## Enabling App Sandbox for macOS
+
+To disable the App Sandbox entitlement for macOS, ensure the following lines in your `.entitlements` file are commented:
+
+<!-- <key>com.apple.security.app-sandbox</key>
+<true/> -->
+
+
 ## Example App Screenshot
 
 <img alt="Example App Screenshot" src="https://raw.githubusercontent.com/sbrsubuvga/zatca/refs/heads/main/assets/example_app.png" width="821" height="798" />
