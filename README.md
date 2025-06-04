@@ -35,6 +35,9 @@ To use this package, add it to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  zatca: ^0.3.2
+  zatca: ^0.3.8
+```
 
-![Example App Screenshot](![img_1.png](img_1.png))
+## Example App Screenshot
+
+<img alt="Example App Screenshot" src="./assets/example_app.png" width="600" height="900" />
