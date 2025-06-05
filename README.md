@@ -19,7 +19,8 @@ For more details, check out our Medium story: [Simplifying ZATCA E-Invoicing in 
 
 ## Features
 
-- ✅ Generate and manage certificates for signing invoices.
+- ✅ Generate certificates for signing invoices (desktop only).
+- ✅ Manage certificates for signing invoices.
 - ✅ Generate ZATCA-compliant QR codes for invoices.
 - ✅ Generate ZATCA-compliant XML codes for invoices.
 - ✅ Create and manage invoice data models.
