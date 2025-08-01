@@ -99,11 +99,14 @@ void main() {
       invoiceLines: [
         InvoiceLine(
           id: '1',
-          quantity: '1',
+          quantity: 1,
           unitCode: 'PCE',
           lineExtensionAmount: 10,
           itemName: 'TEST NAME',
           taxPercent: 15,
+          discounts: [
+            Discount(amount: 1, reason: 'discount')
+          ]
         ),
       ],
       taxAmount: 1.50,
@@ -160,7 +163,7 @@ void main() {
       invoiceLines: [
         InvoiceLine(
           id: '1',
-          quantity: '1',
+          quantity: 1,
           unitCode: 'PCE',
           lineExtensionAmount: 10,
           itemName: 'TEST NAME',
@@ -227,7 +230,7 @@ void main() {
       invoiceLines: [
         InvoiceLine(
           id: '1',
-          quantity: '1',
+          quantity: 1,
           unitCode: 'PCE',
           lineExtensionAmount: 10,
           itemName: 'TEST NAME',
@@ -285,7 +288,7 @@ void main() {
       invoiceLines: [
         InvoiceLine(
           id: '1',
-          quantity: '1',
+          quantity: 1,
           unitCode: 'PCE',
           lineExtensionAmount: 10,
           itemName: 'TEST NAME',

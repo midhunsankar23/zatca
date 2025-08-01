@@ -312,7 +312,7 @@ class _HomeState extends State<Home> {
       invoiceLines: [
         InvoiceLine(
           id: '1',
-          quantity: '1',
+          quantity: 1,
           unitCode: 'PCE',
           lineExtensionAmount: 10,
           itemName: 'TEST NAME',

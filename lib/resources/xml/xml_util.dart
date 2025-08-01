@@ -434,16 +434,14 @@ class XmlUtil {
               builder.element(
                 'cac:TaxTotal',
                 nest: () {
-                  double taxAmount =
-                      (line.lineExtensionAmount * line.taxPercent / 100);
                   builder.element(
                     'cbc:TaxAmount',
                     nest: () {
                       builder.attribute('currencyID', 'SAR');
-                      builder.text(taxAmount.toStringAsFixed(2));
+                      builder.text(line.taxAmount.toStringAsFixed(2));
                     },
                   );
-                  double roundingAmount = line.lineExtensionAmount + taxAmount;
+                  double roundingAmount = line.roundingAmount;
                   builder.element(
                     'cbc:RoundingAmount',
                     nest: () {
@@ -483,8 +481,31 @@ class XmlUtil {
                     nest: () {
                       builder.attribute('currencyID', 'SAR');
                       builder.text(
-                        line.lineExtensionAmount.toStringAsFixed(14),
+                        line.taxExclusiveDiscountAppliedPrice.toStringAsFixed(14),
                       );
+                    },
+                  );
+                  builder.element(
+                    'cac:AllowanceCharge',
+                    nest: () {
+                      for (var discount in line.discounts) {
+                        builder.element('cbc:ChargeIndicator', nest: 'false');
+                        builder.element('cbc:AllowanceChargeReason', nest: discount.reason);
+                        builder.element(
+                          'cbc:Amount',
+                          nest: () {
+                            builder.attribute('currencyID', 'SAR');
+                            builder.text(discount.amount.toStringAsFixed(14));
+                          },
+                        );
+                        builder.element(
+                          'cbc:BaseAmount',
+                          nest: () {
+                            builder.attribute('currencyID', 'SAR');
+                            builder.text(line.taxExclusivePrice.toString());
+                          },
+                        );
+                      }
                     },
                   );
                 },
