@@ -504,6 +504,7 @@ class XmlUtil {
                               builder.text(discount.amount.toStringAsFixed(14));
                             },
                           );
+
                           /// Required when the discount is a percentage.
                           // builder.element(
                           //   'cbc:BaseAmount',
