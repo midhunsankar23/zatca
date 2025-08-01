@@ -487,7 +487,7 @@ class XmlUtil {
                       );
                     },
                   );
-                  if(line.discounts.isNotEmpty) {
+                  if (line.discounts.isNotEmpty) {
                     builder.element(
                       'cac:AllowanceCharge',
                       nest: () {
