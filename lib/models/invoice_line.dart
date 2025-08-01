@@ -13,25 +13,29 @@ class InvoiceLine {
   final List<Discount> discounts;
 
   /// Creates a new [InvoiceLine] instance.
-InvoiceLine({
-  required this.id,
-  required this.quantity,
-  required this.unitCode,
-  required this.lineExtensionAmount,
-  required this.itemName,
-  required this.taxPercent,
-  this.discounts = const [],
-});
+  InvoiceLine({
+    required this.id,
+    required this.quantity,
+    required this.unitCode,
+    required this.lineExtensionAmount,
+    required this.itemName,
+    required this.taxPercent,
+    this.discounts = const [],
+  });
+
   /// Creates an [InvoiceLine] instance from a [Map].
   factory InvoiceLine.fromMap(Map<String, dynamic> map) {
     return InvoiceLine(
       id: map['id'] ?? '',
-      quantity: double.tryParse((map['quantity'] ?? '0').toString())??0,
+      quantity: double.tryParse((map['quantity'] ?? '0').toString()) ?? 0,
       unitCode: map['unitCode'] ?? '',
       lineExtensionAmount: map['lineExtensionAmount'] ?? '',
       itemName: map['itemName'] ?? '',
       taxPercent: map['taxPercent'] ?? '',
-      discounts: (map['discounts']??[]).map((discount) => Discount.fromMap(discount)).toList(),
+      discounts:
+          (map['discounts'] ?? [])
+              .map((discount) => Discount.fromMap(discount))
+              .toList(),
     );
   }
 
@@ -47,10 +51,13 @@ InvoiceLine({
       'discounts': discounts.map((discount) => discount.toMap()).toList(),
     };
   }
-  double get taxAmount=>(lineExtensionAmount*taxPercent/100);
-  double get taxExclusivePrice=>(lineExtensionAmount/quantity)+discounts.totalAmount;
-  double get taxExclusiveDiscountAppliedPrice=>(lineExtensionAmount/quantity);
-  double get roundingAmount=>lineExtensionAmount+taxAmount;
+
+  double get taxAmount => (lineExtensionAmount * taxPercent / 100);
+  double get taxExclusivePrice =>
+      (lineExtensionAmount / quantity) + discounts.totalAmount;
+  double get taxExclusiveDiscountAppliedPrice =>
+      (lineExtensionAmount / quantity);
+  double get roundingAmount => lineExtensionAmount + taxAmount;
 }
 
 /// Represents the cancellation details of an invoice.
@@ -99,10 +106,7 @@ class Discount {
   final String reason;
 
   /// Creates a new [Discount] instance.
-  Discount({
-    required this.amount,
-    required this.reason,
-  });
+  Discount({required this.amount, required this.reason});
 
   /// Creates a [Discount] instance from a [Map].
   factory Discount.fromMap(Map<String, dynamic> map) {
@@ -114,9 +118,6 @@ class Discount {
 
   /// Converts the [Discount] instance to a [Map].
   Map<String, dynamic> toMap() {
-    return {
-      'amount': amount,
-      'reason': reason,
-    };
+    return {'amount': amount, 'reason': reason};
   }
 }

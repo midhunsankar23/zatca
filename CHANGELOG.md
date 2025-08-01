@@ -1,19 +1,26 @@
-## 0.2.4
+# Changelog
 
-* Updated dependencies to the latest package versions for improved functionality and compatibility.
+## 0.4.1
 
-## 0.3.0
+* Added support for item discounts.
 
-* Resolved an issue with certificate generation.
+## 0.4.0+3
 
-## 0.3.2
-
-* Adding a custom path for the certificate.
+* Updated documentation for better clarity and consistency.
 
 ## 0.4.0
 
 * Bug fixed: OpenSSL certificate generation now supported on Linux, Windows, and macOS.
 
-## 0.4.0+3
+## 0.3.2
 
-* Updated documentation for better clarity and consistency.
+* Adding a custom path for the certificate.
+
+## 0.3.0
+
+* Resolved an issue with certificate generation.
+
+## 0.2.4
+
+* Updated dependencies to the latest package versions for improved functionality and compatibility.
+

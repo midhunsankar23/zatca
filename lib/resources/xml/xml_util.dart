@@ -481,7 +481,9 @@ class XmlUtil {
                     nest: () {
                       builder.attribute('currencyID', 'SAR');
                       builder.text(
-                        line.taxExclusiveDiscountAppliedPrice.toStringAsFixed(14),
+                        line.taxExclusiveDiscountAppliedPrice.toStringAsFixed(
+                          14,
+                        ),
                       );
                     },
                   );
@@ -490,7 +492,10 @@ class XmlUtil {
                     nest: () {
                       for (var discount in line.discounts) {
                         builder.element('cbc:ChargeIndicator', nest: 'false');
-                        builder.element('cbc:AllowanceChargeReason', nest: discount.reason);
+                        builder.element(
+                          'cbc:AllowanceChargeReason',
+                          nest: discount.reason,
+                        );
                         builder.element(
                           'cbc:Amount',
                           nest: () {

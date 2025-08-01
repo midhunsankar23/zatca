@@ -36,7 +36,7 @@ To use this package, add it to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  zatca: ^0.4.0+3
+  zatca: ^0.4.1
 ```
 
 ## Enabling App Sandbox for macOS
