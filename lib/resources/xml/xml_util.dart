@@ -487,32 +487,34 @@ class XmlUtil {
                       );
                     },
                   );
-                  builder.element(
-                    'cac:AllowanceCharge',
-                    nest: () {
-                      for (var discount in line.discounts) {
-                        builder.element('cbc:ChargeIndicator', nest: 'false');
-                        builder.element(
-                          'cbc:AllowanceChargeReason',
-                          nest: discount.reason,
-                        );
-                        builder.element(
-                          'cbc:Amount',
-                          nest: () {
-                            builder.attribute('currencyID', 'SAR');
-                            builder.text(discount.amount.toStringAsFixed(14));
-                          },
-                        );
-                        builder.element(
-                          'cbc:BaseAmount',
-                          nest: () {
-                            builder.attribute('currencyID', 'SAR');
-                            builder.text(line.taxExclusivePrice.toString());
-                          },
-                        );
-                      }
-                    },
-                  );
+                  if(line.discounts.isNotEmpty) {
+                    builder.element(
+                      'cac:AllowanceCharge',
+                      nest: () {
+                        for (var discount in line.discounts) {
+                          builder.element('cbc:ChargeIndicator', nest: 'false');
+                          builder.element(
+                            'cbc:AllowanceChargeReason',
+                            nest: discount.reason,
+                          );
+                          builder.element(
+                            'cbc:Amount',
+                            nest: () {
+                              builder.attribute('currencyID', 'SAR');
+                              builder.text(discount.amount.toStringAsFixed(14));
+                            },
+                          );
+                          builder.element(
+                            'cbc:BaseAmount',
+                            nest: () {
+                              builder.attribute('currencyID', 'SAR');
+                              builder.text(line.taxExclusivePrice.toString());
+                            },
+                          );
+                        }
+                      },
+                    );
+                  }
                 },
               );
             },

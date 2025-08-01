@@ -99,7 +99,7 @@ void main() {
       invoiceLines: [
         InvoiceLine(
           id: '1',
-          quantity: 1,
+          quantity: 2,
           unitCode: 'PCE',
           lineExtensionAmount: 10,
           itemName: 'TEST NAME',
@@ -118,7 +118,7 @@ void main() {
     String invoiceXmlString = qrData.xmlString;
     String qr = zatcaManager.getQrString(qrData);
 
-    // print("qr: $qr");
+    print("qr: $qr");
     String ublXML = zatcaManager.generateUBLXml(
       invoiceHash: invoiceHash,
       signingTime:
@@ -128,7 +128,8 @@ void main() {
       qrString: qr,
     );
 
-    print("XML: $ublXML");
+    // print("XML: $ublXML");
+
     final certificateManager = CertificateManager.instance;
     await certificateManager.checkInvoiceCompliance(
       complianceCertificate: complianceCertificate,
