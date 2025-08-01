@@ -504,13 +504,14 @@ class XmlUtil {
                               builder.text(discount.amount.toStringAsFixed(14));
                             },
                           );
-                          builder.element(
-                            'cbc:BaseAmount',
-                            nest: () {
-                              builder.attribute('currencyID', 'SAR');
-                              builder.text(line.taxExclusivePrice.toString());
-                            },
-                          );
+                          /// Required when the discount is a percentage.
+                          // builder.element(
+                          //   'cbc:BaseAmount',
+                          //   nest: () {
+                          //     builder.attribute('currencyID', 'SAR');
+                          //     builder.text(line.taxExclusivePrice.toString());
+                          //   },
+                          // );
                         }
                       },
                     );
