@@ -208,13 +208,13 @@ void main() {
 
   test('Sign Standard Invoice', () async {
     final zatcaManager = ZatcaManager.instance;
-
+    final invoiceDate = DateTime.now().subtract(Duration(hours: 5));
     final invoice = StandardInvoice(
       invoiceNumber: "EGS1-886431145-104",
       uuid: egsUnitInfo.uuid,
-      issueDate: "2024-02-29",
-      issueTime: "11:40:40",
-      actualDeliveryDate: "2024-02-29",
+      issueDate: DateFormat('yyyy-MM-dd').format(invoiceDate),
+      issueTime: DateFormat('HH:mm:ss').format(invoiceDate),
+      actualDeliveryDate: DateFormat('yyyy-MM-dd').format(invoiceDate),
       currencyCode: 'SAR',
       taxCurrencyCode: 'SAR',
       customer: Customer(
@@ -267,12 +267,12 @@ void main() {
 
   test('Sign Standard Credit Note', () async {
     final zatcaManager = ZatcaManager.instance;
-
+    final invoiceDate = DateTime.now().subtract(Duration(hours: 5));
     final invoice = StandardCreditNoteInvoice(
       invoiceNumber: "EGS1-886431145-105",
       uuid: egsUnitInfo.uuid,
-      issueDate: "2024-02-29",
-      issueTime: "11:40:40",
+      issueDate: DateFormat('yyyy-MM-dd').format(invoiceDate),
+      issueTime: DateFormat('HH:mm:ss').format(invoiceDate),
       currencyCode: 'SAR',
       taxCurrencyCode: 'SAR',
       customer: Customer(
