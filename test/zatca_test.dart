@@ -138,192 +138,193 @@ void main() {
       uuid: egsUnitInfo.uuid,
     );
   });
-  //
-  // test('Sign Simplified Credit Note', () async {
-  //   final zatcaManager = ZatcaManager.instance;
-  //
-  //   final invoice = SimplifiedCreditNoteInvoice(
-  //     invoiceNumber: "EGS1-886431145-102",
-  //     uuid: egsUnitInfo.uuid,
-  //     issueDate: "2025-05-26",
-  //     issueTime: "11:40:40",
-  //     currencyCode: 'SAR',
-  //     taxCurrencyCode: 'SAR',
-  //     customer: Customer(
-  //       companyID: '300000000000003',
-  //       registrationName: 'S7S',
-  //       address: Address(
-  //         street: '__',
-  //         building: '00',
-  //         citySubdivision: 'ssss',
-  //         city: 'jeddah',
-  //         postalZone: '00000',
-  //       ),
-  //     ),
-  //     invoiceLines: [
-  //       InvoiceLine(
-  //         id: '1',
-  //         quantity: 1,
-  //         unitCode: 'PCE',
-  //         lineExtensionAmount: 10,
-  //         itemName: 'TEST NAME',
-  //         taxPercent: 15,
-  //       ),
-  //     ],
-  //     taxAmount: 1.50,
-  //     totalAmount: 11.50,
-  //     previousInvoiceHash: "zDnQnE05P6rFMqF1ai21V5hIRlUq/EXvrpsaoPkWRVI=",
-  //     cancellation: InvoiceCancellation(
-  //       reason: "Customer requested cancellation",
-  //       canceledSerialInvoiceNumber: 'EGS1-886431145-101',
-  //       paymentMethod: ZATCAPaymentMethods.cash,
-  //     ),
-  //   );
-  //
-  //   final qrData = zatcaManager.generateZatcaQrInit(invoice: invoice);
-  //
-  //   String invoiceHash = qrData.invoiceHash;
-  //   String invoiceXmlString = qrData.xmlString;
-  //   String qr = zatcaManager.getQrString(qrData);
-  //
-  //   // print("qr: $qr");
-  //   String ublXML = zatcaManager.generateUBLXml(
-  //     invoiceHash: invoiceHash,
-  //     signingTime:
-  //         "${DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateTime.now())}Z",
-  //     digitalSignature: qrData.digitalSignature,
-  //     invoiceXmlString: invoiceXmlString,
-  //     qrString: qr,
-  //   );
-  //   final certificateManager = CertificateManager.instance;
-  //   await certificateManager.checkInvoiceCompliance(
-  //     complianceCertificate: complianceCertificate,
-  //     invoiceHash: invoiceHash,
-  //     ublXml: ublXML,
-  //     uuid: egsUnitInfo.uuid,
-  //   );
-  //   // print("XML: $ublXML");
-  // });
-  //
-  // test('Sign Standard Invoice', () async {
-  //   final zatcaManager = ZatcaManager.instance;
-  //
-  //   final invoice = StandardInvoice(
-  //     invoiceNumber: "EGS1-886431145-104",
-  //     uuid: egsUnitInfo.uuid,
-  //     issueDate: "2024-02-29",
-  //     issueTime: "11:40:40",
-  //     actualDeliveryDate: "2024-02-29",
-  //     currencyCode: 'SAR',
-  //     taxCurrencyCode: 'SAR',
-  //     customer: Customer(
-  //       companyID: '300000000000003',
-  //       registrationName: 'S7S',
-  //       address: Address(
-  //         street: '__',
-  //         building: '00',
-  //         citySubdivision: 'ssss',
-  //         city: 'jeddah',
-  //         postalZone: '00000',
-  //       ),
-  //     ),
-  //     invoiceLines: [
-  //       InvoiceLine(
-  //         id: '1',
-  //         quantity: 1,
-  //         unitCode: 'PCE',
-  //         lineExtensionAmount: 10,
-  //         itemName: 'TEST NAME',
-  //         taxPercent: 15,
-  //       ),
-  //     ],
-  //     taxAmount: 1.50,
-  //     totalAmount: 11.50,
-  //     previousInvoiceHash: "zDnQnE05P6rFMqF1ai21V5hIRlUq/EXvrpsaoPkWRVI=",
-  //   );
-  //
-  //   final qrData = zatcaManager.generateZatcaQrInit(invoice: invoice);
-  //
-  //   String invoiceHash = qrData.invoiceHash;
-  //   String invoiceXmlString = qrData.xmlString;
-  //   String qr = zatcaManager.getQrString(qrData);
-  //   String ublXML = zatcaManager.generateUBLXml(
-  //     invoiceHash: invoiceHash,
-  //     signingTime:
-  //         "${DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateTime.now())}Z",
-  //     digitalSignature: qrData.digitalSignature,
-  //     invoiceXmlString: invoiceXmlString,
-  //     qrString: qr,
-  //   );
-  //   final certificateManager = CertificateManager.instance;
-  //   await certificateManager.checkInvoiceCompliance(
-  //     complianceCertificate: complianceCertificate,
-  //     invoiceHash: invoiceHash,
-  //     ublXml: ublXML,
-  //     uuid: egsUnitInfo.uuid,
-  //   );
-  // });
-  //
-  // test('Sign Standard Credit Note', () async {
-  //   final zatcaManager = ZatcaManager.instance;
-  //
-  //   final invoice = StandardCreditNoteInvoice(
-  //     invoiceNumber: "EGS1-886431145-105",
-  //     uuid: egsUnitInfo.uuid,
-  //     issueDate: "2024-02-29",
-  //     issueTime: "11:40:40",
-  //     currencyCode: 'SAR',
-  //     taxCurrencyCode: 'SAR',
-  //     customer: Customer(
-  //       companyID: '300000000000003',
-  //       registrationName: 'S7S',
-  //       address: Address(
-  //         street: '__',
-  //         building: '00',
-  //         citySubdivision: 'ssss',
-  //         city: 'jeddah',
-  //         postalZone: '00000',
-  //       ),
-  //     ),
-  //     invoiceLines: [
-  //       InvoiceLine(
-  //         id: '1',
-  //         quantity: 1,
-  //         unitCode: 'PCE',
-  //         lineExtensionAmount: 10,
-  //         itemName: 'TEST NAME',
-  //         taxPercent: 15,
-  //       ),
-  //     ],
-  //     taxAmount: 1.50,
-  //     totalAmount: 11.50,
-  //     previousInvoiceHash: "zDnQnE05P6rFMqF1ai21V5hIRlUq/EXvrpsaoPkWRVI=",
-  //     cancellation: InvoiceCancellation(
-  //       reason: "Customer requested cancellation",
-  //       canceledSerialInvoiceNumber: 'EGS1-886431145-104',
-  //       paymentMethod: ZATCAPaymentMethods.cash,
-  //     ),
-  //   );
-  //
-  //   final qrData = zatcaManager.generateZatcaQrInit(invoice: invoice);
-  //
-  //   String invoiceHash = qrData.invoiceHash;
-  //   String invoiceXmlString = qrData.xmlString;
-  //   String qr = zatcaManager.getQrString(qrData);
-  //   String ublXML = zatcaManager.generateUBLXml(
-  //     invoiceHash: invoiceHash,
-  //     signingTime:
-  //         "${DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateTime.now())}Z",
-  //     digitalSignature: qrData.digitalSignature,
-  //     invoiceXmlString: invoiceXmlString,
-  //     qrString: qr,
-  //   );
-  //   final certificateManager = CertificateManager.instance;
-  //   await certificateManager.checkInvoiceCompliance(
-  //     complianceCertificate: complianceCertificate,
-  //     invoiceHash: invoiceHash,
-  //     ublXml: ublXML,
-  //     uuid: egsUnitInfo.uuid,
-  //   );
-  // });
+
+  test('Sign Simplified Credit Note', () async {
+    final zatcaManager = ZatcaManager.instance;
+    final invoiceDate = DateTime.now().subtract(Duration(hours: 5));
+    final invoice = SimplifiedCreditNoteInvoice(
+      invoiceNumber: "EGS1-886431145-102",
+      uuid: egsUnitInfo.uuid,
+      issueDate: DateFormat('yyyy-MM-dd').format(invoiceDate),
+      issueTime: DateFormat('HH:mm:ss').format(invoiceDate),
+      currencyCode: 'SAR',
+      taxCurrencyCode: 'SAR',
+      customer: Customer(
+        companyID: '300000000000003',
+        registrationName: 'S7S',
+        address: Address(
+          street: '__',
+          building: '00',
+          citySubdivision: 'ssss',
+          city: 'jeddah',
+          postalZone: '00000',
+        ),
+      ),
+      invoiceLines: [
+        InvoiceLine(
+          id: '1',
+          quantity: 1,
+          unitCode: 'PCE',
+          lineExtensionAmount: 10,
+          itemName: 'TEST NAME',
+          taxPercent: 15,
+          discounts: [Discount(amount: 2, reason: 'discount')],
+        ),
+      ],
+      taxAmount: 1.50,
+      totalAmount: 11.50,
+      previousInvoiceHash: "zDnQnE05P6rFMqF1ai21V5hIRlUq/EXvrpsaoPkWRVI=",
+      cancellation: InvoiceCancellation(
+        reason: "Customer requested cancellation",
+        canceledSerialInvoiceNumber: 'EGS1-886431145-101',
+        paymentMethod: ZATCAPaymentMethods.cash,
+      ),
+    );
+
+    final qrData = zatcaManager.generateZatcaQrInit(invoice: invoice);
+
+    String invoiceHash = qrData.invoiceHash;
+    String invoiceXmlString = qrData.xmlString;
+    String qr = zatcaManager.getQrString(qrData);
+
+    // print("qr: $qr");
+    String ublXML = zatcaManager.generateUBLXml(
+      invoiceHash: invoiceHash,
+      signingTime:
+          "${DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateTime.now())}Z",
+      digitalSignature: qrData.digitalSignature,
+      invoiceXmlString: invoiceXmlString,
+      qrString: qr,
+    );
+    final certificateManager = CertificateManager.instance;
+    await certificateManager.checkInvoiceCompliance(
+      complianceCertificate: complianceCertificate,
+      invoiceHash: invoiceHash,
+      ublXml: ublXML,
+      uuid: egsUnitInfo.uuid,
+    );
+    // print("XML: $ublXML");
+  });
+
+  test('Sign Standard Invoice', () async {
+    final zatcaManager = ZatcaManager.instance;
+
+    final invoice = StandardInvoice(
+      invoiceNumber: "EGS1-886431145-104",
+      uuid: egsUnitInfo.uuid,
+      issueDate: "2024-02-29",
+      issueTime: "11:40:40",
+      actualDeliveryDate: "2024-02-29",
+      currencyCode: 'SAR',
+      taxCurrencyCode: 'SAR',
+      customer: Customer(
+        companyID: '300000000000003',
+        registrationName: 'S7S',
+        address: Address(
+          street: '__',
+          building: '00',
+          citySubdivision: 'ssss',
+          city: 'jeddah',
+          postalZone: '00000',
+        ),
+      ),
+      invoiceLines: [
+        InvoiceLine(
+          id: '1',
+          quantity: 1,
+          unitCode: 'PCE',
+          lineExtensionAmount: 10,
+          itemName: 'TEST NAME',
+          taxPercent: 15,
+        ),
+      ],
+      taxAmount: 1.50,
+      totalAmount: 11.50,
+      previousInvoiceHash: "zDnQnE05P6rFMqF1ai21V5hIRlUq/EXvrpsaoPkWRVI=",
+    );
+
+    final qrData = zatcaManager.generateZatcaQrInit(invoice: invoice);
+
+    String invoiceHash = qrData.invoiceHash;
+    String invoiceXmlString = qrData.xmlString;
+    String qr = zatcaManager.getQrString(qrData);
+    String ublXML = zatcaManager.generateUBLXml(
+      invoiceHash: invoiceHash,
+      signingTime:
+          "${DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateTime.now())}Z",
+      digitalSignature: qrData.digitalSignature,
+      invoiceXmlString: invoiceXmlString,
+      qrString: qr,
+    );
+    final certificateManager = CertificateManager.instance;
+    await certificateManager.checkInvoiceCompliance(
+      complianceCertificate: complianceCertificate,
+      invoiceHash: invoiceHash,
+      ublXml: ublXML,
+      uuid: egsUnitInfo.uuid,
+    );
+  });
+
+  test('Sign Standard Credit Note', () async {
+    final zatcaManager = ZatcaManager.instance;
+
+    final invoice = StandardCreditNoteInvoice(
+      invoiceNumber: "EGS1-886431145-105",
+      uuid: egsUnitInfo.uuid,
+      issueDate: "2024-02-29",
+      issueTime: "11:40:40",
+      currencyCode: 'SAR',
+      taxCurrencyCode: 'SAR',
+      customer: Customer(
+        companyID: '300000000000003',
+        registrationName: 'S7S',
+        address: Address(
+          street: '__',
+          building: '00',
+          citySubdivision: 'ssss',
+          city: 'jeddah',
+          postalZone: '00000',
+        ),
+      ),
+      invoiceLines: [
+        InvoiceLine(
+          id: '1',
+          quantity: 1,
+          unitCode: 'PCE',
+          lineExtensionAmount: 10,
+          itemName: 'TEST NAME',
+          taxPercent: 15,
+        ),
+      ],
+      taxAmount: 1.50,
+      totalAmount: 11.50,
+      previousInvoiceHash: "zDnQnE05P6rFMqF1ai21V5hIRlUq/EXvrpsaoPkWRVI=",
+      cancellation: InvoiceCancellation(
+        reason: "Customer requested cancellation",
+        canceledSerialInvoiceNumber: 'EGS1-886431145-104',
+        paymentMethod: ZATCAPaymentMethods.cash,
+      ),
+    );
+
+    final qrData = zatcaManager.generateZatcaQrInit(invoice: invoice);
+
+    String invoiceHash = qrData.invoiceHash;
+    String invoiceXmlString = qrData.xmlString;
+    String qr = zatcaManager.getQrString(qrData);
+    String ublXML = zatcaManager.generateUBLXml(
+      invoiceHash: invoiceHash,
+      signingTime:
+          "${DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateTime.now())}Z",
+      digitalSignature: qrData.digitalSignature,
+      invoiceXmlString: invoiceXmlString,
+      qrString: qr,
+    );
+    final certificateManager = CertificateManager.instance;
+    await certificateManager.checkInvoiceCompliance(
+      complianceCertificate: complianceCertificate,
+      invoiceHash: invoiceHash,
+      ublXml: ublXML,
+      uuid: egsUnitInfo.uuid,
+    );
+  });
 }
