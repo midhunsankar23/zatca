@@ -168,7 +168,7 @@ void main() {
           lineExtensionAmount: 10,
           itemName: 'TEST NAME',
           taxPercent: 15,
-          discounts: [Discount(amount: 2, reason: 'discount')],
+          discounts: [Discount(amount: 2, reason: "Return Discount")],
         ),
       ],
       taxAmount: 1.50,
