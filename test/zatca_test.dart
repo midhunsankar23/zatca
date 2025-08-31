@@ -8,11 +8,15 @@ import 'package:zatca/models/customer.dart';
 import 'package:zatca/models/egs_unit.dart';
 import 'package:zatca/models/invoice.dart';
 import 'package:zatca/models/invoice_line.dart';
+
 import 'package:zatca/models/supplier.dart';
 import 'package:zatca/certificate_manager.dart';
 import 'package:zatca/resources/enums.dart';
 
 import 'package:zatca/zatca_manager.dart';
+
+// Debug flag to enable writing XMLs to files
+const bool DEBUG_WRITE_XML = true;
 
 void main() {
   late EGSUnitInfo egsUnitInfo;
@@ -130,6 +134,13 @@ void main() {
 
     // print("XML: $ublXML");
 
+    // Write XML to file if debug is enabled
+    if (DEBUG_WRITE_XML) {
+      final file = File('simplified_invoice.xml');
+      await file.writeAsString(ublXML);
+      print('XML written to: ${file.absolute.path}');
+    }
+
     final certificateManager = CertificateManager.instance;
     await certificateManager.checkInvoiceCompliance(
       complianceCertificate: complianceCertificate,
@@ -196,6 +207,13 @@ void main() {
       invoiceXmlString: invoiceXmlString,
       qrString: qr,
     );
+    // Write XML to file if debug is enabled
+    if (DEBUG_WRITE_XML) {
+      final file = File('simplified_credit_note.xml');
+      await file.writeAsString(ublXML);
+      print('XML written to: ${file.absolute.path}');
+    }
+
     final certificateManager = CertificateManager.instance;
     await certificateManager.checkInvoiceCompliance(
       complianceCertificate: complianceCertificate,
